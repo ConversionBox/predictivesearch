@@ -436,6 +436,8 @@ class ProductDataProcessor
             }
             $spAmount = $product->getSpecialPrice();
             $spPrice = ($spAmount)?$this->priceHelper->currency($spAmount, true, false):'';
+
+            if($product->getStatus() == 1 && ($stockStatus == 1 || $stockStatus == true)){
             $response = [
                 'id' => $product->getId(),
                 'product_id' => $product->getId(),
@@ -466,6 +468,7 @@ class ProductDataProcessor
                 'short_description' => $this->removeHtmlTags($product->getShortDescription()),
                 'price_search' => round((float)$price, 2),
             ];
+            }
             $productArray = array_merge($finalAtrArray, $response);
             return $productArray;
         }

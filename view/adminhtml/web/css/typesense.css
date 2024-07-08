@@ -1,0 +1,25 @@
+.accordion  #row_typesense_search_result_instant_search_result_search_filters{
+    .value{
+        width: 63%;
+    }
+}
+
+.type_support_section h2 {
+    clear: both;
+    color: #303030 !important;
+    display: block;
+    font-size: 1.7rem;
+    font-weight: 600 !important;
+    letter-spacing: .025em;
+    padding:1.9rem 2.8rem 0rem 0;
+    position: relative;
+    text-decoration: none;
+    transition: color .15s linear;
+}
+.type_support_section a {
+    margin: 8px 0 0;
+    display: inline-block !important;
+    font-size: 14px;
+    border: 1px solid;
+    padding: 5px 15px;
+}

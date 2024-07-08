@@ -1,0 +1,297 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../Magento/Config/etc/system_file.xsd">
+    <system>
+        <tab id="typesense" translate="label" sortOrder="991" class="thecommerceshop">
+            <label>Thecommerceshop</label>
+        </tab>
+        <section id="typesense_general" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+            <class>separator-top</class>
+            <label>Credential and Basic Setup</label>
+            <tab>typesense</tab>
+            <resource>Thecommerceshop_Predictivesearch::config_typesense</resource>
+            <group id="credentials" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>General Configuration</label>
+                <field id="enable_frontend" translate="label comment" type="select" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Search</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="host" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Host</label>
+                                     <comment><![CDATA[ You can find your API keys in the <a href="https://app.conversionbox.io/auth/login" target="_blank">ConversionBox dashboard</a>. ]]></comment>
+                    <depends>
+                        <field id="enable_frontend">1</field>
+                    </depends>
+                    <validate>required-entry</validate>
+                </field>
+
+                   <field id="node" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Node</label>
+                    <depends>
+                        <field id="enable_frontend">1</field>
+                    </depends>
+                    <validate>required-entry</validate>
+                    <comment><![CDATA[ You can find your API keys in the <a href="https://app.conversionbox.io/auth/login" target="_blank">ConversionBox dashboard</a>. ]]></comment>
+                </field>
+                <field id="search_only_api_key" translate="label" type="password" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Search-only (public) API key</label>
+                    <depends>
+                        <field id="enable_frontend">1</field>
+                    </depends>
+                    <validate>required-entry</validate>
+                    <comment><![CDATA[ You can find your API keys in the <a href="https://app.conversionbox.io/auth/login" target="_blank">ConversionBox dashboard</a>. ]]></comment>
+                </field>
+                <field id="admin_api_key" translate="label" type="password" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Admin API key</label>
+                    <depends>
+                        <field id="enable_frontend">1</field>
+                    </depends>
+                    <validate>required-entry</validate>
+                    <comment><![CDATA[ You can find your API keys in the <a href="https://app.conversionbox.io/auth/login" target="_blank">ConversionBox dashboard</a>. ]]></comment>
+                </field>
+                <field id="index_prefix" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Index Name Prefix</label>
+                    <depends>
+                        <field id="enable_frontend">1</field>
+                    </depends>
+                    <validate>required-entry</validate>
+                </field>
+                <field id="protocol" translate="label" type="select"  sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Protocol</label>
+                       <source_model>Thecommerceshop\Predictivesearch\Model\Source\Port</source_model>
+                    <depends>
+                        <field id="enable_frontend">1</field>
+                    </depends>
+                    <validate>required-entry</validate>
+                </field>
+                <field id="port" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Port</label>
+                    <depends>
+                        <field id="enable_frontend">1</field>
+                    </depends>
+                    <validate>required-entry</validate>
+                </field>
+                   <field id="debug" translate="label comment" type="select" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Logging</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="highlights" translate="label comment" type="select" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Highlights</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="unique_id" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Unique ID</label>
+                    <depends>
+                        <field id="enable_frontend">1</field>
+                    </depends>
+                </field>
+            </group>
+        </section>
+        <section id="typesense_search_result" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+            <class>separator-top</class>
+            <label>Instant Search Result Page</label>
+            <tab>typesense</tab>
+            <resource>Thecommerceshop_Predictivesearch::config_typesense</resource>
+            <group id="instant_search_result" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>General Configuration</label>
+                <field id="enable_result_page" translate="label comment" type="select" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Search Instant Search page</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="page_per_product" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Number of Product Per Page</label>
+                    <depends>
+                        <field id="enable_result_page">1</field>
+                    </depends>
+                </field>
+                <field id="search_filters" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Search Filters</label>
+                    <frontend_model>Thecommerceshop\Predictivesearch\Block\Adminhtml\Form\Field\FilterAttributes</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                     <depends>
+                        <field id="enable_result_page">1</field>
+                    </depends>
+                    <comment>
+                        <![CDATA[
+                            Specify the filtering options you want to offer on a search results page.<br>
+                                &nbsp; - Disjunctive allows a selection of different values per facet (e.g. hotels with 4 OR 5 stars).<br>
+                                &nbsp; - Conjunctive allows a selection of only one value per facet (e.g. only "Size M").
+                            <br><br>
+                                ]]>
+                   </comment>
+                </field>
+                <field id="sort_options" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Sort Options</label>
+                    <frontend_model>Thecommerceshop\Predictivesearch\Block\Adminhtml\Form\Field\SortAttributes</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                    <depends>
+                        <field id="enable_result_page">1</field>
+                    </depends>
+                </field>
+                <field id="enable_addtocart" translate="label comment" type="select" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Add to Cart</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+             <group id="image" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Images</label>
+                <field id="width" translate="label comment" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <validate>validate-digits</validate>
+                    <label>Width</label>
+                </field>
+                <field id="height" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <validate>validate-digits</validate>
+                    <label>Height</label>
+                    <comment>You can specify the size of images used in the search result pages</comment>
+                </field>
+                <field id="type" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Type</label>
+                    <source_model>Thecommerceshop\Predictivesearch\Model\Source\ImageType</source_model>
+                    <comment>You can specify what type of products to show in the result pages</comment>
+                </field>
+            </group>
+        </section> 
+        
+        <section id="typesense_autocomplete" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Autocomplete Menu</label>
+            <class>separator-top</class>
+            <tab>typesense</tab>
+            <resource>Thecommerceshop_Predictivesearch::config_typesense</resource>
+            <group id="autocomplete" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Autocomplete Menu</label>
+                <field id="enable_frontend" translate="label comment" type="select" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Autocomplete Menu</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="nb_of_products_suggestions" translate="label comment" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <validate>required-entry validate-digits validate-not-negative-number validate-digits-range digits-range-1-20</validate>
+                    <label>Number of products</label>
+                    <depends>
+                        <field id="enable_frontend">1</field>
+                    </depends>
+                    <comment>How many products to display by default</comment>
+                </field>
+                 <field id="enable_Category" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Category Search</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="nb_of_categories_suggestions" translate="label comment" type="text" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <validate>required-entry validate-digits validate-not-negative-number validate-digits-range digits-range-1-20</validate>
+                    <label>Number of categories</label>
+                    <depends>
+                        <field id="enable_Category">1</field>
+                    </depends>
+                </field>
+                <field id="enable_page" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Page Search</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="nb_of_pages_suggestions" translate="label comment" type="text" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <validate>required-entry validate-digits validate-not-negative-number validate-digits-range digits-range-1-20</validate>
+                    <label>Number of Pages</label>
+                    <depends>
+                        <field id="enable_page">1</field>
+                    </depends>
+                </field>
+                 <field id="excluded_pages" translate="label comment" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Exclude Pages</label>
+                    <frontend_model>Thecommerceshop\Predictivesearch\Block\Adminhtml\Form\Field\Autocomplete\CustomPages</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+                  <field id="minimum_char_length" translate="label comment" type="text" sortOrder="32" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Minimum query length</label>
+                    <validate>validate-digits</validate>
+                    <comment>
+                        <![CDATA[
+                            The minimal number of characters required for a search term before a request is sent to the Typesense API. If set to 0 then  results will be fet>
+                         ]]>
+                    </comment>
+                    <depends>
+                        <field id="enable_frontend">1</field>
+                    </depends>
+                   </field>
+
+            </group>
+        </section>
+            <section id="typesense_products" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Products</label>
+            <tab>typesense</tab>
+            <resource>Thecommerceshop_Predictivesearch::config_typesense</resource>
+            <group id="products" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Products</label>
+                <field id="product_additional_attributes" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Attributes</label>
+                    <frontend_model>Thecommerceshop\Predictivesearch\Block\Adminhtml\Form\Field\Products\Attributes</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+                <field id="custom_ranking_product_attributes" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Ranking</label>
+                    <frontend_model>Thecommerceshop\Predictivesearch\Block\Adminhtml\Form\Field\Products\CustomRankingProduct</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+                <field id="show_sku" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Show Sku</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="show_price" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Show Price</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+        </section>
+        <section id="typesense_categories" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Categories</label>
+            <tab>typesense</tab>
+            <resource>Thecommerceshop_Predictivesearch::config_typesenseh</resource>
+            <group id="categories" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Categories</label>
+                <field id="category_additional_attributes" translate="label comment" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Attributes</label>
+                    <frontend_model>Thecommerceshop\Predictivesearch\Block\Adminhtml\Form\Field\Category\SortOrderCategory</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+                <field id="custom_ranking_category_attributes" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Ranking</label>
+                    <frontend_model>Thecommerceshop\Predictivesearch\Block\Adminhtml\Form\Field\Category\CustomRankingCategory</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+            </group>
+        </section>
+        <section id="typesense_queue" translate="label" type="text" sortOrder="65" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Indexing Queue / Cron</label>
+            <tab>typesense</tab>
+            <resource>Thecommerceshop_Predictivesearch::config_typesense</resource>
+            <group id="queue" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Indexing Queue / Cron</label>
+                <field id="active" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Indexing Queue</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="batch_size" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <validate>validate-digits</validate>
+                    <label>Batch Size</label>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                    <comment>You can specify the number of products to sync when running cron recommanded upto 10</comment>
+                </field>
+                <field id="clear" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Clear synced records</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                </field>
+                <field id="index_type" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Delete Index</label>
+                    <source_model>Thecommerceshop\Predictivesearch\Model\Source\IndexList</source_model>
+                </field>
+                <field id="delete_index" translate="label" type="button" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <frontend_model>Thecommerceshop\Predictivesearch\Block\System\Config\Button</frontend_model>
+                </field>
+                <field id="reindex_data" translate="label" type="button" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <frontend_model>Thecommerceshop\Predictivesearch\Block\System\Config\ReindexButton</frontend_model>
+                </field>
+            </group>
+        </section>
+       </system>
+</config>

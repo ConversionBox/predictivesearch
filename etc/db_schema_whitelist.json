@@ -1,0 +1,17 @@
+{
+    "typesense_job_queue": {
+        "column": {
+            "job_id": true,
+            "job_type": true,
+            "job_data": true,
+            "job_status": true,
+            "job_index": true,
+            "created": true,
+            "updated_at": true,
+            "errors": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    }
+}

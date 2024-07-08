@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+   <head>
+        <css src="Thecommerceshop_Predictivesearch::css/typesense.css"/>
+        <script src="Thecommerceshop_Predictivesearch::js/typesense/browser.min.js"/>
+    </head>
+    <body>
+        <referenceBlock name="head.additional">
+            <block class="Thecommerceshop\Predictivesearch\Block\Configuration" name="typesense.configuration" template="Thecommerceshop_Predictivesearch::configuration/configuration.phtml"/>
+        </referenceBlock>
+        <referenceBlock name="top.search">
+            <action method="setTemplate" ifconfig="typesense_general/credentials/enable_frontend">
+                <argument name="setTemplate" xsi:type="string">Thecommerceshop_Predictivesearch::searchautocomplete.phtml</argument>
+            </action>
+        </referenceBlock>
+        <referenceBlock name="search.result">
+            <action ifconfig="typesense_search_result/instant_search_result/enable_result_page" method="setTemplate">
+                <argument name="template" xsi:type="string">Thecommerceshop_Predictivesearch::search/result.phtml</argument>
+            </action>
+        </referenceBlock>
+        <referenceBlock name="catalogsearch.leftnav">
+            <action ifconfig="typesense_search_result/instant_search_result/enable_result_page" method="setTemplate">
+                <argument name="template" xsi:type="string">Thecommerceshop_Predictivesearch::search/layer/view.phtml</argument>
+            </action>
+            <arguments>
+                <argument name="view_model"
+                        xsi:type="object">Thecommerceshop\Predictivesearch\ViewModel\General</argument>
+            </arguments>
+        </referenceBlock>
+    </body>
+</page>

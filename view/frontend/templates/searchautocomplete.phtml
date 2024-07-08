@@ -1,0 +1,27 @@
+<?php
+
+ /**
+  * @var \Magento\Framework\Escaper $escaper
+  */
+?>
+<div class="search-main">
+    <input type="text" 
+           placeholder="<?= $escaper->escapeHtmlAttr(__('search here...')) ?>" 
+           id="searchbox" class="searchbox" />
+    <div id="search-component" data-bind="scope:'searchcomponent'">
+        <!-- ko template: getTemplate() --><!-- /ko -->
+        <script type="text/x-magento-init">
+        {
+            "#search-component": {
+                "Magento_Ui/js/core/app": {
+                "components": {
+                        "searchcomponent": {
+                            "component": "Thecommerceshop_Predictivesearch/js/searchAutocomplete"
+                        }
+                    }
+                }
+            }
+        }
+        </script>
+    </div>
+</div>

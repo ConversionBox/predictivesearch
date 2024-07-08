@@ -1,0 +1,40 @@
+<?php
+
+
+ /**
+  * @var \Magento\Framework\Escaper $escaper
+  */
+?>
+<div class="message success" id="message_parent">
+    <div id="success_message"></div>
+</div>
+<div class="search-result-page">
+    <div id="search_result_page" class="search_result_page">
+        <div class="content_wrapper">
+            <div id="product_count_listing"></div>
+            <input type="text" 
+           placeholder="<?= $escaper->escapeHtmlAttr(__('search here...')) ?>" 
+           id="category_searchbox" class="search-result-box search-box" />
+            <div id="cat_sort_option"></div>
+            <div id="cat_product_display_count"></div>
+        </div>
+        <div id="category_product_result"></div>
+    </div>
+    <ul id="product_list_pagination" class="pagination-sm"></ul>
+    <div id="category-listing-component" data-bind="scope:'category-search-resultcomponent'">
+        <!-- ko template: getTemplate() --><!-- /ko -->
+        <script type="text/x-magento-init">
+        {
+            "#category-listing-component": {
+                "Magento_Ui/js/core/app": {
+                "components": {
+                        "category-search-resultcomponent": {
+                            "component": "Thecommerceshop_Predictivesearch/js/category/category-listing"
+                        }
+                    }
+                }
+            }
+        }
+        </script>
+    </div>
+</div>

@@ -1,0 +1,8 @@
+<?php
+
+/** @var \Thecommerceshop\Predictivesearch\Block\Configuration $block */
+$configuration = $block->getConfigurationData();
+?>
+<script>
+    window.typesenseConfig = <?= /* @noEscape */ $configuration; ?>;
+</script>

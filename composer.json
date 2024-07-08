@@ -1,0 +1,20 @@
+{
+  "name": "thecommerceshop/predictivesearch",
+  "description": "Typesense Search integration for Magento 2",
+  "type": "magento2-module",
+  "version": "1.0.0",
+  "license": [
+        "OSL-3.0",
+        "AFL-3.0"
+    ],
+  "require": {
+    "php-http/curl-client":"^2.3",
+    "typesense/typesense-php": "^4.8"
+  },
+  "autoload": {
+    "files": [ "registration.php" ],
+    "psr-4": {
+      "Thecommerceshop\\Predictivesearch\\": ""
+    }
+  }
+}

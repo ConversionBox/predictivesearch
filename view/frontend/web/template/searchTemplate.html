@@ -1,0 +1,24 @@
+<div id="search_result" class="search_result three-col">
+    <div data-bind="visible: suggestionSection" class="col-left">
+        <span data-bind="text: 'Suggestions'" class="autocomplete_head"></span>
+        <div id="suggestion_section" class="suggestion_section"></div>
+    </div>
+    <div class="col-center">
+        <div  data-bind="visible: categorySection">
+            <span data-bind="text: 'Categories'" class="autocomplete_head"></span>
+            <div id="category_section" class="category_section"></div>
+        </div>
+        <div data-bind="visible: pageSection" class="search_cms_popup">
+            <span data-bind="text: 'Pages'" class="autocomplete_head"></span>
+            <div id="cms_section" class="cms_section"></div>
+        </div>
+    </div>
+    <div class="col-right">
+        <div class="col-head">
+            <span data-bind="text: 'Products'" class="autocomplete_head"></span>
+            <div id="auto_search_time"></div>
+        </div>
+        <div id="product_section" class="product_section"></div>
+        <a data-bind="text: 'View All', attr: { href: searchPage() }" class="product-viewall"></a>
+    </div>
+</div>

@@ -166,8 +166,6 @@ define(
          */
         function renderProducts(hits, found,keyword,out_of,search_time_ms) {
           let searchUrl = BASE_URL+'catalogsearch/result/?q='+keyword;
-        console.log(hits);
-        console.log(found);
             html = '';
             if (hits.length < 1) {
                 html = 'No products found';

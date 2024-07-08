@@ -803,7 +803,6 @@ define(
 										checkField.setAttribute("checked", "checked");
 										filterParam[attributeFieldname] = e.target.id; // Store the selected radio button ID
 										stableContent = $('#' + attributeFieldname)[0].outerHTML;
-										console.log(stableContent);
 										selectedFilters.push({
 											key: attributeFieldname,
 											content: stableContent

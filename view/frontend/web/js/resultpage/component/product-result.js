@@ -1084,7 +1084,7 @@ define(
 							maxValue = parseInt(priceRange[1]);
 						}
 					}
-					if (filterParamData.price == undefined || filterParamData.price == "") {
+					if (filterParamData != undefined || filterParamData != "") {
 						min = parseInt(minValue);
 						max = parseInt(maxValue);
 					} else {

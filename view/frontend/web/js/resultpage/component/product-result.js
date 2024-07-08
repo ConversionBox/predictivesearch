@@ -998,7 +998,6 @@ define(
 		function priceSlider(filterArray) {
 			const priceArr = filterArray.filter((item) => {
 				if (item.field_name == 'price') {
-					console.log(item);
 					return item.counts;
 				}
 			});

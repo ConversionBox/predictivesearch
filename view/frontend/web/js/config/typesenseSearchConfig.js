@@ -25,9 +25,6 @@ define(
                         'apiKey': apiKey,
                         'connectionTimeoutSeconds': 2
                     };
-
-                   
-console.log(client);
                     return new Typesense.Client(client);
                 } catch (error) {
                     console.log(error)

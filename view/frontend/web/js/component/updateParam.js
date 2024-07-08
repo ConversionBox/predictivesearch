@@ -7,7 +7,6 @@ define(
         let sortParam='';
         return {
             updateParams: function(params, mode = null, page = null,sortQuery=null) {
-                console.log(sortQuery);
                 const urlParams = new URLSearchParams(window.location.search);
                 let queryParam = urlParams.get('q');
                 let searchparams = '';

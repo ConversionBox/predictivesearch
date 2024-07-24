@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Thecommerceshop\Predictivesearch\Block\Adminhtml\Form\Field\Category;
+namespace Conversionbox\Predictivesearch\Block\Adminhtml\Form\Field\Category;
 
 use Magento\Framework\View\Element\Html\Select;
 use Magento\Eav\Model\Config;
 use Magento\Framework\View\Element\Context;
-use Thecommerceshop\Predictivesearch\Model\Schema\CategorySchema;
+use Conversionbox\Predictivesearch\Model\Schema\CategorySchema;
 
 class AttributeOptions extends Select
 {

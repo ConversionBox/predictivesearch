@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Thecommerceshop\Predictivesearch\Rewrite\Framework\HTTP\Client;
+namespace Conversionbox\Predictivesearch\Rewrite\Framework\HTTP\Client;
 
 /**
  * Class to work with HTTP protocol using curl library

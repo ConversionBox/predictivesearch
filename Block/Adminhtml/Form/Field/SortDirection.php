@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Thecommerceshop\Predictivesearch\Block\Adminhtml\Form\Field;
+namespace Conversionbox\Predictivesearch\Block\Adminhtml\Form\Field;
 
 use Magento\Framework\View\Element\Html\Select;
 

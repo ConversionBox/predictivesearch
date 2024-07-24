@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Thecommerceshop\Predictivesearch\Model\Resolver\Query\DataProvider;
+namespace Conversionbox\Predictivesearch\Model\Resolver\Query\DataProvider;
 
 use Exception;
-use Thecommerceshop\Predictivesearch\Model\Api\TypeSenseApi;
-use Thecommerceshop\Predictivesearch\Model\ConfigData;
+use Conversionbox\Predictivesearch\Model\Api\TypeSenseApi;
+use Conversionbox\Predictivesearch\Model\ConfigData;
 use Magento\Framework\GraphQl\Exception\GraphQlInputException;
 
 class SearchResults

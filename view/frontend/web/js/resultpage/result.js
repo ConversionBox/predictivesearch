@@ -2,8 +2,8 @@ define(
 	[
 		'jquery',
 		'uiComponent',
-		'Thecommerceshop_Predictivesearch/js/config/typesenseSearchConfig',
-		'Thecommerceshop_Predictivesearch/js/resultpage/component/product-result',
+		'Conversionbox_Predictivesearch/js/config/typesenseSearchConfig',
+		'Conversionbox_Predictivesearch/js/resultpage/component/product-result',
 		'mage/url',
 		'ko'
 	],

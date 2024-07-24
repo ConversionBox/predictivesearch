@@ -2,7 +2,7 @@ define(
 	[
 		'jquery',
 		'jquery/ui',
-		'Thecommerceshop_Predictivesearch/js/config/typesenseSearchConfig',
+		'Conversionbox_Predictivesearch/js/config/typesenseSearchConfig',
 	],
 	function($, ui, searchConfig) {
 		const SEARCHBLE_ATTRIBUTES = typesenseConfig.products.attributes;

@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Thecommerceshop\Predictivesearch\Model;
+namespace Conversionbox\Predictivesearch\Model;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\ScopeInterface;
-use Thecommerceshop\Predictivesearch\Model\General;
+use Conversionbox\Predictivesearch\Model\General;
 
 class ConfigData
 {

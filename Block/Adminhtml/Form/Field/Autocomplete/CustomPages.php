@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Thecommerceshop\Predictivesearch\Block\Adminhtml\Form\Field\Autocomplete;
+namespace Conversionbox\Predictivesearch\Block\Adminhtml\Form\Field\Autocomplete;
 
 use Magento\Config\Block\System\Config\Form\Field\FieldArray\AbstractFieldArray;
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\LocalizedException;
-use Thecommerceshop\Predictivesearch\Block\Adminhtml\Form\Field\Autocomplete\Page;
+use Conversionbox\Predictivesearch\Block\Adminhtml\Form\Field\Autocomplete\Page;
 
 class CustomPages extends AbstractFieldArray
 {

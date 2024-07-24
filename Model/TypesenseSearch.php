@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Thecommerceshop\Predictivesearch\Model;
+namespace Conversionbox\Predictivesearch\Model;
 
 use Magento\Framework\Model\AbstractModel;
-use Thecommerceshop\Predictivesearch\Model\ResourceModel\TypesenseSearch as TypesenseSearchResource;
+use Conversionbox\Predictivesearch\Model\ResourceModel\TypesenseSearch as TypesenseSearchResource;
 
 class TypesenseSearch extends AbstractModel
 {

@@ -3,14 +3,14 @@
 
 declare(strict_types=1);
 
-namespace Thecommerceshop\Predictivesearch\Block\Adminhtml\Form\Field\Products;
+namespace Conversionbox\Predictivesearch\Block\Adminhtml\Form\Field\Products;
 
 use Magento\Config\Block\System\Config\Form\Field\FieldArray\AbstractFieldArray;
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\LocalizedException;
-use Thecommerceshop\Predictivesearch\Block\Adminhtml\Form\Field\YesNo;
-use Thecommerceshop\Predictivesearch\Block\Adminhtml\Form\Field\Products\Order;
-use Thecommerceshop\Predictivesearch\Block\Adminhtml\Form\Field\Products\AttributeOptions;
+use Conversionbox\Predictivesearch\Block\Adminhtml\Form\Field\YesNo;
+use Conversionbox\Predictivesearch\Block\Adminhtml\Form\Field\Products\Order;
+use Conversionbox\Predictivesearch\Block\Adminhtml\Form\Field\Products\AttributeOptions;
 
 class Attributes extends AbstractFieldArray
 {

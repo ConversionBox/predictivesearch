@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Thecommerceshop\Predictivesearch\Model\ResourceModel\TypesenseSearch;
+namespace Conversionbox\Predictivesearch\Model\ResourceModel\TypesenseSearch;
 
 use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
 
@@ -21,8 +21,8 @@ class Collection extends AbstractCollection
     public function _construct()
     {
         $this->_init(
-            \Thecommerceshop\Predictivesearch\Model\TypesenseSearch::class,
-            \Thecommerceshop\Predictivesearch\Model\ResourceModel\TypesenseSearch::class
+            \Conversionbox\Predictivesearch\Model\TypesenseSearch::class,
+            \Conversionbox\Predictivesearch\Model\ResourceModel\TypesenseSearch::class
         );
         $this->_idFieldName = 'job_id';
     }

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Thecommerceshop\Predictivesearch\Model\Api;
+namespace Conversionbox\Predictivesearch\Model\Api;
 
 use Exception;
 use Typesense\Client;
-use Thecommerceshop\Predictivesearch\Model\ConfigData;
-use Thecommerceshop\Predictivesearch\Logger\Logger;
+use Conversionbox\Predictivesearch\Model\ConfigData;
+use Conversionbox\Predictivesearch\Logger\Logger;
 class TypeSenseApi
 {
     /**

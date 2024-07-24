@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Thecommerceshop\Predictivesearch\Observer\Product;
+namespace Conversionbox\Predictivesearch\Observer\Product;
 
 use Exception;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Event\Observer;
-use Thecommerceshop\Predictivesearch\Model\DataProcessor\ProductDataProcessor;
-use Thecommerceshop\Predictivesearch\Logger\Logger;
+use Conversionbox\Predictivesearch\Model\DataProcessor\ProductDataProcessor;
+use Conversionbox\Predictivesearch\Logger\Logger;
 use Magento\Framework\App\RequestInterface;
-use Thecommerceshop\Predictivesearch\Model\ConfigData;
-use Thecommerceshop\Predictivesearch\Model\Queue\QueueProcessor;
+use Conversionbox\Predictivesearch\Model\ConfigData;
+use Conversionbox\Predictivesearch\Model\Queue\QueueProcessor;
 use Magento\Store\Api\StoreRepositoryInterface;
 
 class ProductChange implements ObserverInterface

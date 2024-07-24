@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Mview/etc/mview.xsd">
-    <view id="typesense_products" class="Thecommerceshop\Predictivesearch\Model\Indexer\Products" group="indexer">
+    <view id="conversionbox_products" class="Conversionbox\Predictivesearch\Model\Indexer\Products" group="indexer">
          <subscriptions>
             <table name="catalog_product_entity" entity_column="entity_id" />
             <table name="catalog_product_entity_datetime" entity_column="entity_id" />
@@ -16,7 +16,7 @@
             <table name="cataloginventory_stock_item" entity_column="product_id" />
         </subscriptions>
     </view>
-     <view id="typesense_categories" class="Thecommerceshop\Predictivesearch\Model\Indexer\Category" group="indexer">
+     <view id="conversionbox_categories" class="Conversionbox\Predictivesearch\Model\Indexer\Category" group="indexer">
         <subscriptions>
             <table name="catalog_category_entity" entity_column="entity_id" />
             <table name="catalog_category_entity_decimal" entity_column="entity_id" />
@@ -26,7 +26,7 @@
             <table name="catalog_category_entity_datetime" entity_column="entity_id" />
         </subscriptions>
     </view>
-     <view id="typsense_pages" class="Thecommerceshop\Predictivesearch\Model\Indexer\Page" group="indexer">
+     <view id="conversionbox_pages" class="Conversionbox\Predictivesearch\Model\Indexer\Page" group="indexer">
         <subscriptions>
             <table name="cms_page" entity_column="page_id" />
         </subscriptions>

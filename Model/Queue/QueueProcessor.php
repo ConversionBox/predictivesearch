@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Thecommerceshop\Predictivesearch\Model\Queue;
+namespace Conversionbox\Predictivesearch\Model\Queue;
 
 use Exception;
-use Thecommerceshop\Predictivesearch\Logger\Logger;
-use Thecommerceshop\Predictivesearch\Model\ConfigData;
-use Thecommerceshop\Predictivesearch\Model\General;
-use Thecommerceshop\Predictivesearch\Model\Api\Data\TypesenseSearchInterfaceFactory;
-use Thecommerceshop\Predictivesearch\Model\Api\TypesenseSearchRepositoryInterface;
+use Conversionbox\Predictivesearch\Logger\Logger;
+use Conversionbox\Predictivesearch\Model\ConfigData;
+use Conversionbox\Predictivesearch\Model\General;
+use Conversionbox\Predictivesearch\Model\Api\Data\TypesenseSearchInterfaceFactory;
+use Conversionbox\Predictivesearch\Model\Api\TypesenseSearchRepositoryInterface;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
-use Thecommerceshop\Predictivesearch\Model\ResourceModel\TypesenseSearch\CollectionFactory;
+use Conversionbox\Predictivesearch\Model\ResourceModel\TypesenseSearch\CollectionFactory;
 
 class QueueProcessor
 {

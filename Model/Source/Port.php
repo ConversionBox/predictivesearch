@@ -1,8 +1,8 @@
 <?php
-namespace Thecommerceshop\Predictivesearch\Model\Source;
+namespace Conversionbox\Predictivesearch\Model\Source;
 
 use Magento\Framework\Option\ArrayInterface;
-use Thecommerceshop\Predictivesearch\Model\Api\TypeSenseApi;
+use Conversionbox\Predictivesearch\Model\Api\TypeSenseApi;
 class Port implements ArrayInterface
 {
     protected $typeSenseApi;

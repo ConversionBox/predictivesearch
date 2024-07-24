@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace Thecommerceshop\Predictivesearch\Model\Resolver\Query;
+namespace Conversionbox\Predictivesearch\Model\Resolver\Query;
 
 use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
 use Magento\Framework\GraphQl\Config\Element\Field;
 use Magento\Framework\GraphQl\Query\ResolverInterface;
-use Thecommerceshop\Predictivesearch\Model\ConfigData;
+use Conversionbox\Predictivesearch\Model\ConfigData;
 
 class Configurations implements ResolverInterface
 {

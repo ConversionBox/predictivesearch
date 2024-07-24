@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Thecommerceshop\Predictivesearch\Logger;
+namespace Conversionbox\Predictivesearch\Logger;
 
 use Monolog\Logger;
 use Magento\Framework\Logger\Handler\Base;
@@ -21,5 +21,5 @@ class Handler extends Base
      *
      * @var string
      */
-    protected $fileName = '/var/log/typesenseError.log';
+    protected $fileName = '/var/log/conversionboxError.log';
 }

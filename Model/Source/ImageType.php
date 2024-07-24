@@ -1,5 +1,5 @@
 <?php
-namespace Thecommerceshop\Predictivesearch\Model\Source;
+namespace Conversionbox\Predictivesearch\Model\Source;
 
 use Magento\Framework\Option\ArrayInterface;
 

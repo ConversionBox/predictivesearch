@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Thecommerceshop\Predictivesearch\Model\Api\Data;
+namespace Conversionbox\Predictivesearch\Model\Api\Data;
 
 use Magento\Framework\Api\SearchResultsInterface;
-use Thecommerceshop\Predictivesearch\Model\Api\Data\TypesenseSearchInterface;
+use Conversionbox\Predictivesearch\Model\Api\Data\TypesenseSearchInterface;
 
 interface TypesenseSearchResultsInterface extends SearchResultsInterface
 {

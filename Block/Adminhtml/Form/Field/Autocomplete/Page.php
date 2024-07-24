@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Thecommerceshop\Predictivesearch\Block\Adminhtml\Form\Field\Autocomplete;
+namespace Conversionbox\Predictivesearch\Block\Adminhtml\Form\Field\Autocomplete;
 
 use Magento\Framework\View\Element\Html\Select;
 use Magento\Cms\Api\Data\PageInterface;

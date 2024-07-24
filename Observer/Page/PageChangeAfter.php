@@ -1,15 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace Thecommerceshop\Predictivesearch\Observer\Page;
+namespace Conversionbox\Predictivesearch\Observer\Page;
 
 use Exception;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Event\Observer;
-use Thecommerceshop\Predictivesearch\Model\DataProcessor\PageDataProcessor;
-use Thecommerceshop\Predictivesearch\Logger\Logger;
-use Thecommerceshop\Predictivesearch\Model\ConfigData;
-use Thecommerceshop\Predictivesearch\Model\Queue\QueueProcessor;
+use Conversionbox\Predictivesearch\Model\DataProcessor\PageDataProcessor;
+use Conversionbox\Predictivesearch\Logger\Logger;
+use Conversionbox\Predictivesearch\Model\ConfigData;
+use Conversionbox\Predictivesearch\Model\Queue\QueueProcessor;
 use Magento\Store\Api\StoreRepositoryInterface;
 
 class PageChangeAfter implements ObserverInterface

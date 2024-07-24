@@ -3,15 +3,15 @@
 
 declare(strict_types=1);
 
-namespace Thecommerceshop\Predictivesearch\Controller\Index;
+namespace Conversionbox\Predictivesearch\Controller\Index;
 
 use Exception;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\App\Request\Http;
-use Thecommerceshop\Predictivesearch\Model\DataProcessor\ProductDataProcessor;
-use Thecommerceshop\Predictivesearch\Model\DataProcessor\CategoryDataProcessor;
-use Thecommerceshop\Predictivesearch\Model\DataProcessor\PageDataProcessor;
+use Conversionbox\Predictivesearch\Model\DataProcessor\ProductDataProcessor;
+use Conversionbox\Predictivesearch\Model\DataProcessor\CategoryDataProcessor;
+use Conversionbox\Predictivesearch\Model\DataProcessor\PageDataProcessor;
 
 class AdminReindex implements HttpGetActionInterface
 {

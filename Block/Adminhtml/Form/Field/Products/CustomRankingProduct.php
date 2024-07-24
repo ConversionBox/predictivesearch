@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Thecommerceshop\Predictivesearch\Block\Adminhtml\Form\Field\Products;
+namespace Conversionbox\Predictivesearch\Block\Adminhtml\Form\Field\Products;
 
 use Magento\Config\Block\System\Config\Form\Field\FieldArray\AbstractFieldArray;
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\LocalizedException;
-use Thecommerceshop\Predictivesearch\Block\Adminhtml\Form\Field\SortDirection;
-use Thecommerceshop\Predictivesearch\Block\Adminhtml\Form\Field\Products\RankingOptions;
+use Conversionbox\Predictivesearch\Block\Adminhtml\Form\Field\SortDirection;
+use Conversionbox\Predictivesearch\Block\Adminhtml\Form\Field\Products\RankingOptions;
 
 class CustomRankingProduct extends AbstractFieldArray
 {

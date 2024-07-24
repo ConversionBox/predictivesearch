@@ -1,2 +1,2 @@
-# typesense-magento2
+# conversionbox-predictive search magento2
 

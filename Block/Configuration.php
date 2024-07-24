@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Thecommerceshop\Predictivesearch\Block;
+namespace Conversionbox\Predictivesearch\Block;
 
 use Magento\Framework\Data\CollectionDataSourceInterface;
 use Magento\Framework\View\Element\Template;
-use Thecommerceshop\Predictivesearch\Model\ConfigData;
+use Conversionbox\Predictivesearch\Model\ConfigData;
 use Magento\Framework\DataObject;
-use Thecommerceshop\Predictivesearch\Model\General;
+use Conversionbox\Predictivesearch\Model\General;
 use Magento\Framework\Registry;
 use Magento\Search\Model\ResourceModel\Query\CollectionFactory;
 use Magento\Framework\DataObjectFactory;

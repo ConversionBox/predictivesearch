@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Thecommerceshop\Predictivesearch\Model\Types;
+namespace Conversionbox\Predictivesearch\Model\Types;
 
 class TypesenseTypes
 {

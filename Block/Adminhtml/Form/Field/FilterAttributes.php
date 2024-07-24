@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace Thecommerceshop\Predictivesearch\Block\Adminhtml\Form\Field;
+namespace Conversionbox\Predictivesearch\Block\Adminhtml\Form\Field;
 
 use Magento\Config\Block\System\Config\Form\Field\FieldArray\AbstractFieldArray;
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\LocalizedException;
-use Thecommerceshop\Predictivesearch\Block\Adminhtml\Form\Field\AttributeList;
-use Thecommerceshop\Predictivesearch\Block\Adminhtml\Form\Field\FacetOptions;
-use Thecommerceshop\Predictivesearch\Block\Adminhtml\Form\Field\FacetType;
+use Conversionbox\Predictivesearch\Block\Adminhtml\Form\Field\AttributeList;
+use Conversionbox\Predictivesearch\Block\Adminhtml\Form\Field\FacetOptions;
+use Conversionbox\Predictivesearch\Block\Adminhtml\Form\Field\FacetType;
 
 class FilterAttributes extends AbstractFieldArray
 {

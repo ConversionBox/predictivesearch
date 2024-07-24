@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Thecommerceshop\Predictivesearch\Block\Adminhtml\Form\Field\Products;
+namespace Conversionbox\Predictivesearch\Block\Adminhtml\Form\Field\Products;
 
 use Magento\Framework\View\Element\Html\Select;
 use Magento\Eav\Model\Config;

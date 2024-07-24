@@ -3,5 +3,5 @@ use Magento\Framework\Component\ComponentRegistrar;
 
 ComponentRegistrar::register(
     ComponentRegistrar::MODULE,
-    'Thecommerceshop_Predictivesearch',
+    'Conversionbox_Predictivesearch',
     __DIR__);

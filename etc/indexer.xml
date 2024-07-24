@@ -1,18 +1,18 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Indexer/etc/indexer.xsd">
-    <indexer id="typesense_products" view_id="typesense_products" class="Thecommerceshop\Predictivesearch\Model\Indexer\Products">
-        <title translate="true">Typesense Search Products</title>
-        <description translate="true">Rebuild Product index with Typesense</description>
+    <indexer id="conversionbox_products" view_id="conversionbox_products" class="Conversionbox\Predictivesearch\Model\Indexer\Products">
+        <title translate="true">Conversionbox Search Products</title>
+        <description translate="true">Rebuild Product index with Conversionbox</description>
         <dependencies>
             <indexer id="catalog_product_price" />
         </dependencies>
     </indexer>
-    <indexer id="typesense_categories" view_id="typesense_categories" class="Thecommerceshop\Predictivesearch\Model\Indexer\Category">
-       <title translate="true">Typesense Search Categories</title>
-        <description translate="true">Rebuild categories index with Typesense.</description>
+    <indexer id="conversionbox_categories" view_id="conversionbox_categories" class="Conversionbox\Predictivesearch\Model\Indexer\Category">
+       <title translate="true">Conversionbox Search Categories</title>
+        <description translate="true">Rebuild categories index with Conversionbox.</description>
     </indexer>
-    <indexer id="typsense_pages" view_id="typsense_pages" class="Thecommerceshop\Predictivesearch\Model\Indexer\Page">
-        <title translate="true">Typsense Search Pages</title>
-        <description translate="true">Rebuild pages index with typesense.</description>
+    <indexer id="conversionbox_pages" view_id="conversionbox_pages" class="Conversionbox\Predictivesearch\Model\Indexer\Page">
+        <title translate="true">Conversionbox Search Pages</title>
+        <description translate="true">Rebuild pages index with Conversionbox.</description>
     </indexer>
 </config>

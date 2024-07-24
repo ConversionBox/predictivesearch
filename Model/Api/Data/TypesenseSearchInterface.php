@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Thecommerceshop\Predictivesearch\Model\Api\Data;
+namespace Conversionbox\Predictivesearch\Model\Api\Data;
 
 use Magento\Framework\Api\ExtensibleDataInterface;
 

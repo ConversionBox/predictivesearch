@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Thecommerceshop\Predictivesearch\Model\Data;
+namespace Conversionbox\Predictivesearch\Model\Data;
 
-use Thecommerceshop\Predictivesearch\Model\Api\Data\TypesenseSearchInterface;
+use Conversionbox\Predictivesearch\Model\Api\Data\TypesenseSearchInterface;
 
 class TypesenseSearch extends \Magento\Framework\Api\AbstractExtensibleObject implements TypesenseSearchInterface
 {

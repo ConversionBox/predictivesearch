@@ -2,23 +2,23 @@
 
 declare(strict_types=1);
 
-namespace Thecommerceshop\Predictivesearch\Model;
+namespace Conversionbox\Predictivesearch\Model;
 
 use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
-use Thecommerceshop\Predictivesearch\Model\TypesenseSearchFactory;
-use Thecommerceshop\Predictivesearch\Model\Api\Data\TypesenseSearchInterface;
-use Thecommerceshop\Predictivesearch\Model\ResourceModel\TypesenseSearch;
-use Thecommerceshop\Predictivesearch\Model\Api\Data\TypesenseSearchInterfaceFactory;
+use Conversionbox\Predictivesearch\Model\TypesenseSearchFactory;
+use Conversionbox\Predictivesearch\Model\Api\Data\TypesenseSearchInterface;
+use Conversionbox\Predictivesearch\Model\ResourceModel\TypesenseSearch;
+use Conversionbox\Predictivesearch\Model\Api\Data\TypesenseSearchInterfaceFactory;
 use Magento\Framework\Api\ExtensibleDataObjectConverter;
 use Magento\Framework\Api\DataObjectHelper;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Api\SearchCriteriaInterface;
-use Thecommerceshop\Predictivesearch\Model\Api\Data\TypesenseSearchResultsInterfaceFactory;
-use Thecommerceshop\Predictivesearch\Model\ResourceModel\TypesenseSearch\CollectionFactory;
-use Thecommerceshop\Predictivesearch\Model\Api\TypesenseSearchRepositoryInterface;
+use Conversionbox\Predictivesearch\Model\Api\Data\TypesenseSearchResultsInterfaceFactory;
+use Conversionbox\Predictivesearch\Model\ResourceModel\TypesenseSearch\CollectionFactory;
+use Conversionbox\Predictivesearch\Model\Api\TypesenseSearchRepositoryInterface;
 use Magento\Framework\Exception\LocalizedException;
-use Thecommerceshop\Predictivesearch\Model\Api\Data\TypesenseSearchSearchResultsInterface;
+use Conversionbox\Predictivesearch\Model\Api\Data\TypesenseSearchSearchResultsInterface;
 
 class TypesenseSearchRepository implements TypesenseSearchRepositoryInterface
 {

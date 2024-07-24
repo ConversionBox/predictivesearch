@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Thecommerceshop\Predictivesearch\Model;
+namespace Conversionbox\Predictivesearch\Model;
 
 use Exception;
 use Magento\Store\Model\StoreManagerInterface;
@@ -10,7 +10,7 @@ use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\CatalogInventory\Model\Stock\StockItemRepository;
 use Magento\Framework\Url\EncoderInterface;
-use Thecommerceshop\Predictivesearch\Logger\Logger;
+use Conversionbox\Predictivesearch\Logger\Logger;
 
 class General
 {

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Thecommerceshop\Predictivesearch\Observer;
+namespace Conversionbox\Predictivesearch\Observer;
 
 use Exception;
 use Magento\Framework\Event\ObserverInterface;
@@ -11,8 +11,7 @@ use Magento\Framework\Filesystem;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Filesystem\Directory\WriteInterface;
 use Psr\Log\LoggerInterface as PsrLoggerInterface;
-
-use Thecommerceshop\Predictivesearch\Model\ConfigData;
+use Conversionbox\Predictivesearch\Model\ConfigData;
 
 /**
  * Class for logging data

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Thecommerceshop\Predictivesearch\Controller\Index;
+namespace Conversionbox\Predictivesearch\Controller\Index;
 
 use Exception;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\App\Request\Http;
-use Thecommerceshop\Predictivesearch\Model\Api\TypeSenseApi;
+use Conversionbox\Predictivesearch\Model\Api\TypeSenseApi;
 
 class DeleteIndex implements HttpGetActionInterface
 {

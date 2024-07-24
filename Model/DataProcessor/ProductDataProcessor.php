@@ -1,17 +1,17 @@
 <?php
 declare(strict_types=1);
 
-namespace Thecommerceshop\Predictivesearch\Model\DataProcessor;
+namespace Conversionbox\Predictivesearch\Model\DataProcessor;
 
 use Exception;
-use Thecommerceshop\Predictivesearch\Model\ConfigData;
+use Conversionbox\Predictivesearch\Model\ConfigData;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
-use Thecommerceshop\Predictivesearch\Model\General;
-use Thecommerceshop\Predictivesearch\Model\Api\TypeSenseApi;
+use Conversionbox\Predictivesearch\Model\General;
+use Conversionbox\Predictivesearch\Model\Api\TypeSenseApi;
 use Magento\Framework\Pricing\Helper\Data;
 use Magento\Catalog\Model\ProductCategoryList;
-use Thecommerceshop\Predictivesearch\Model\Schema\ProductSchema;
-use Thecommerceshop\Predictivesearch\Logger\Logger;
+use Conversionbox\Predictivesearch\Model\Schema\ProductSchema;
+use Conversionbox\Predictivesearch\Logger\Logger;
 use Magento\Catalog\Model\ProductFactory;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Catalog\Api\CategoryRepositoryInterface;
@@ -19,8 +19,8 @@ use Magento\Catalog\Model\ResourceModel\Product\Attribute\CollectionFactory as F
 use Magento\Catalog\Model\Product\Attribute\Repository as ProductAttributeRespository;
 use Magento\Review\Model\ReviewFactory;
 use Magento\Sales\Model\ResourceModel\Report\Bestsellers\CollectionFactory as BestsellerCollection;
-use Thecommerceshop\Predictivesearch\Model\Queue\QueueProcessor;
-use Thecommerceshop\Predictivesearch\Model\Api\TypesenseSearchRepositoryInterface;
+use Conversionbox\Predictivesearch\Model\Queue\QueueProcessor;
+use Conversionbox\Predictivesearch\Model\Api\TypesenseSearchRepositoryInterface;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Framework\Filter\FilterManager;
 

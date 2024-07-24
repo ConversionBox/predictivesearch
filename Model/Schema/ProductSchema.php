@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Thecommerceshop\Predictivesearch\Model\Schema;
+namespace Conversionbox\Predictivesearch\Model\Schema;
 
-use Thecommerceshop\Predictivesearch\Model\Types\TypesenseTypes;
+use Conversionbox\Predictivesearch\Model\Types\TypesenseTypes;
 use Magento\Catalog\Model\ResourceModel\Product\Attribute\CollectionFactory;
-use Thecommerceshop\Predictivesearch\Model\ConfigData;
+use Conversionbox\Predictivesearch\Model\ConfigData;
 
 class ProductSchema
 {

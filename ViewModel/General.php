@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Thecommerceshop\Predictivesearch\ViewModel;
+namespace Conversionbox\Predictivesearch\ViewModel;
 
 use Magento\Framework\View\Element\Block\ArgumentInterface;
-use Thecommerceshop\Predictivesearch\Model\ConfigData;
+use Conversionbox\Predictivesearch\Model\ConfigData;
 
 class General implements ArgumentInterface
 {

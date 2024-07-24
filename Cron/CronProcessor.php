@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Thecommerceshop\Predictivesearch\Cron;
+namespace Conversionbox\Predictivesearch\Cron;
 
-use Thecommerceshop\Predictivesearch\Model\Queue;
-use Thecommerceshop\Predictivesearch\Model\ConfigData;
-use Thecommerceshop\Predictivesearch\Model\ResourceModel\TypesenseSearch\CollectionFactory;
-use Thecommerceshop\Predictivesearch\Model\Api\TypesenseSearchRepositoryInterface;
+use Conversionbox\Predictivesearch\Model\Queue;
+use Conversionbox\Predictivesearch\Model\ConfigData;
+use Conversionbox\Predictivesearch\Model\ResourceModel\TypesenseSearch\CollectionFactory;
+use Conversionbox\Predictivesearch\Model\Api\TypesenseSearchRepositoryInterface;
 
 class CronProcessor
 {

@@ -1148,3 +1148,20 @@ margin-right: 46px;}
     display: flex;
     align-items: flex-start;
 }
+.catalogsearch-result-index .search-result-page button.out_of_stock {
+    background: #e1e1e1;
+    border: 1px solid #ccc;
+    color: #333;
+    border-radius: 0;
+    line-height: 1;
+    padding-bottom: 10px;
+    padding-top: 10px;
+    white-space: nowrap;
+    cursor: pointer;
+    font-family: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-weight: 600;
+    padding: 7px 15px;
+    font-size: 1.4rem;
+    box-sizing: border-box;
+    vertical-align: middle;
+}

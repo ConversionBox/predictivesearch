@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Thecommerceshop\Predictivesearch\Observer\Layout;
+namespace Conversionbox\Predictivesearch\Observer\Layout;
 
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use Thecommerceshop\Predictivesearch\Model\ConfigData;
+use Conversionbox\Predictivesearch\Model\ConfigData;
 
 class LayoutProcessBefore implements ObserverInterface
 {

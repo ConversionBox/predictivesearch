@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace Thecommerceshop\Predictivesearch\Model\Indexer;
+namespace Conversionbox\Predictivesearch\Model\Indexer;
 
-use Thecommerceshop\Predictivesearch\Model\DataProcessor\CategoryDataProcessor;
+use Conversionbox\Predictivesearch\Model\DataProcessor\CategoryDataProcessor;
 
 class Category implements \Magento\Framework\Indexer\ActionInterface, \Magento\Framework\Mview\ActionInterface
 {

@@ -2,16 +2,16 @@ define([
     'jquery', 
     'jquery/ui',
     'uiComponent',
-    'Thecommerceshop_Predictivesearch/js/config/typesenseSearchConfig',
-    'Thecommerceshop_Predictivesearch/js/plugin/pagination/jquery.twbsPagination',
-    'Thecommerceshop_Predictivesearch/js/component/add-to-cart',
+    'Conversionbox_Predictivesearch/js/config/typesenseSearchConfig',
+    'Conversionbox_Predictivesearch/js/plugin/pagination/jquery.twbsPagination',
+    'Conversionbox_Predictivesearch/js/component/add-to-cart',
     'mage/url',
     'ko',
     'Magento_Catalog/js/price-utils',
-    'Thecommerceshop_Predictivesearch/js/component/add-to-wishlist',
-    'Thecommerceshop_Predictivesearch/js/component/add-to-compare',
-    'Thecommerceshop_Predictivesearch/js/resultpage/component/price',
-    'Thecommerceshop_Predictivesearch/js/component/updateParam',
+    'Conversionbox_Predictivesearch/js/component/add-to-wishlist',
+    'Conversionbox_Predictivesearch/js/component/add-to-compare',
+    'Conversionbox_Predictivesearch/js/resultpage/component/price',
+    'Conversionbox_Predictivesearch/js/component/updateParam',
 ], function ($, ui, Component, SearchConfig, twbsPagination, addTOCart, urlFormatter, ko, priceUtils, addToWishList, addToCompare, priceComponent, updateParam) {
     'use strict';
 

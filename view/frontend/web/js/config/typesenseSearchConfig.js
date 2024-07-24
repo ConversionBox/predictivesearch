@@ -1,7 +1,7 @@
 define(
     [
         'jquery',
-        'Thecommerceshop_Predictivesearch/js/typesense/typesense',
+        'Conversionbox_Predictivesearch/js/typesense/typesense',
     ], function ($, Typesense) {
         return {
             /**

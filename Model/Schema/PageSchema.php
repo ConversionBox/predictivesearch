@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Thecommerceshop\Predictivesearch\Model\Schema;
+namespace Conversionbox\Predictivesearch\Model\Schema;
 
-use Thecommerceshop\Predictivesearch\Model\Types\TypesenseTypes;
+use Conversionbox\Predictivesearch\Model\Types\TypesenseTypes;
 
 class PageSchema
 {

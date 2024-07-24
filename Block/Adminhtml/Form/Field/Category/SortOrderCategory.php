@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Thecommerceshop\Predictivesearch\Block\Adminhtml\Form\Field\Category;
+namespace Conversionbox\Predictivesearch\Block\Adminhtml\Form\Field\Category;
 
 use Magento\Config\Block\System\Config\Form\Field\FieldArray\AbstractFieldArray;
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\LocalizedException;
-use Thecommerceshop\Predictivesearch\Block\Adminhtml\Form\Field\YesNo;
-use Thecommerceshop\Predictivesearch\Block\Adminhtml\Form\Field\Products\Order;
-use Thecommerceshop\Predictivesearch\Block\Adminhtml\Form\Field\Category\AttributeOptions;
+use Conversionbox\Predictivesearch\Block\Adminhtml\Form\Field\YesNo;
+use Conversionbox\Predictivesearch\Block\Adminhtml\Form\Field\Products\Order;
+use Conversionbox\Predictivesearch\Block\Adminhtml\Form\Field\Category\AttributeOptions;
 
 class SortOrderCategory extends AbstractFieldArray
 {

@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Thecommerceshop\Predictivesearch\Observer\Category;
+namespace Conversionbox\Predictivesearch\Observer\Category;
 
 use Exception;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Event\Observer;
-use Thecommerceshop\Predictivesearch\Model\DataProcessor\CategoryDataProcessor;
-use Thecommerceshop\Predictivesearch\Logger\Logger;
+use Conversionbox\Predictivesearch\Model\DataProcessor\CategoryDataProcessor;
+use Conversionbox\Predictivesearch\Logger\Logger;
 use Magento\Framework\App\RequestInterface;
-use Thecommerceshop\Predictivesearch\Model\ConfigData;
-use Thecommerceshop\Predictivesearch\Model\Queue\QueueProcessor;
+use Conversionbox\Predictivesearch\Model\ConfigData;
+use Conversionbox\Predictivesearch\Model\Queue\QueueProcessor;
 use Magento\Store\Api\StoreRepositoryInterface;
 
 class CategoryChangeAfter implements ObserverInterface

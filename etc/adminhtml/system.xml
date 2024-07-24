@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../Magento/Config/etc/system_file.xsd">
     <system>
-        <tab id="typesense" translate="label" sortOrder="991" class="thecommerceshop">
-            <label>Thecommerceshop</label>
+        <tab id="typesense" translate="label" sortOrder="991" class="conversionbox">
+            <label>Conversionbox</label>
         </tab>
         <section id="typesense_general" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
             <class>separator-top</class>
             <label>Credential and Basic Setup</label>
             <tab>typesense</tab>
-            <resource>Thecommerceshop_Predictivesearch::config_typesense</resource>
+            <resource>Conversionbox_Predictivesearch::config_typesense</resource>
             <group id="credentials" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>General Configuration</label>
                 <field id="enable_frontend" translate="label comment" type="select" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -57,7 +57,7 @@
                 </field>
                 <field id="protocol" translate="label" type="select"  sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Protocol</label>
-                       <source_model>Thecommerceshop\Predictivesearch\Model\Source\Port</source_model>
+                       <source_model>Conversionbox\Predictivesearch\Model\Source\Port</source_model>
                     <depends>
                         <field id="enable_frontend">1</field>
                     </depends>
@@ -90,7 +90,7 @@
             <class>separator-top</class>
             <label>Instant Search Result Page</label>
             <tab>typesense</tab>
-            <resource>Thecommerceshop_Predictivesearch::config_typesense</resource>
+            <resource>Conversionbox_Predictivesearch::config_typesense</resource>
             <group id="instant_search_result" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>General Configuration</label>
                 <field id="enable_result_page" translate="label comment" type="select" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -105,7 +105,7 @@
                 </field>
                 <field id="search_filters" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Search Filters</label>
-                    <frontend_model>Thecommerceshop\Predictivesearch\Block\Adminhtml\Form\Field\FilterAttributes</frontend_model>
+                    <frontend_model>Conversionbox\Predictivesearch\Block\Adminhtml\Form\Field\FilterAttributes</frontend_model>
                     <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
                      <depends>
                         <field id="enable_result_page">1</field>
@@ -121,7 +121,7 @@
                 </field>
                 <field id="sort_options" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Sort Options</label>
-                    <frontend_model>Thecommerceshop\Predictivesearch\Block\Adminhtml\Form\Field\SortAttributes</frontend_model>
+                    <frontend_model>Conversionbox\Predictivesearch\Block\Adminhtml\Form\Field\SortAttributes</frontend_model>
                     <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
                     <depends>
                         <field id="enable_result_page">1</field>
@@ -145,7 +145,7 @@
                 </field>
                 <field id="type" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Type</label>
-                    <source_model>Thecommerceshop\Predictivesearch\Model\Source\ImageType</source_model>
+                    <source_model>Conversionbox\Predictivesearch\Model\Source\ImageType</source_model>
                     <comment>You can specify what type of products to show in the result pages</comment>
                 </field>
             </group>
@@ -155,7 +155,7 @@
             <label>Autocomplete Menu</label>
             <class>separator-top</class>
             <tab>typesense</tab>
-            <resource>Thecommerceshop_Predictivesearch::config_typesense</resource>
+            <resource>Conversionbox_Predictivesearch::config_typesense</resource>
             <group id="autocomplete" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Autocomplete Menu</label>
                 <field id="enable_frontend" translate="label comment" type="select" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -194,7 +194,7 @@
                 </field>
                  <field id="excluded_pages" translate="label comment" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Exclude Pages</label>
-                    <frontend_model>Thecommerceshop\Predictivesearch\Block\Adminhtml\Form\Field\Autocomplete\CustomPages</frontend_model>
+                    <frontend_model>Conversionbox\Predictivesearch\Block\Adminhtml\Form\Field\Autocomplete\CustomPages</frontend_model>
                     <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
                 </field>
                   <field id="minimum_char_length" translate="label comment" type="text" sortOrder="32" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -202,7 +202,7 @@
                     <validate>validate-digits</validate>
                     <comment>
                         <![CDATA[
-                            The minimal number of characters required for a search term before a request is sent to the Typesense API. If set to 0 then  results will be fet>
+                            The minimal number of characters required for a search term before a request is sent to the ConversionBox. If set to 0 then  results will be fetched on first keystroke. Default value is 0. 
                          ]]>
                     </comment>
                     <depends>
@@ -215,17 +215,17 @@
             <section id="typesense_products" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Products</label>
             <tab>typesense</tab>
-            <resource>Thecommerceshop_Predictivesearch::config_typesense</resource>
+            <resource>Conversionbox_Predictivesearch::config_typesense</resource>
             <group id="products" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Products</label>
                 <field id="product_additional_attributes" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Attributes</label>
-                    <frontend_model>Thecommerceshop\Predictivesearch\Block\Adminhtml\Form\Field\Products\Attributes</frontend_model>
+                    <frontend_model>Conversionbox\Predictivesearch\Block\Adminhtml\Form\Field\Products\Attributes</frontend_model>
                     <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
                 </field>
                 <field id="custom_ranking_product_attributes" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Ranking</label>
-                    <frontend_model>Thecommerceshop\Predictivesearch\Block\Adminhtml\Form\Field\Products\CustomRankingProduct</frontend_model>
+                    <frontend_model>Conversionbox\Predictivesearch\Block\Adminhtml\Form\Field\Products\CustomRankingProduct</frontend_model>
                     <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
                 </field>
                 <field id="show_sku" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -241,17 +241,17 @@
         <section id="typesense_categories" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Categories</label>
             <tab>typesense</tab>
-            <resource>Thecommerceshop_Predictivesearch::config_typesenseh</resource>
+            <resource>Conversionbox_Predictivesearch::config_typesenseh</resource>
             <group id="categories" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Categories</label>
                 <field id="category_additional_attributes" translate="label comment" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Attributes</label>
-                    <frontend_model>Thecommerceshop\Predictivesearch\Block\Adminhtml\Form\Field\Category\SortOrderCategory</frontend_model>
+                    <frontend_model>Conversionbox\Predictivesearch\Block\Adminhtml\Form\Field\Category\SortOrderCategory</frontend_model>
                     <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
                 </field>
                 <field id="custom_ranking_category_attributes" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Ranking</label>
-                    <frontend_model>Thecommerceshop\Predictivesearch\Block\Adminhtml\Form\Field\Category\CustomRankingCategory</frontend_model>
+                    <frontend_model>Conversionbox\Predictivesearch\Block\Adminhtml\Form\Field\Category\CustomRankingCategory</frontend_model>
                     <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
                 </field>
             </group>
@@ -259,7 +259,7 @@
         <section id="typesense_queue" translate="label" type="text" sortOrder="65" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Indexing Queue / Cron</label>
             <tab>typesense</tab>
-            <resource>Thecommerceshop_Predictivesearch::config_typesense</resource>
+            <resource>Conversionbox_Predictivesearch::config_typesense</resource>
             <group id="queue" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Indexing Queue / Cron</label>
                 <field id="active" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -283,13 +283,13 @@
                 </field>
                 <field id="index_type" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Delete Index</label>
-                    <source_model>Thecommerceshop\Predictivesearch\Model\Source\IndexList</source_model>
+                    <source_model>Conversionbox\Predictivesearch\Model\Source\IndexList</source_model>
                 </field>
                 <field id="delete_index" translate="label" type="button" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <frontend_model>Thecommerceshop\Predictivesearch\Block\System\Config\Button</frontend_model>
+                    <frontend_model>Conversionbox\Predictivesearch\Block\System\Config\Button</frontend_model>
                 </field>
                 <field id="reindex_data" translate="label" type="button" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <frontend_model>Thecommerceshop\Predictivesearch\Block\System\Config\ReindexButton</frontend_model>
+                    <frontend_model>Conversionbox\Predictivesearch\Block\System\Config\ReindexButton</frontend_model>
                 </field>
             </group>
         </section>

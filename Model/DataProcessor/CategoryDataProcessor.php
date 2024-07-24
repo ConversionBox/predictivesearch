@@ -1,22 +1,22 @@
 <?php
 declare(strict_types=1);
 
-namespace Thecommerceshop\Predictivesearch\Model\DataProcessor;
+namespace Conversionbox\Predictivesearch\Model\DataProcessor;
 
 use Exception;
-use Thecommerceshop\Predictivesearch\Model\ConfigData;
-use Thecommerceshop\Predictivesearch\Model\General;
+use Conversionbox\Predictivesearch\Model\ConfigData;
+use Conversionbox\Predictivesearch\Model\General;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory;
-use Thecommerceshop\Predictivesearch\Model\Api\TypeSenseApi;
-use Thecommerceshop\Predictivesearch\Logger\Logger;
-use Thecommerceshop\Predictivesearch\Model\Schema\CategorySchema;
+use Conversionbox\Predictivesearch\Model\Api\TypeSenseApi;
+use Conversionbox\Predictivesearch\Logger\Logger;
+use Conversionbox\Predictivesearch\Model\Schema\CategorySchema;
 use Magento\Catalog\Api\CategoryRepositoryInterface;
 use Magento\Catalog\Model\CategoryFactory;
 use Magento\Catalog\Model\ResourceModel\Category\Attribute\CollectionFactory as FilterableAttributes;
 use Magento\Catalog\Api\Data\CategoryAttributeInterface;
 use Magento\Catalog\Api\CategoryAttributeRepositoryInterface;
-use Thecommerceshop\Predictivesearch\Model\Queue\QueueProcessor;
-use Thecommerceshop\Predictivesearch\Model\Api\TypesenseSearchRepositoryInterface;
+use Conversionbox\Predictivesearch\Model\Queue\QueueProcessor;
+use Conversionbox\Predictivesearch\Model\Api\TypesenseSearchRepositoryInterface;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 
 class CategoryDataProcessor

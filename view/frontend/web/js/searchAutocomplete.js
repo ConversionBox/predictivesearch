@@ -1,11 +1,11 @@
 define([
 	'jquery',
 	'uiComponent',
-	'Thecommerceshop_Predictivesearch/js/config/typesenseSearchConfig',
-	'Thecommerceshop_Predictivesearch/js/component/multi-search',
-	'Thecommerceshop_Predictivesearch/js/component/products',
-	'Thecommerceshop_Predictivesearch/js/component/category',
-	'Thecommerceshop_Predictivesearch/js/component/pages',
+	'Conversionbox_Predictivesearch/js/config/typesenseSearchConfig',
+	'Conversionbox_Predictivesearch/js/component/multi-search',
+	'Conversionbox_Predictivesearch/js/component/products',
+	'Conversionbox_Predictivesearch/js/component/category',
+	'Conversionbox_Predictivesearch/js/component/pages',
 	'mage/url',
 	'ko'
 ], function($, Component, searchConfig, multiSearchComponent, productComponent, categoryComponent, pageComponent, url, ko) {
@@ -38,7 +38,7 @@ define([
 
 	return Component.extend({
 		defaults: {
-			template: 'Thecommerceshop_Predictivesearch/searchTemplate'
+			template: 'Conversionbox_Predictivesearch/searchTemplate'
 		},
 		searchPage: ko.observable(keyword),
 		categorySection: ko.observable(showCategory),

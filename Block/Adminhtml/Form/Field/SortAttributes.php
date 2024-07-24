@@ -1,13 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace Thecommerceshop\Predictivesearch\Block\Adminhtml\Form\Field;
+namespace Conversionbox\Predictivesearch\Block\Adminhtml\Form\Field;
 
 use Magento\Config\Block\System\Config\Form\Field\FieldArray\AbstractFieldArray;
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\LocalizedException;
-use Thecommerceshop\Predictivesearch\Block\Adminhtml\Form\Field\SortList;
-use Thecommerceshop\Predictivesearch\Block\Adminhtml\Form\Field\SortDirection;
+use Conversionbox\Predictivesearch\Block\Adminhtml\Form\Field\SortList;
+use Conversionbox\Predictivesearch\Block\Adminhtml\Form\Field\SortDirection;
 
 class SortAttributes extends AbstractFieldArray
 {

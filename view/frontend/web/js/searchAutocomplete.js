@@ -7,8 +7,9 @@ define([
 	'Conversionbox_Predictivesearch/js/component/category',
 	'Conversionbox_Predictivesearch/js/component/pages',
 	'mage/url',
+	'uuid4',
 	'ko'
-], function($, Component, searchConfig, multiSearchComponent, productComponent, categoryComponent, pageComponent, url, ko) {
+], function($, Component, searchConfig, multiSearchComponent, productComponent, categoryComponent, pageComponent, url,uuid4, ko) {
 	'use strict';
 
 	let keyword = '';

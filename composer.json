@@ -14,7 +14,7 @@
   "autoload": {
     "files": [ "registration.php" ],
     "psr-4": {
-      "Thecommerceshop\\Predictivesearch\\": ""
+      "Conversionbox\\Predictivesearch\\": ""
     }
   }
 }

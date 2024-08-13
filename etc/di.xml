@@ -14,8 +14,8 @@
             </argument>
         </arguments>
     </type>
-     <preference for="Conversionbox\Predictivesearch\Model\Api\TypesenseSearchRepositoryInterface" type="Conversionbox\Predictivesearch\Model\TypesenseSearchRepository" />
-    <preference for="Conversionbox\Predictivesearch\Model\Api\Data\TypesenseSearchInterface" type="Conversionbox\Predictivesearch\Model\Data\TypesenseSearch" />
-    <preference for="Conversionbox\Predictivesearch\Model\Api\Data\TypesenseSearchResultsInterface" type="Magento\Framework\Api\SearchResults" />
+     <preference for="Conversionbox\Predictivesearch\Api\TypesenseSearchRepositoryInterface" type="Conversionbox\Predictivesearch\Model\TypesenseSearchRepository" />
+    <preference for="Conversionbox\Predictivesearch\Api\Data\TypesenseSearchInterface" type="Conversionbox\Predictivesearch\Model\Data\TypesenseSearch" />
+    <preference for="Conversionbox\Predictivesearch\Api\Data\TypesenseSearchResultsInterface" type="Magento\Framework\Api\SearchResults" />
     <preference for="Magento\Framework\HTTP\Client\Curl" type="Conversionbox\Predictivesearch\Rewrite\Framework\HTTP\Client\Curl" />
 </config>

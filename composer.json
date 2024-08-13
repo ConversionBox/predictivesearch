@@ -1,6 +1,6 @@
 {
   "name": "conversionbox/predictivesearch",
-  "description": "Typesense Search integration for Magento 2",
+  "description": "conversionbox Search integration for Magento 2",
   "type": "magento2-module",
   "version": "1.0.0",
   "license": [
@@ -8,13 +8,14 @@
         "AFL-3.0"
     ],
   "require": {
+     "php": ">=7.4",
     "php-http/curl-client":"^2.3",
     "typesense/typesense-php": "^4.8"
   },
   "autoload": {
     "files": [ "registration.php" ],
     "psr-4": {
-      "Thecommerceshop\\Predictivesearch\\": ""
+      "Conversionbox\\Predictivesearch\\": ""
     }
   }
 }

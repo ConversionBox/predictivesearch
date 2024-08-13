@@ -16,7 +16,7 @@ use Magento\Catalog\Model\ResourceModel\Category\Attribute\CollectionFactory as 
 use Magento\Catalog\Api\Data\CategoryAttributeInterface;
 use Magento\Catalog\Api\CategoryAttributeRepositoryInterface;
 use Conversionbox\Predictivesearch\Model\Queue\QueueProcessor;
-use Conversionbox\Predictivesearch\Model\Api\TypesenseSearchRepositoryInterface;
+use Conversionbox\Predictivesearch\Api\TypesenseSearchRepositoryInterface;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 
 class CategoryDataProcessor

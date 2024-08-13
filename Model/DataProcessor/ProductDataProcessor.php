@@ -20,7 +20,7 @@ use Magento\Catalog\Model\Product\Attribute\Repository as ProductAttributeRespos
 use Magento\Review\Model\ReviewFactory;
 use Magento\Sales\Model\ResourceModel\Report\Bestsellers\CollectionFactory as BestsellerCollection;
 use Conversionbox\Predictivesearch\Model\Queue\QueueProcessor;
-use Conversionbox\Predictivesearch\Model\Api\TypesenseSearchRepositoryInterface;
+use Conversionbox\Predictivesearch\Api\TypesenseSearchRepositoryInterface;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Framework\Filter\FilterManager;
 

@@ -6,19 +6,19 @@ namespace Conversionbox\Predictivesearch\Model;
 
 use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
 use Conversionbox\Predictivesearch\Model\TypesenseSearchFactory;
-use Conversionbox\Predictivesearch\Model\Api\Data\TypesenseSearchInterface;
+use Conversionbox\Predictivesearch\Api\Data\TypesenseSearchInterface;
 use Conversionbox\Predictivesearch\Model\ResourceModel\TypesenseSearch;
-use Conversionbox\Predictivesearch\Model\Api\Data\TypesenseSearchInterfaceFactory;
+use Conversionbox\Predictivesearch\Api\Data\TypesenseSearchInterfaceFactory;
 use Magento\Framework\Api\ExtensibleDataObjectConverter;
 use Magento\Framework\Api\DataObjectHelper;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Api\SearchCriteriaInterface;
-use Conversionbox\Predictivesearch\Model\Api\Data\TypesenseSearchResultsInterfaceFactory;
+use Conversionbox\Predictivesearch\Api\Data\TypesenseSearchResultsInterfaceFactory;
 use Conversionbox\Predictivesearch\Model\ResourceModel\TypesenseSearch\CollectionFactory;
-use Conversionbox\Predictivesearch\Model\Api\TypesenseSearchRepositoryInterface;
+use Conversionbox\Predictivesearch\Api\TypesenseSearchRepositoryInterface;
 use Magento\Framework\Exception\LocalizedException;
-use Conversionbox\Predictivesearch\Model\Api\Data\TypesenseSearchSearchResultsInterface;
+use Conversionbox\Predictivesearch\Api\Data\TypesenseSearchSearchResultsInterface;
 
 class TypesenseSearchRepository implements TypesenseSearchRepositoryInterface
 {

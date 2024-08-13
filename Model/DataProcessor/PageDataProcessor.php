@@ -14,7 +14,7 @@ use Magento\Cms\Model\ResourceModel\Page\CollectionFactory;
 use Magento\Cms\Helper\Page as PageHelper;
 use Magento\Cms\Model\PageFactory;
 use Conversionbox\Predictivesearch\Model\Queue\QueueProcessor;
-use Conversionbox\Predictivesearch\Model\Api\TypesenseSearchRepositoryInterface;
+use Conversionbox\Predictivesearch\Api\TypesenseSearchRepositoryInterface;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 
 class PageDataProcessor

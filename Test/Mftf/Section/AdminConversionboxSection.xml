@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
+    <section name="AdminConversionboxSection">
+        <element name="conversionboxTab" type="button" selector="#typesense_general_credentials-head"/>
+         <element name="conversionboxHost" type="input" selector="#typesense_general_credentials_host"/>
+          <element name="conversionboxApikey" type="input" selector="#typesense_general_credentials_admin_api_key"/>
+           <element name="conversionboxPort" type="input" selector="#typesense_general_credentials_port"/>
+           <element name="onversionboxProtocol" type="select" selector="#typesense_general_credentials_protocol"/>
+        <element name="selectedconversionboxProtocol" type="text" selector="#typesense_general_credentials_protocol option[selected]"/>
+    </section>
+</sections>

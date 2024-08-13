@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Conversionbox\Predictivesearch\Model\Api;
+namespace Conversionbox\Predictivesearch\Api;
 
 use Magento\Framework\Api\SearchCriteriaInterface;
-use Conversionbox\Predictivesearch\Model\Api\Data\TypesenseSearchInterface;
-use Conversionbox\Predictivesearch\Model\Api\Data\TypesenseSearchSearchResultsInterface;
+use Conversionbox\Predictivesearch\Api\Data\TypesenseSearchInterface;
+use Conversionbox\Predictivesearch\Api\Data\TypesenseSearchSearchResultsInterface;
 use Magento\Framework\Exception\LocalizedException;
 
 interface TypesenseSearchRepositoryInterface

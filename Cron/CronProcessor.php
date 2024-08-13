@@ -7,7 +7,7 @@ namespace Conversionbox\Predictivesearch\Cron;
 use Conversionbox\Predictivesearch\Model\Queue;
 use Conversionbox\Predictivesearch\Model\ConfigData;
 use Conversionbox\Predictivesearch\Model\ResourceModel\TypesenseSearch\CollectionFactory;
-use Conversionbox\Predictivesearch\Model\Api\TypesenseSearchRepositoryInterface;
+use Conversionbox\Predictivesearch\Api\TypesenseSearchRepositoryInterface;
 
 class CronProcessor
 {

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+<test name="DefaultConfigForTypesesenseTest">
+<annotations>
+<features value="Conversionbox"/>
+<stories value="Conversionbox configuration"/>
+<title value="Default Configuration for Conversionbox"/>
+<stories value="Conversionbox"/>
+<description value="Default Configuration for Conversionbox"/>
+<severity value="MAJOR"/>
+<group value="Conversionbox"/>
+</annotations>
+<before>
+<actionGroup ref="AdminLoginActionGroup" stepKey="loginAsAdmin"/>
+</before>
+<after>
+<!-- Collapse Conversionbox tab and logout -->
+<comment userInput="Collapse Conversionbox tab and logout" stepKey="collapseTabAndLogout"/>
+<click selector="{{AdminConversionboxSection.conversionboxTab}}" stepKey="collapseTab"/>
+<actionGroup ref="AdminLogoutActionGroup" stepKey="logout"/>
+</after>
+<comment userInput="Navigate to Stores -> Configuration -> Conversionbox -> Credential and Basic Setup" stepKey="goToAdminShippingMethodsPage"/>
+<amOnPage url="{{AdminConversionboxConfigPage.url}}" stepKey="navigateToAdminConversionboxPage"/>
+<waitForPageLoad stepKey="waitPageToLoad"/>
+<!--  Expand 'Credential and basic setup' tab  -->
+<comment userInput="Credential and basic setup tab" stepKey="expandcredentialtab"/>
+<conditionalClick selector="{{AdminConversionboxSection.conversionboxTab}}" dependentSelector="{{AdminConversionboxSection.conversionboxHost}}" visible="false" stepKey="expandTab"/>
+<waitForElementVisible selector="{{AdminConversionboxSection.conversionboxProtocol}}" stepKey="waitTabToExpand"/>
+<!--  Assert that selected Protocol type by default is 'https'  -->
+<comment userInput="Check that selected Protocol by default is 'https'" stepKey="assertDefConversionProtocols"/>
+<grabTextFrom selector="{{AdminConversionboxSection.selectedconversionboxProtocol}}" stepKey="grabSelectedOptionText"/>
+<assertEquals stepKey="assertDefConversionProtocol">
+<actualResult type="const">($grabSelectedOptionText)</actualResult>
+<expectedResult type="string">https</expectedResult>
+</assertEquals>
+</test>
+</tests>

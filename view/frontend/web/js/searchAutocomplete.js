@@ -7,8 +7,9 @@ define([
 	'Conversionbox_Predictivesearch/js/component/category',
 	'Conversionbox_Predictivesearch/js/component/pages',
 	'mage/url',
+	'Conversionbox_Predictivesearch/js/typesense/browser.min',
 	'ko'
-], function($, Component, searchConfig, multiSearchComponent, productComponent, categoryComponent, pageComponent, url, ko) {
+], function($, Component, searchConfig, multiSearchComponent, productComponent, categoryComponent, pageComponent, url,browser, ko) {
 	'use strict';
 
 	let keyword = '';
@@ -109,7 +110,11 @@ define([
 				sessionID = cookieID;
 				localStorage.setItem("_conversion_box_track_id", cookieID);
 			} else if (!cookieID && !storageId) {
-				sessionID = uuid4();
+				 if (typeof uuid4 === 'function') {
+			      sessionID = uuid4();
+			        } else {
+			            console.error('uuid4 is not defined or not a function');
+			        }
 				this.setCookie("_conversion_box_track_id", sessionID);
 				localStorage.setItem("_conversion_box_track_id", sessionID);
 			} else {

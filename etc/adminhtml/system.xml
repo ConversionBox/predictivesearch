@@ -239,21 +239,74 @@
             </group>
         </section>
         <section id="typesense_categories" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
-            <label>Categories</label>
+            <label>Category Pages</label>
             <tab>typesense</tab>
             <resource>Conversionbox_Predictivesearch::config_typesenseh</resource>
             <group id="categories" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Categories</label>
-                <field id="category_additional_attributes" translate="label comment" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Conversionbox search on category page</label>
+                <field id="enable_Category" translate="label comment" type="select" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Conversionbox search on category page</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="nb_of_products_shown" translate="label comment" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <validate>required-entry validate-digits validate-not-negative-number validate-digits-range digits-range-1-20</validate>
+                    <label>Number of products Shown</label>
+                    <comment>How many products to display by default</comment>
+                </field>
+                <field id="show_sku" translate="label comment" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Show Sku</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="show_outof_stock" translate="label comment" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Show Out Of Stock Products</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                 <field id="show_price" translate="label comment" type="select" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Show Price</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                 <field id="max_title_lines" translate="label comment" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Maximum Title Lines</label>
+                </field>
+                <field id="show_description" translate="label comment" type="select" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Show Product Description</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="max_description_lines" translate="label comment" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Maximum Description Lines</label>
+                </field>
+                <field id="flip_image_on_hover" translate="label comment" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Flip Image On Hover</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="search_filters" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Facets</label>
+                    <frontend_model>Conversionbox\Predictivesearch\Block\Adminhtml\Form\Field\FilterAttributes</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                    <comment>
+                        <![CDATA[
+                            Specify the filtering options you want to offer on a category page.<br>
+                                &nbsp; - Disjunctive allows a selection of different values per facet (e.g. hotels with 4 OR 5 stars).<br>
+                                &nbsp; - Conjunctive allows a selection of only one value per facet (e.g. only "Size M").
+                            <br><br>
+                                ]]>
+                   </comment>
+                </field>
+                <field id="sort_options" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Sort Options</label>
+                    <frontend_model>Conversionbox\Predictivesearch\Block\Adminhtml\Form\Field\SortAttributes</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+               <!--  <field id="category_additional_attributes" translate="label comment" type="text" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Attributes</label>
                     <frontend_model>Conversionbox\Predictivesearch\Block\Adminhtml\Form\Field\Category\SortOrderCategory</frontend_model>
                     <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
                 </field>
-                <field id="custom_ranking_category_attributes" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="custom_ranking_category_attributes" translate="label comment" type="text" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Ranking</label>
                     <frontend_model>Conversionbox\Predictivesearch\Block\Adminhtml\Form\Field\Category\CustomRankingCategory</frontend_model>
                     <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
-                </field>
+                </field> -->
             </group>
         </section>
         <section id="typesense_queue" translate="label" type="text" sortOrder="65" showInDefault="1" showInWebsite="1" showInStore="1">

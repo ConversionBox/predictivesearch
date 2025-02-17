@@ -1,0 +1,25 @@
+<!-- <script type="text/javascript">
+define([
+    'jquery',
+    'Magento_Ui/js/dynamic-rows/dynamic-rows'
+], function ($, DynamicRows) {
+    'use strict';
+
+    return DynamicRows.extend({
+        initialize: function () {
+            this._super();
+            this.initDeleteAction();
+        },
+
+        initDeleteAction: function () {
+            var self = this;
+            this.on('delete', function (record) {
+                // Custom logic before deleting
+                if (confirm('Are you sure you want to delete this row?')) {
+                    self.remove(record);
+                }
+            });
+        }
+    });
+});
+</script> -->

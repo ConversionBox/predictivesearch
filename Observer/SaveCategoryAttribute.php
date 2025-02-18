@@ -9,10 +9,26 @@ use Magento\Framework\App\RequestInterface;
 
 class SaveCategoryAttribute implements ObserverInterface
 {
+    /**
+     * @var PsrLoggerInterface
+     */
     protected $logger;
+    /**
+     * @var CategoryRepositoryInterface;
+     */
     protected $categoryRepository;
+    /**
+     * @var RequestInterface ;
+     */
     protected $request;
 
+    /**
+     * Save Category Attribute constructor.
+     *
+     * @param PsrLoggerInterface $logger
+     * @param CategoryRepositoryInterface $categoryRepository
+     * @param RequestInterface $request
+     */
     public function __construct(
         LoggerInterface $logger, 
         CategoryRepositoryInterface $categoryRepository,
@@ -22,22 +38,36 @@ class SaveCategoryAttribute implements ObserverInterface
         $this->categoryRepository = $categoryRepository;
         $this->request = $request;
     }
-
+    /**
+     * Custom Attribute save Observer
+     *
+     * @param Observer $observer
+     * @return void
+     */
     public function execute(Observer $observer)
     {
         $category = $observer->getEvent()->getCategory();
-        $facetData = $this->request->getParam('conversion_categories_facet');
-        // $writer = new \Zend_Log_Writer_Stream(BP . '/var/log/catcustom.log');
-        // $logger = new \Zend_Log();
-        // $logger->addWriter($writer);
-        // $logger->info(print_r($facetData['facet_settings'],true));
-        // $logger->info(json_encode(($facetData['facet_settings'])));
-        $value = json_encode($facetData);
-        $category->setConversionCategoriesFacet($value);
-    //     if (!empty($facetData) && isset($facetData['facet_settings'])) {
-    //         $formattedFacets = array_values($facetData['facet_settings']);
-    //         $category->setData('conversion_categories_facet', json_encode($formattedFacets));
-    // }
-}
+        $request = $this->request->getPostValue();
+        if (isset($request['conversion_categories_facet']) && is_array($request['conversion_categories_facet'])) {
+            $logger->info(print_r($request['conversion_categories_facet'],true));
+            $jsonValue = json_encode($request['conversion_categories_facet']);
+            $category->setData('conversion_categories_facet', $jsonValue);
+            $category->getResource()->saveAttribute($category, 'conversion_categories_facet');
+
+        }else{
+            $category->setData('conversion_categories_facet', null);
+            $category->getResource()->saveAttribute($category, 'conversion_categories_facet');
+        }
+        if (isset($request['conversion_categories_sortorder']) && is_array($request['conversion_categories_sortorder'])) {
+            $logger->info(print_r($request['conversion_categories_sortorder'],true));
+            $jsonValue = json_encode($request['conversion_categories_sortorder']);
+            $category->setData('conversion_categories_sortorder', $jsonValue);
+            $category->getResource()->saveAttribute($category, 'conversion_categories_sortorder');
+
+        }else{
+            $category->setData('conversion_categories_sortorder', null);
+            $category->getResource()->saveAttribute($category, 'conversion_categories_sortorder');
+        }
+  } 
 }
 ?>

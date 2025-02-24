@@ -18,4 +18,5 @@
     <preference for="Conversionbox\Predictivesearch\Api\Data\TypesenseSearchInterface" type="Conversionbox\Predictivesearch\Model\Data\TypesenseSearch" />
     <preference for="Conversionbox\Predictivesearch\Api\Data\TypesenseSearchResultsInterface" type="Magento\Framework\Api\SearchResults" />
     <preference for="Magento\Framework\HTTP\Client\Curl" type="Conversionbox\Predictivesearch\Rewrite\Framework\HTTP\Client\Curl" />
+    <preference for="Conversionbox\Predictivesearch\Api\ConfigInterface" type="Conversionbox\Predictivesearch\Model\Config"/>
 </config>

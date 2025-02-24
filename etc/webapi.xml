@@ -1,7 +1,25 @@
 <?xml version="1.0"?>
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi::etc/webapi.xsd">
-    <route url="/V1/customconfig/getbysection:section" method="GET">
-        <service class="Conversionbox\Predictivesearch\Api\ConfigInterface" method="getConfig"/>
+    <route url="/V1/customconfig/getbysection/:section" method="GET">
+        <service class="Conversionbox\Predictivesearch\Api\ConfigInterface" method="getBySection"/>
+        <resources>
+        <resource ref="Magento_Backend::admin"/>
+    </resources>
+    </route>
+    <route url="/V1/config/save" method="POST">
+        <service class="Conversionbox\Predictivesearch\Api\ConfigSaveInterface" method="saveConfig"/>
+        <resources>
+            <resource ref="Magento_Backend::admin"/>
+        </resources>
+    </route>
+  <route url="/V1/getfilter" method="GET">
+        <service class="Conversionbox\Predictivesearch\Api\FilterInterface" method="getFilter"/>
+        <resources>
+        <resource ref="Magento_Backend::admin"/>
+    </resources>
+    </route>
+  <route url="/V1/getsort" method="GET">
+        <service class="Conversionbox\Predictivesearch\Api\SortInterface" method="getSortby"/>
         <resources>
         <resource ref="Magento_Backend::admin"/>
     </resources>

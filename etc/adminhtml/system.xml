@@ -120,6 +120,9 @@
                 </field>
                 <field id="max_description_lines" translate="label comment" type="text" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Maximum Description Lines</label>
+                  <depends>
+                        <field id="show_description">1</field>
+                    </depends>
                 </field>
                 <field id="flip_image_on_hover" translate="label comment" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Flip Image On Hover</label>
@@ -241,11 +244,17 @@
                     <label>Show Product Description</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-               <field id="see_all_button" translate="label comment" type="select" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="max_description_lines" translate="label comment" type="text" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Maximum Description Lines</label>
+                  <depends>
+                        <field id="show_description">1</field>
+                    </depends>
+                </field>
+               <field id="see_all_button" translate="label comment" type="select" sortOrder="13" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>See All Button</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="minimum_char_length" translate="label comment" type="text" sortOrder="13" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="minimum_char_length" translate="label comment" type="text" sortOrder="14" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Minimum query length</label>
                     <validate>validate-digits</validate>
                     <comment>
@@ -257,7 +266,7 @@
                         <field id="enable_frontend">1</field>
                     </depends>
                    </field>
-                 <field id="excluded_pages" translate="label comment" type="select" sortOrder="14" showInDefault="1" showInWebsite="1" showInStore="1">
+                 <field id="excluded_pages" translate="label comment" type="select" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Exclude Pages</label>
                     <frontend_model>Conversionbox\Predictivesearch\Block\Adminhtml\Form\Field\Autocomplete\CustomPages</frontend_model>
                     <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>

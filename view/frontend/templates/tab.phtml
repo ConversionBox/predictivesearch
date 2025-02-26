@@ -1,0 +1,116 @@
+<div class="tabcontainer"></div>
+
+<script type="text/javascript">
+    require(['jquery'], function ($) {
+        var tabFlag = false;
+        var activeTab = "Products";
+        var tabArray = ["Products",  "Pages"]; 
+
+        let tabContentWrapper = document.createElement("div"),
+            tabContentInnerwrap = document.createElement("div"),
+            tabContentList = document.createElement("ul");
+
+        tabContentWrapper.classList.add("rvSearchResultTabWrapper");
+        tabContentInnerwrap.classList.add("rvSearchResultTabInnerWrap");
+        tabContentList.classList.add("rvSearchResultTabContentList");
+
+        tabContentWrapper.appendChild(tabContentInnerwrap);
+        tabContentInnerwrap.appendChild(tabContentList);
+
+        for (let i = 0; i < tabArray.length; i++) {
+            let currentTab = tabArray[i],
+                tabListItem = document.createElement("li");
+
+            tabListItem.classList.add("rvSearchResultTabListItem");
+
+            if (activeTab === currentTab) {
+                tabListItem.classList.add("rvSearchResultTabListItemActive");
+            }
+
+            tabListItem.innerHTML = `<a href="#" onclick="event.preventDefault();" data-tab-content="${currentTab}">${currentTab}<span class="rvSR${currentTab}Count"></span></a>`;
+            tabContentList.appendChild(tabListItem);
+        }
+
+        // Use `.append()` correctly inside `require`
+        $(".tabcontainer").append(tabContentWrapper);
+    });
+</script>
+
+<style type="text/css">
+    /* Tab Container */
+.rvSearchResultTabWrapper {
+    width: 100%;
+    max-width: 600px;
+    margin: auto;
+    background: #f8f9fa;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+/* Tab List (Navigation) */
+.rvSearchResultTabContentList {
+    list-style: none;
+    display: flex;
+    justify-content: space-around;
+    padding: 0;
+    margin: 0;
+    border-bottom: 2px solid #ddd;
+}
+
+/* Individual Tab Item */
+.rvSearchResultTabListItem {
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+    color: #555;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease-in-out;
+}
+
+/* Active Tab */
+.rvSearchResultTabListItemActive {
+    font-weight: bold;
+    color: #007bff;
+    border-bottom: 3px solid #007bff;
+}
+
+/* Tab Content Area */
+.rvSearchResultTabContent {
+    display: none;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+/* Show Active Tab Content */
+.rvSearchResultTabContent.active {
+    display: block;
+}
+
+/* Tab Links */
+.rvSearchResultTabListItem a {
+    text-decoration: none;
+    color: inherit;
+    font-weight: 500;
+}
+
+/* Hover Effect */
+.rvSearchResultTabListItem:hover {
+    color: #007bff;
+}
+
+/* Responsive Styles */
+@media (max-width: 600px) {
+    .rvSearchResultTabContentList {
+        flex-direction: column;
+    }
+    .rvSearchResultTabListItem {
+        text-align: center;
+        padding: 10px;
+        width: 100%;
+    }
+}
+
+</style>

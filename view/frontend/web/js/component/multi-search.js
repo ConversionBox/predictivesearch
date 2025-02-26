@@ -19,7 +19,11 @@ define(
 
         /** Page Config */
         const PAGE_MAX_COUNT = typesenseConfig.auto_complete.pages_count;
-
+        const SHOW_PRICE = typesenseConfig.auto_complete.show_price;
+        const SHOW_SKU = typesenseConfig.auto_complete.show_sku;
+        const SHOW_DESCRIPTION = typesenseConfig.auto_complete.show_description;
+        const Max_DESCRIPTION_LINE = typesenseConfig.auto_complete.max_description_line;
+        const  SEE_ALL_BUTTON = typesenseConfig.auto_complete.see_all_button;
         /** Typo Tolerance */
         const TYPO_ENABLED = typesenseConfig.typotolerance.enable;
         const WORD_LENGTH = typesenseConfig.typotolerance.word_length;
@@ -33,7 +37,7 @@ define(
         const STORE = typesenseConfig.general.storeCode;
         const POPULAR_TERMS = typesenseConfig.search_terms.data;
         const UNIQUEID = typesenseConfig.general.unique_id;
-
+       
         let excludedPageArr = [];
         let analyticsURL='https://devbackend.conversionbox.io/';
         if (Object.keys(EXCUDED_PAGE).length >= 1) {
@@ -188,6 +192,7 @@ $('#auto_search_time').html(
                         }
                     }
                     var name = val.document.product_name;
+                    var description =  val.document.description;
                     var sku = val.document.sku;
                      if (typeof val.highlight !== 'undefined'&& HIGHLIGHTS == 1) {
                         var highlight = val.highlight.name;
@@ -205,7 +210,7 @@ $('#auto_search_time').html(
                     } else {
                         image = PLACEHOLDER;
                     }
-                    html += `
+                     html += `
                         <div class="product-item">
                             <a href="${val.document.url}" >
                                 <div class="product-wrapper">
@@ -213,29 +218,35 @@ $('#auto_search_time').html(
                                         <img src="${image}" class="product-image"/>
                                     </div>
                                     <div class="predictive-product_container">
-                                        <div class="predictive-product_heading">${name}</div>
-                                        <div class="predictive-product_sku">Sku: ${sku}</div>
-                                        <div class="predictive-product_price" >`;
+                                        <div class="predictive-product_heading">${name}</div>`;
+                                          if(SHOW_DESCRIPTION == 1){
+                                               html += `<div class="predictive-product_description" style="-webkit-line-clamp:${Max_DESCRIPTION_LINE};">${description}</div>`;
+                                           }
+                                           if(SHOW_SKU == 1){
+                                        html += `<div class="predictive-product_sku">Sku: ${sku}</div>`;
+                                           }
+                                          if(SHOW_PRICE == 1){
+                                       html += `<div class="predictive-product_price" >`;
                                         if(window.location.href != BASE_URL && $("body").hasClass('catalog-product-view') == false){
                                             html+=`$${priceUtils.formatPriceLocale(price)}`;
                                         }
                                         else{
                                             html +=`${priceUtils.formatPriceLocale(price)}`;
                                         }
-                                        html+=`</div>
-                                    </div>
+                                        html +=`</div>`;
+                                        }
+                                   html +=`</div>
                                 </div>
                             </a>
                         </div>
-                    `;
-                    count++;
+                    `;                    count++;
                     if (count == PRODUCT_MAX_COUNT) {
                         $('.product-viewall').html('View All '+found+' Products')
                         $('.product-viewall').show();
                         return false;
                     }
             });
-            if (count < PRODUCT_MAX_COUNT) {
+            if (count < PRODUCT_MAX_COUNT || SEE_ALL_BUTTON == 0) {
                 $('.product-viewall').hide();
             }
             $('#product_section').html(html);

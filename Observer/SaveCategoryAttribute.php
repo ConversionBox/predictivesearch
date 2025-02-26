@@ -49,7 +49,6 @@ class SaveCategoryAttribute implements ObserverInterface
         $category = $observer->getEvent()->getCategory();
         $request = $this->request->getPostValue();
         if (isset($request['conversion_categories_facet']) && is_array($request['conversion_categories_facet'])) {
-            $logger->info(print_r($request['conversion_categories_facet'],true));
             $jsonValue = json_encode($request['conversion_categories_facet']);
             $category->setData('conversion_categories_facet', $jsonValue);
             $category->getResource()->saveAttribute($category, 'conversion_categories_facet');
@@ -59,7 +58,6 @@ class SaveCategoryAttribute implements ObserverInterface
             $category->getResource()->saveAttribute($category, 'conversion_categories_facet');
         }
         if (isset($request['conversion_categories_sortorder']) && is_array($request['conversion_categories_sortorder'])) {
-            $logger->info(print_r($request['conversion_categories_sortorder'],true));
             $jsonValue = json_encode($request['conversion_categories_sortorder']);
             $category->setData('conversion_categories_sortorder', $jsonValue);
             $category->getResource()->saveAttribute($category, 'conversion_categories_sortorder');

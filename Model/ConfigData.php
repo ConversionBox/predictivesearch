@@ -78,7 +78,50 @@ class ConfigData
      * Enable Addto cart
      */
     private const ADD_CART = 'typesense_search_result/instant_search_result/enable_addtocart';
-
+   /**
+    *  show price Search result page
+    **/  
+   private const SEARCH_SHOW_PRICE = 'typesense_search_result/instant_search_result/show_price';
+   /**
+    *  show sku Search result page
+    **/  
+   private const SEARCH_SHOW_SKU = 'typesense_search_result/instant_search_result/show_sku';
+   /**
+    *  Maximum Title Lines Search result page
+    **/  
+   private const SEARCH_MAX_TITLE_LINE = 'typesense_search_result/instant_search_result/max_title_lines';
+    /**
+    *  Flip Image On Hover Search result page
+    **/  
+   private const SEARCH_FLIP_IMG_HOVER = 'typesense_search_result/instant_search_result/flip_image_on_hover';
+   /**
+    *  Show description Search result page
+    **/  
+   private const SEARCH_SHOW_DESC = 'typesense_search_result/instant_search_result/show_description';
+    /**
+    *  Maximum  description line search result page
+    **/  
+   private const SEARCH_MAX_DESC_LINE = 'typesense_search_result/instant_search_result/max_description_lines';
+   /**
+    *  Show  Price  autocomplete
+    */
+    private const AUTOCOMPLTE_SHOW_PRICE = "typesense_autocomplete/autocomplete/show_price";
+   /**
+    * Show SKU autocomplete
+    */
+    private const AUTOCOMPLETE_SHOW_SKU = "typesense_autocomplete/autocomplete/show_sku";
+    /**
+     * Show description autocomplete
+     */
+      private const AUTOCOMPLETE_SHOW_DESC = "typesense_autocomplete/autocomplete/show_description";
+   /**
+    * See All Button
+    */
+   private const SEE_ALL_BUTTON = "typesense_autocomplete/autocomplete/see_all_button";
+   /**
+    *  Maximum description Line
+    */
+    private const AUTOCOMPLETE_MAX_DESC_LINE = "typesense_autocomplete/autocomplete/max_description_lines";
     /**
      * Enable Category Search
      */
@@ -730,7 +773,39 @@ class ConfigData
     {
         return $this->getSystemConfigValues(self::IMG_WIDTH);
     }
-
+    public function getAutocompletesku(){
+      return $this->getSystemConfigValues(self::AUTOCOMPLETE_SHOW_SKU);
+     }
+    public function getAutocompleteprice(){
+     return $this->getSystemConfigValues(self::AUTOCOMPLTE_SHOW_PRICE);
+    }
+    public function getAutocompletedesc(){
+     return $this->getSystemConfigValues(self::AUTOCOMPLETE_SHOW_DESC);
+    }
+     public function getAutocompletemaxdescline(){
+     return $this->getSystemConfigValues(self::AUTOCOMPLETE_MAX_DESC_LINE);
+     }
+    public function getSeeall(){
+     return $this->getSystemConfigValues(self::SEE_ALL_BUTTON);
+    }
+    public function getInstantsku(){
+      return $this->getSystemConfigValues(self::SEARCH_SHOW_SKU);
+     }
+    public function getInstantprice(){
+     return $this->getSystemConfigValues(self::SEARCH_SHOW_PRICE);
+    }
+    public function getInstantdesc(){
+     return $this->getSystemConfigValues(self::SEARCH_SHOW_DESC);
+    }
+     public function getInstantmaxdescline(){
+     return $this->getSystemConfigValues(self::SEARCH_MAX_DESC_LINE);
+     }
+    public function getInstanttitle(){
+     return $this->getSystemConfigValues(self::SEARCH_MAX_TITLE_LINE);
+     }
+     public function getInstantflipImghover(){
+     return $this->getSystemConfigValues(self::SEARCH_FLIP_IMG_HOVER);
+     }
     /**
      * Cron staus
      *

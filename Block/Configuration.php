@@ -130,8 +130,14 @@ class Configuration extends Template implements CollectionDataSourceInterface
                 'price_slider' => $this->configData->enableSlider(),
                 'image_type' => $this->configData->getImageType(),
                 'image_height' => $this->configData->getImageHeight(),
-                'image_width' => $this->configData->getImageWidth()
-            ],
+                'image_width' => $this->configData->getImageWidth(),
+                'show_sku' =>  $this->configData->getInstantsku(),
+                'show_price' => $this->configData->getInstantprice(),
+                'show_description' =>  $this->configData->getInstantdesc(),
+                'max_description_line' => $this->configData->getInstantmaxdescline(),
+                'max_title_line'    => $this->configData->getInstanttitle(),
+                'flip_img_over'   => $this->configData->getInstantflipImghover()
+             ],
             'auto_complete' => [
                 'no_products' => $this->configData->getProductCount(),
                 'category_enabled' => $this->configData->getEnableCategorySearch(),
@@ -142,6 +148,11 @@ class Configuration extends Template implements CollectionDataSourceInterface
                 'suggestions' => $this->configData->showSuggestions(),
                 'suggestions_count' => $this->configData->getSuggestionsCount(),
                 'minimum_char_length' => $this->configData->getMinimumChar(),
+                'show_price'  => $this->configData->getAutocompleteprice(),
+                'show_sku'    => $this->configData->getAutocompletesku(),
+                'show_description'=> $this->configData->getAutocompletedesc(),
+                'max_description_line' =>  $this->configData->getAutocompletemaxdescline(),
+                'see_all_button'   => $this->configData->getSeeall()
             ],
             'products' => [
                 'attributes' => $this->configData->getProductAttributeConfig(),

@@ -46,6 +46,12 @@ define(
         const IMAGE_TYPE = typesenseConfig.search_result.image_type;
         const IMAGE_WIDTH = typesenseConfig.search_result.image_width;
         const IMAGE_HEIGHT = typesenseConfig.search_result.image_height;
+        const SHOW_SKU =  typesenseConfig.search_result.show_sku;
+        const SHOW_PRICE  = typesenseConfig.search_result.show_price;
+        const SHOW_DESCRIPTION = typesenseConfig.search_result.show_description;
+        const  MAX_DESCRIPTION_LINE = typesenseConfig.search_result.max_description_line;
+        const MAX_TITLE_LINE = typesenseConfig.search_result.max_title_line;
+       const   FLIP_IMG_HOVER =typesenseConfig.search_result.flip_img_over;
         const urlParams = new URLSearchParams(window.location.search);
         let refine = 'Refine';
         let analyticsURL = 'https://devbackend.conversionbox.io/';
@@ -421,6 +427,7 @@ define(
                             }
                             var name = val.document.product_name;
                             var sku = val.document.sku;
+                            var description = val.document.description;
                             if (typeof val.highlights[0] !== 'undefined' && HIGHLIGHTS == 1) {
                                 var highlight = val.highlights[0].field || false;
                                 if (highlight == 'name') {
@@ -451,10 +458,17 @@ define(
                                                 <img src="${image}" class="search-product-image" width="${IMAGE_WIDTH}" height="${IMAGE_HEIGHT}">
                                             </div>
                                             <div class="product_item_wrapper">
-                                                <div class="item_name">${name}</div>
-                                                <div class="item_sku">SKU: ${sku}</div>
-                                                <div class="item_price">${CURRENCY+priceUtils.formatPriceLocale(price)}</div>
-                                            </div>
+                                                <div class="item_name" style="-webkit-line-clamp:${MAX_TITLE_LINE};">${name}</div>`;
+                                                   if(SHOW_DESCRIPTION == 1){
+                                              html += `<div class="item_description" style="-webkit-line-clamp:${MAX_DESCRIPTION_LINE};">${description}</div>`;
+                                                 }
+                                               if(SHOW_SKU == 1){
+                                              html +=`<div class="item_sku">SKU: ${sku}</div>`;
+                                               }
+                                               if(SHOW_PRICE == 1){
+                                                html +=`<div class="item_price">${CURRENCY+priceUtils.formatPriceLocale(price)}</div>`;
+                                                }
+                                          html +=`</div>
                                         </div>
                                     </a>`;
                                     if(val.document.stock_status == false){

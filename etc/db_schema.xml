@@ -13,6 +13,25 @@
             <column name="job_id"/>
         </constraint>
     </table>
+    <table name="conversionbox_landing_page" resource="default" engine="innodb" comment="Conversionbox Landing Page Table">
+        <column xsi:type="int" name="landing_page_id" unsigned="false" nullable="false" identity="true" comment="Landing Page Id"/>
+        <column xsi:type="int" name="store_id" unsigned="true" nullable="true" identity="false" comment="Store Id"/>
+        <column xsi:type="text" name="url_key" nullable="false" comment="Url Key"/>
+        <column xsi:type="smallint" name="is_active" unsigned="true" nullable="false" identity="false" default="0" comment="Is Active"/>
+        <column xsi:type="text" name="title" nullable="false" comment="Page Title"/>
+        <column xsi:type="text" name="meta_title" nullable="true" comment="Meta Title"/>
+        <column xsi:type="text" name="meta_description" nullable="true" comment="Meta Description"/>
+        <column xsi:type="text" name="meta_keywords" nullable="true" comment="Meta Keywords"/>
+        <column xsi:type="text" name="content" nullable="true" comment="Content"/>
+        <column xsi:type="text" name="custom_js" nullable="true" comment="Custom Js"/>
+        <column xsi:type="text" name="configuration" nullable="true" comment="Conversionbox Configuration"/>
+        <column xsi:type="text" name="custom_css" nullable="true" comment="Custom CSS"/>
+        <column xsi:type="datetime" name="date_from" nullable="true" comment="Date From"/>
+        <column xsi:type="datetime" name="date_to" nullable="true" comment="Date To"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="landing_page_id"/>
+        </constraint>
+    </table>
 </schema>
 
 

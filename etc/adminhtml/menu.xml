@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add
+            id="Conversionbox_Predictivesearch::manage"
+            title="Conversionbox Predictivesearch"
+            translate="title"
+            module="Conversionbox_Predictivesearch"
+            sortOrder="999"
+            parent="Magento_Backend::stores"
+            resource="Magento_Backend::stores"
+        />
+        <add
+            id="Conversionbox_Predictivesearch::credentials"
+            title="Credentials and Basic Setup"
+            translate="title"
+            module="Conversionbox_Predictivesearch"
+            sortOrder="10"
+            parent="Conversionbox_Predictivesearch::manage"
+            action="adminhtml/system_config/edit/section/typesense_general"
+            resource="Conversionbox_Predictivesearch::manage"
+        />
+        <add
+            id="Conversionbox_Predictivesearch::landing_page"
+            title="Conversionbox landing page"
+            translate="title"
+            module="Conversionbox_Predictivesearch"
+            sortOrder="10"
+            parent="Conversionbox_Predictivesearch::manage"
+            action="conversionbox_predictivesearch/landingpage/index"
+            resource="Conversionbox_Predictivesearch::manage"
+        />
+    </menu>
+    
+</config>

@@ -22,4 +22,22 @@
     <preference for="Conversionbox\Predictivesearch\Api\ConfigSaveInterface" type="Conversionbox\Predictivesearch\Model\ConfigSave"/>
  <preference for="Conversionbox\Predictivesearch\Api\FilterInterface" type="Conversionbox\Predictivesearch\Model\GetFilter"/>
     <preference for="Conversionbox\Predictivesearch\Api\SortInterface" type="Conversionbox\Predictivesearch\Model\GetSort"/>
+    <preference for="Conversionbox\Predictivesearch\Api\Data\LandingPageInterface" type="Conversionbox\Predictivesearch\Model\LandingPage"/>
+     <preference for="Conversionbox\Predictivesearch\Api\LandingPageInterface" type="Conversionbox\Predictivesearch\Model\Landing"/>
+          <preference for="Conversionbox\Predictivesearch\Api\UpdatelandingPageInterface" type="Conversionbox\Predictivesearch\Model\UpdateLanding"/>
+ <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+    <arguments>
+<argument name="collections" xsi:type="array">
+      <item name="conversionbox_predictivesearch_landingpage_listing_data_source" xsi:type="string">Conversionbox\Predictivesearch\Model\ResourceModel\LandingPage\Grid\Collection</item>
+      </argument>
+</arguments>
+</type>
+<type name="Conversionbox\Predictivesearch\Model\ResourceModel\LandingPage\Grid\Collection">
+   <arguments>
+      <argument name="mainTable" xsi:type="string">conversionbox_landing_page</argument>
+      <argument name="eventPrefix" xsi:type="string">conversionbox_landing_page_grid_collection</argument>
+     <argument name="eventObject" xsi:type="string">conversionbox_landing_page_grid_collection</argument>
+      <argument name="resourceModel" xsi:type="string">Conversionbox\Predictivesearch\Model\ResourceModel\LandingPage</argument>
+   </arguments>
+  </type>  
 </config>

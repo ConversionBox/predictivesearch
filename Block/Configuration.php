@@ -162,6 +162,16 @@ class Configuration extends Template implements CollectionDataSourceInterface
             ],
             'category' => [
                 'name' => $this->getCurrentCategory(),
+                'no_products' => $this->configData->getNoProductShown(),
+                'search_filters' => $this->configData->getCategorySearchFilters(),
+                'sort_options' => $this->configData->getCategorySortOptions(),
+                'price_slider' => $this->configData->enableCategorySlider(),
+                'show_sku' =>  $this->configData->getCategoryInstantsku(),
+                'show_price' => $this->configData->getCategoryInstantprice(),
+                'show_description' =>  $this->configData->getCategoryInstantdesc(),
+                'max_description_line' => $this->configData->getCategoryInstantmaxdescline(),
+                'max_title_line'    => $this->configData->getCategoryInstanttitle(),
+                'flip_img_over'   => $this->configData->getCategoryInstantflipImghover(),
                 'attributes' => $this->configData->getCategoryAttributeConfig(),
                 'ranking' => $this->categoryRankingQuery()
             ],

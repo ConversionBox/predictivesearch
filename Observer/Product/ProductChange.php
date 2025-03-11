@@ -80,6 +80,7 @@ class ProductChange implements ObserverInterface
      */
     public function execute(Observer $observer)
     {
+
         if (!$this->configData->getModuleStatus()) {
             return;
         }

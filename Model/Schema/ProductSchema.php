@@ -56,7 +56,7 @@ class ProductSchema
             ['name' => 'category', 'type' => TypesenseTypes::ARRAY_STRTING, 'facet' => true],
             ['name' => 'storeCode', 'type' => TypesenseTypes::STRING, 'facet' => true],
             ['name' => 'url_path', 'type' => TypesenseTypes::ARRAY_STRTING, 'facet' => true],
-            ['name' => 'stock_status', 'type' => TypesenseTypes::BOOL],
+            ['name' => 'stock_status', 'type' => TypesenseTypes::BOOL,'facet' => true],
             ['name' => 'product_status', 'type' => TypesenseTypes::STRING],
             ['name' => 'created_at', 'type' => TypesenseTypes::STRING, 'sort'  => true],
             ['name' => 'stock_qty', 'type' => TypesenseTypes::STRING, 'sort'  => true],

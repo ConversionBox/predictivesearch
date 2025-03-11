@@ -197,14 +197,12 @@ class ProductDataProcessor
         if (!$this->configData->getModuleStatus()) {
             return;
         }
-
-        if (!$this->configData->getAdminApiKey() ||
-                !$this->configData->getNode() ||
-                !$this->configData->getProtocol()
-            ) {
-                return;
-        }
-
+        // if (!$this->configData->getAdminApiKey() ||
+        //         !$this->configData->getNode() ||
+        //         !$this->configData->getProtocol()
+        //     ) {
+        //         return;
+        // }
         $this->syncAllProducts($ids, $storeId);
     }
 
@@ -216,7 +214,7 @@ class ProductDataProcessor
      * @param string $mode
      */
     public function syncAllProducts($ids, $storeId, $mode = null)
-    {
+    { 
         if ($this->configData->isCronEnbaled() && !empty($ids)) {
             return;
         }
@@ -437,7 +435,7 @@ class ProductDataProcessor
             $spAmount = $product->getSpecialPrice();
             $spPrice = ($spAmount)?$this->priceHelper->currency($spAmount, true, false):'';
 
-            if($product->getStatus() == 1 && ($stockStatus == 1 || $stockStatus == true)){
+            if($product->getStatus() == 1){
             $response = [
                 'id' => $product->getId(),
                 'product_id' => $product->getId(),

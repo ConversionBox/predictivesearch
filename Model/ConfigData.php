@@ -170,7 +170,7 @@ class ConfigData
     /**
      * Show Suggestions
      */
-    private const SHOW_SUGGESTIONS = 'typesense_autocomplete/autocomplete/enable_suggestions';
+    private const SHOW_SUGGESTIONS = 'typesense_autocomplete/autocomplete/enable_query_suggestions';
 
     /**
      * Ranking
@@ -202,6 +202,16 @@ class ConfigData
     private const CATEGORY_RANKING_ATTR = 'typesense_categories/categories/custom_ranking_category_attributes';
 
     /**
+     * Search Filter Attributes
+     */
+    private const CATEGORY_FILTERS = 'typesense_categories/categories/search_filters';
+
+    /**
+     * Sort Attributes
+     */
+    private const CATEGORY_SORT_ATTRIBUTES = 'typesense_categories/categories/sort_options';
+
+    /**
      * Enable Highlights
      */
     private const HIGHLIGHT_ENABLED = 'typesense_general/credentials/highlights';
@@ -224,7 +234,7 @@ class ConfigData
     /**
      * Suggestion Item Count
      */
-    private const SUGGESTIONS_COUNT = 'typesense_autocomplete/autocomplete/nb_of_suggestions_count';
+    private const SUGGESTIONS_COUNT = 'typesense_autocomplete/autocomplete/nb_of_query_suggestions';
 
      /**
       * Image Type
@@ -267,6 +277,34 @@ class ConfigData
 
 
     private const UNIQUEID ='typesense_general/credentials/unique_id';
+    /**
+    *  Display No of product
+    **/  
+   private const CATEGORY_NO_OF_PRODUCT = 'typesense_categories/categories/nb_of_products_shown';
+     /**
+    *  show price Search result page
+    **/  
+   private const CATEGORY_SHOW_PRICE = 'typesense_categories/categories/show_price';
+   /**
+    *  show sku Search result page
+    **/  
+   private const CATEGORY_SHOW_SKU = 'typesense_categories/categories/show_sku';
+   /**
+    *  Maximum Title Lines Search result page
+    **/  
+   private const CATEGORY_MAX_TITLE_LINE = 'typesense_categories/categories/max_title_lines';
+    /**
+    *  Flip Image On Hover Search result page
+    **/  
+   private const CATEGORY_FLIP_IMG_HOVER = 'typesense_categories/categories//flip_image_on_hover';
+   /**
+    *  Show description Search result page
+    **/  
+   private const CATEGORY_SHOW_DESC = 'typesense_categories/categories/show_description';
+    /**
+    *  Maximum  description line search result page
+    **/  
+   private const CATEGORY_MAX_DESC_LINE = 'typesense_categories/categories/max_description_lines';
     /**
      * @var ScopeConfigInterface
      */
@@ -806,6 +844,55 @@ class ConfigData
      public function getInstantflipImghover(){
      return $this->getSystemConfigValues(self::SEARCH_FLIP_IMG_HOVER);
      }
+     public function getCategoryInstantsku(){
+        return $this->getSystemConfigValues(self::CATEGORY_SHOW_SKU);
+       }
+      public function getCategoryInstantprice(){
+       return $this->getSystemConfigValues(self::CATEGORY_SHOW_PRICE);
+      }
+      public function getCategoryInstantdesc(){
+       return $this->getSystemConfigValues(self::CATEGORY_SHOW_DESC);
+      }
+       public function getCategoryInstantmaxdescline(){
+       return $this->getSystemConfigValues(self::CATEGORY_MAX_DESC_LINE);
+       }
+      public function getCategoryInstanttitle(){
+       return $this->getSystemConfigValues(self::CATEGORY_MAX_TITLE_LINE);
+      }
+      public function getCategoryInstantflipImghover(){
+        return $this->getSystemConfigValues(self::CATEGORY_FLIP_IMG_HOVER);
+       }
+       public function getNoProductShown(){
+        return $this->getSystemConfigValues(self::CATEGORY_NO_OF_PRODUCT);
+       }
+       public function getCategorySearchFilters(){
+        $filters = $this->getSystemConfigValues(self::CATEGORY_FILTERS);
+        if ($filters) {
+            $filters = $this->generalModel->decodeData($filters);
+            return $filters;
+        }
+        return [];
+       }
+       public function enableCategorySlider(){
+        $filterCollection = $this->getCategorySearchFilters();
+        foreach($filterCollection as $filter){
+            if($filter['facet'] == 'slider' && $filter['filterAttribute'] == 'price'){
+                return 1;
+            }else{
+                return 0;
+            }
+        }
+       
+       }
+       public function getCategorySortOptions(){
+        $sortOption = $this->getSystemConfigValues(self::CATEGORY_SORT_ATTRIBUTES);
+        if ($sortOption) {
+            $sortOption = $this->generalModel->decodeData($sortOption);
+            return $sortOption;
+        }
+
+        return [];
+       }
     /**
      * Cron staus
      *

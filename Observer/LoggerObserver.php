@@ -90,7 +90,7 @@ class LoggerObserver implements ObserverInterface
      */
     public function delete()
     {
-        $fileName= "log/typesenseError.log";
+        $fileName= "log/conversionboxError.log";
         if ($this->file->isExists($this->directory->getAbsolutePath().$fileName)) {
             $this->file->deleteFile($this->directory->getAbsolutePath().$fileName);
         }

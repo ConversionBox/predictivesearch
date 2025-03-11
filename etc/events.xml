@@ -4,4 +4,7 @@
     <event name="catalog_category_save_after">
         <observer name="save_conversion_categories_facet" instance="Conversionbox\Predictivesearch\Observer\SaveCategoryAttribute" />
     </event>
+    <event name="controller_action_postdispatch">
+       <observer name="All_Page_Observer" instance="Conversionbox\Predictivesearch\Observer\LoggerObserver"/>
+    </event>
 </config>

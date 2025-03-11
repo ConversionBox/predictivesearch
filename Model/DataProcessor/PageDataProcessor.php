@@ -125,14 +125,6 @@ class PageDataProcessor
         if (!$this->configData->getModuleStatus()) {
             return;
         }
-
-        if (!$this->configData->getAdminApiKey() ||
-                !$this->configData->getNode() ||
-                !$this->configData->getProtocol()
-            ) {
-            return;
-        }
-
         $this->syncPages($ids);
     }
 

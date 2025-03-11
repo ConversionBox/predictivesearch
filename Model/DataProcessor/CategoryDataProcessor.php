@@ -143,14 +143,6 @@ class CategoryDataProcessor
         if (!$this->configData->getModuleStatus()) {
             return;
         }
-
-        if (!$this->configData->getAdminApiKey() ||
-                !$this->configData->getNode() ||
-                !$this->configData->getProtocol()
-            ) {
-                return;
-        }
-
         $this->syncCategory($ids, $storeId);
     }
 

@@ -1,6 +1,4 @@
 <?php
-
-
  /**
   * @var \Magento\Framework\Escaper $escaper
   */
@@ -11,25 +9,32 @@
 <div class="search-result-page">
     <div id="search_result_page" class="search_result_page">
         <div class="content_wrapper">
-            <div id="product_count_listing"></div>
-            <input type="text" 
-           placeholder="<?= $escaper->escapeHtmlAttr(__('search here...')) ?>" 
-           id="category_searchbox" class="search-result-box search-box" />
-            <div id="cat_sort_option"></div>
-            <div id="cat_product_display_count"></div>
+             <div class="search-box">
+                <input type="text" 
+                    placeholder="<?= $escaper->escapeHtmlAttr(__('search here...')) ?>" 
+                    id="search-result-box" class="search-result-box" />
+                <span class="search-btn"></span>
+            </div>
+            <div class="search-option-insta">
+            <div id="product_count"></div>
+              
+            <div id="sort_option"></div>
+            <div id="product_display_count"></div>
         </div>
-        <div id="category_product_result"></div>
+        </div>
+        
+        <div id="product_result" class="suggestion_section"></div>
     </div>
-    <ul id="product_list_pagination" class="pagination-sm"></ul>
-    <div id="category-listing-component" data-bind="scope:'category-search-resultcomponent'">
+    <ul id="product-pagination" class="pagination-sm"></ul>
+    <div id="search-result-component" data-bind="scope:'search-resultcomponent'">
         <!-- ko template: getTemplate() --><!-- /ko -->
         <script type="text/x-magento-init">
         {
-            "#category-listing-component": {
+            "#search-result-component": {
                 "Magento_Ui/js/core/app": {
                 "components": {
-                        "category-search-resultcomponent": {
-                            "component": "Conversionbox_Predictivesearch/js/category/category-listing"
+                        "search-resultcomponent": {
+                            "component": "Conversionbox_Predictivesearch/js/category/result"
                         }
                     }
                 }

@@ -62,7 +62,7 @@
             </argument>
             <settings>
                 <label translate="true">Attribute</label>
-                <dataScope>attribute</dataScope>
+                <dataScope>filterAttribute</dataScope>
                 <dataType>text</dataType>
                 <elementTmpl>ui/grid/filters/elements/ui-select</elementTmpl>
             </settings>
@@ -89,7 +89,7 @@
             </argument>
             <settings>
                 <label translate="true">Facet Type</label>
-                <dataScope>facettype</dataScope>
+                <dataScope>facet</dataScope>
                 <dataType>text</dataType>
                 <elementTmpl>ui/grid/filters/elements/ui-select</elementTmpl>
             </settings>
@@ -105,7 +105,7 @@
         <field name="label" formElement="input">
             <settings>
                 <label translate="true">Label</label>
-                <dataScope>label</dataScope>
+                <dataScope>fieldName</dataScope>
                 <componentType>field</componentType>
                <validation>
             <rule name="required-entry" xsi:type="boolean">true</rule>
@@ -127,7 +127,7 @@
             </argument>
             <settings>
                 <label translate="true">Searchable</label>
-                 <dataScope>searchable</dataScope>
+                 <dataScope>filterOption</dataScope>
                 <dataType>text</dataType>
                 <elementTmpl>ui/grid/filters/elements/ui-select</elementTmpl> 
 
@@ -204,7 +204,7 @@
             </argument>
             <settings>
                 <label translate="true">Attribute</label>
-                <dataScope>attribute</dataScope>
+                <dataScope>sortAttribute</dataScope>
                 <dataType>text</dataType>
                 <elementTmpl>ui/grid/filters/elements/ui-select</elementTmpl>
             </settings>
@@ -232,7 +232,7 @@
             </argument>
             <settings>
                 <label translate="true">Order</label>
-                <dataScope>order</dataScope>
+                <dataScope>sortDirection</dataScope>
                 <dataType>text</dataType>
                 <elementTmpl>ui/grid/filters/elements/ui-select</elementTmpl>
             </settings>
@@ -247,7 +247,7 @@
         <field name="label" formElement="input">
             <settings>
                 <label translate="true">Label</label>
-                <dataScope>label</dataScope>
+                <dataScope>fieldName</dataScope>
                 <componentType>field</componentType>
                  <validation>
                 <rule name="required-entry" xsi:type="boolean">true</rule>

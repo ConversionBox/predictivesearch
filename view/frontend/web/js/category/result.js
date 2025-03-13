@@ -37,6 +37,7 @@ define(
 						productResult.performSearch(queryParam, page, typsenseClient, filterValue);
 					}
                     productResult.performSearch(queryParam, page, typsenseClient, filterValue);
+					upadteUrl(keyword);
 				});
 
 				$("#search-result-box").on("keyup", function(e) {

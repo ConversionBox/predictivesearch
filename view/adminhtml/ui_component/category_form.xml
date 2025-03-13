@@ -30,6 +30,7 @@
                     <item name="componentType" xsi:type="string">dynamicRows</item>
                     <item name="recordTemplate" xsi:type="string">record</item>
                     <item name="addButtonLabel" xsi:type="string">Add Row</item>
+                    <item name="default" xsi:type="string">[]</item>
                     <item name="deleteProperty" xsi:type="boolean">false</item>
                     <item name="label" xsi:type="string">Facets</item>
                     <additionalClasses>

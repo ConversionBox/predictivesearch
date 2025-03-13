@@ -25,6 +25,7 @@
     <preference for="Conversionbox\Predictivesearch\Api\Data\LandingPageInterface" type="Conversionbox\Predictivesearch\Model\LandingPage"/>
      <preference for="Conversionbox\Predictivesearch\Api\LandingPageInterface" type="Conversionbox\Predictivesearch\Model\Landing"/>
           <preference for="Conversionbox\Predictivesearch\Api\UpdatelandingPageInterface" type="Conversionbox\Predictivesearch\Model\UpdateLanding"/>
+           <preference for="Conversionbox\Predictivesearch\Api\CategoryAttributeInterface" type="Conversionbox\Predictivesearch\Model\CategoryAttribute"/>
  <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
     <arguments>
 <argument name="collections" xsi:type="array">

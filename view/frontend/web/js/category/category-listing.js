@@ -52,6 +52,7 @@ define(
         const  MAX_DESCRIPTION_LINE = typesenseConfig.category.max_description_line;
         const MAX_TITLE_LINE = typesenseConfig.category.max_title_line;
        const   FLIP_IMG_HOVER =typesenseConfig.category.flip_img_over;
+       const SHOW_OUT_OF_STOCK = typesenseConfig.category.show_out_of_stock;
         const urlParams = new URLSearchParams(window.location.search);
         let refine = 'Refine';
         let analyticsURL = 'https://devbackend.conversionbox.io/';
@@ -164,6 +165,9 @@ define(
                     'min_len_1typo': WORD_LENGTH,
                     'min_len_2typo': WORD_LENGTH
 
+                }
+                if(SHOW_OUT_OF_STOCK == 0){
+                    searchParameters.filter_by += `&& stock_status:=true`;
                 }
 
                 if (perPage || $('#product_count_page').val()) {
@@ -436,10 +440,12 @@ define(
                         $('#product_result').html(html);
                         renderFilterOptions(searchResults);
                         showSelectedFilter(filterParam)
+                        if(SLIDER == 1){
                         if (searchParameters.filter_by == "") {
                             sliderAction(location.search.split('=')[1], filterParam);
                         } else {
                             sliderAction(keyword, filterParam, searchResults.facet_counts[0].stats);
+                        }
                         }
                         const cartBtn = document.querySelector('#product_result');
                         if (cartBtn) {

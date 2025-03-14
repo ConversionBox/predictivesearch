@@ -14,6 +14,7 @@ define(
 		let keyword = null;
 		let filterValue = null;
 		let sortParam = null;
+		const SLIDER = typesenseConfig.search_result.price_slider;
 		//initialize the typsense client
 		const typsenseClient = searchConfig.createClient(typesenseConfig);
 
@@ -41,7 +42,10 @@ define(
 					keyword = e.target.value;
 					upadteUrl(keyword);
 					productResult.performSearch(keyword, page, typsenseClient, filterValue);
-					productResult.sliderComponent(keyword);
+					if(SLIDER == 1){
+						productResult.sliderComponent(keyword);
+					}
+					
 				});
 			},
 		});

@@ -16,7 +16,7 @@ define(
 		let sortParam = null;
 		//initialize the typsense client
 		const typsenseClient = searchConfig.createClient(typesenseConfig);
-
+		const SLIDER = typesenseConfig.category.price_slider;
 		const urlParams = new URLSearchParams(window.location.search);
 		const queryParam = urlParams.get('q');
 		$('#search-result-box').val(queryParam);
@@ -44,7 +44,9 @@ define(
 					keyword = e.target.value;
 					upadteUrl(keyword);
 					productResult.performSearch(keyword, page, typsenseClient, filterValue);
+					if(SLIDER == 1){
 					productResult.sliderComponent(keyword);
+					}
 				});
 			},
 		});

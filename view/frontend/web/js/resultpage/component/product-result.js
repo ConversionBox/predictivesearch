@@ -52,6 +52,7 @@ define(
         const  MAX_DESCRIPTION_LINE = typesenseConfig.search_result.max_description_line;
         const MAX_TITLE_LINE = typesenseConfig.search_result.max_title_line;
        const   FLIP_IMG_HOVER =typesenseConfig.search_result.flip_img_over;
+       const SHOW_OUT_OF_STOCK = typesenseConfig.search_result.show_out_of_stock;
         const urlParams = new URLSearchParams(window.location.search);
         let refine = 'Refine';
         let analyticsURL = 'https://devbackend.conversionbox.io/';
@@ -214,6 +215,7 @@ define(
                     'q': keyword,
                     'query_by': searchAttributes,
                     'per_page': NO_PRODUCTS_PAGE,
+                    'filter_by' :`storeCode:["${STORE}"]`,
                     'page': page,
                     'facet_by': facetParam,
                     'sort_by': ranking,
@@ -222,7 +224,10 @@ define(
                     'min_len_1typo': WORD_LENGTH,
                     'min_len_2typo': WORD_LENGTH,
                 }
-
+                if(SHOW_OUT_OF_STOCK == 0){
+                    searchParameters.filter_by += ` && stock_status:=true`;
+                }
+                
                 if (perPage || $('#product_count_page').val()) {
                     perPage = ($('#product_count_page').val()) ? $('#product_count_page').val() : perPage;
                     searchParameters.per_page = perPage;
@@ -246,24 +251,24 @@ define(
                 let requestQuery = '';
                 $.each(finalRequestParam, function(key, val) {
                     if (val != '') {
-                        requestQuery += key + ':=[' + val + '] &&';
+                        requestQuery += '&&'+ key + ':=[' + val + '] &&';
                     }
                 });
 
                 if (requestQuery) {
                     searchParameters.query_by = searchAttributes;
                     requestQuery = requestQuery.slice(0, -2);
-                    if (SLIDER == 1 && (tmin && tmax)) {
-                        requestQuery = requestQuery;
-                    }
+                    // if (SLIDER == 1 && (tmin && tmax)) {
+                    //     requestQuery = requestQuery;
+                    // }
                 }
-                searchParameters.filter_by = requestQuery;
+                searchParameters.filter_by += requestQuery;
 
                 if (priceFilter && SLIDER == 1) {
                     priceFilter = priceFilter.split('-');
                     let multiRequestQuery = '';
                     if (SLIDER != 1) {
-                        multiRequestQuery = 'price:=[' + priceFilter[0] + '..' + priceFilter[1] + '] &&' + requestQuery;
+                        multiRequestQuery = '&& price:=[' + priceFilter[0] + '..' + priceFilter[1] + '] &&' + requestQuery;
                         multiRequestQuery = multiRequestQuery.slice(0, -2);
                         searchParameters.filter_by = multiRequestQuery;
                     }
@@ -278,6 +283,7 @@ define(
                 if (sortQuery) {
                     searchParameters.sort_by = sortQuery;
                 }
+                searchParameters.filter_by = cleanQuery(searchParameters.filter_by);
                 typsenseClient.collections(INDEX_PERFIX + STORE + '-products').documents().search(searchParameters).then((searchResults) => {
                         //   sliderAction(keyword,searchParameters,searchResults.facet_counts[0].stats);
 
@@ -491,12 +497,13 @@ define(
                         $('#product_result').html(html);
                         renderFilterOptions(searchResults);
                         showSelectedFilter(filterParam)
+                        if(SLIDER == 1){
                         if (searchParameters.filter_by == "") {
                             sliderAction(location.search.split('=')[1], filterParam);
                         } else {
                             sliderAction(keyword, filterParam, searchResults.facet_counts[0].stats);
                         }
-
+                        }
                         hitSearchAnalytics(searchParameters, searchResults)
                         const cartBtn = document.querySelector('#product_result');
                         if (cartBtn) {
@@ -526,7 +533,19 @@ define(
                 console.log(error)
             }
         }
-
+        function cleanQuery(query) {
+            // Remove extra spaces and ensure uniform spacing around "&&"
+            query = query.replace(/\s*&&+\s*/g, " && ");
+        
+            // Split query by " && "
+            let parts = query.split(" && ").map(part => part.trim());
+        
+            // Use a Set to remove duplicate parameters
+            let uniqueParts = [...new Set(parts)];
+        
+            // Join back without trailing "&&"
+            return uniqueParts.join(" && ");
+        }
         function paginationAction(totalPage, visiblePage, keyword, productCount) {
 
             if (totalPage && visiblePage) {

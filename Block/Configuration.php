@@ -136,7 +136,8 @@ class Configuration extends Template implements CollectionDataSourceInterface
                 'show_description' =>  $this->configData->getInstantdesc(),
                 'max_description_line' => $this->configData->getInstantmaxdescline(),
                 'max_title_line'    => $this->configData->getInstanttitle(),
-                'flip_img_over'   => $this->configData->getInstantflipImghover()
+                'flip_img_over'   => $this->configData->getInstantflipImghover(),
+                'show_out_of_stock' => $this->configData->getInstantShowoutofStock()
              ],
             'auto_complete' => [
                 'no_products' => $this->configData->getProductCount(),
@@ -173,7 +174,8 @@ class Configuration extends Template implements CollectionDataSourceInterface
                 'max_title_line'    => $this->configData->getCategoryInstanttitle(),
                 'flip_img_over'   => $this->configData->getCategoryInstantflipImghover(),
                 'attributes' => $this->configData->getCategoryAttributeConfig(),
-                'ranking' => $this->categoryRankingQuery()
+                'ranking' => $this->categoryRankingQuery(),
+                'show_out_of_stock' =>  $this->configData->getCategoryShowoutofStock(),
             ],
             'search_terms' => [
                 'data' => $this->getPopularTerms()

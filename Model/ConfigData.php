@@ -6,6 +6,7 @@ namespace Conversionbox\Predictivesearch\Model;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\ScopeInterface;
 use Conversionbox\Predictivesearch\Model\General;
+use Magento\Framework\Registry;
 
 class ConfigData
 {
@@ -314,6 +315,10 @@ class ConfigData
      * @var General
      */
     private $generalModel;
+        /**
+     * @var Registry
+     */
+    private $registry;
 
     /**
      * Config Data Provider
@@ -323,10 +328,12 @@ class ConfigData
      */
     public function __construct(
         ScopeConfigInterface $scopeConfigInterface,
-        General $generalModel
+        General $generalModel,
+        Registry $registry
     ) {
         $this->scopeConfigInterface = $scopeConfigInterface;
         $this->generalModel = $generalModel;
+        $this->registry = $registry;
     }
 
     /**
@@ -866,11 +873,35 @@ class ConfigData
         return $this->getSystemConfigValues(self::CATEGORY_NO_OF_PRODUCT);
        }
        public function getCategorySearchFilters(){
+        $category = $this->registry->registry('current_category');
+        $filters = null;
+        $categoryId = null;
+        if ($category) {
+            $categoryId = $category->getId();
+        }
+        if($categoryId && $category->getData('enable_conversion_category') == 1 ){
+            $filters = $category->getData('conversion_categories_facet');
+            if($filters){
+            $outputArray = [];
+            foreach ($filters as $filter) {
+                $uniqueKey = "_" .round(microtime(true) * 1000) . '_'. rand(100, 999);
+                $outputArray[$uniqueKey] = [
+                    "filterAttribute" => $filter["filterAttribute"],
+                    "facet" => $filter["facet"],
+                    "fieldName" => $filter["fieldName"],
+                    "filterOption" => (string) $filter["filterOption"] // Ensure it's a string
+                ];
+            }
+            return $outputArray;
+           }
+            }
+        else{
         $filters = $this->getSystemConfigValues(self::CATEGORY_FILTERS);
         if ($filters) {
             $filters = $this->generalModel->decodeData($filters);
             return $filters;
         }
+         }
         return [];
        }
        public function enableCategorySlider(){
@@ -885,12 +916,35 @@ class ConfigData
        
        }
        public function getCategorySortOptions(){
-        $sortOption = $this->getSystemConfigValues(self::CATEGORY_SORT_ATTRIBUTES);
-        if ($sortOption) {
-            $sortOption = $this->generalModel->decodeData($sortOption);
-            return $sortOption;
+        $category = $this->registry->registry('current_category');
+        $filters = null;
+        $categoryId = null;
+        if ($category) {
+            $categoryId = $category->getId();
         }
-
+        if($categoryId && $category->getData('enable_conversion_category') == 1 ){
+            $filters = $category->getData('conversion_categories_sortorder');
+            if($filters){
+            $outputArray = [];
+             foreach ($filters as $filter) {
+                 $uniqueKey = "_" .round(microtime(true) * 1000) . '_'. rand(100, 999);
+                 $outputArray[$uniqueKey] = [
+                     "sortAttribute" => $filter["sortAttribute"],
+                     "sortDirection" => $filter["sortDirection"],
+                     "fieldName" => $filter["fieldName"],
+                     "position" => (string) $filter["position"] // Ensure it's a string
+                 ];
+             }
+             return $outputArray;
+            }
+            }else{
+            $sortOption = $this->getSystemConfigValues(self::CATEGORY_SORT_ATTRIBUTES);
+            if ($sortOption) {
+                $sortOption = $this->generalModel->decodeData($sortOption);
+               // print_r($sortOption);exit(0);
+                return $sortOption;
+            }
+           }
         return [];
        }
     /**

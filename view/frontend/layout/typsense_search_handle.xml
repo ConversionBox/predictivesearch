@@ -29,12 +29,12 @@
             </arguments>
         </referenceBlock>
         <referenceBlock name="category.products.list">
-            <action ifconfig="typesense_search_result/instant_search_result/enable_result_page" method="setTemplate">
+            <action ifconfig="typesense_categories/categories/enable_Category" method="setTemplate">
                 <argument name="template" xsi:type="string">Conversionbox_Predictivesearch::category/list.phtml</argument>
             </action>
         </referenceBlock>
          <referenceBlock name="catalog.leftnav">
-            <action ifconfig="typesense_search_result/instant_search_result/enable_result_page" method="setTemplate">
+            <action ifconfig="typesense_categories/categories/enable_Category" method="setTemplate">
                 <argument name="template" xsi:type="string">Conversionbox_Predictivesearch::search/layer/category.phtml</argument>
             </action>
             <arguments>

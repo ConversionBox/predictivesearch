@@ -8,6 +8,7 @@ use Magento\Framework\Event\ObserverInterface;
 use Conversionbox\Predictivesearch\Model\ConfigData;
 use Magento\Catalog\Model\Category;
 use Magento\Catalog\Model\Layer\Resolver;
+use Magento\Framework\App\RequestInterface;
 
 class LayoutProcessBefore implements ObserverInterface
 {
@@ -16,6 +17,11 @@ class LayoutProcessBefore implements ObserverInterface
      */
     private $configData;
     protected $layerResolver;
+    /**
+     * @var RequestInterface ;
+     */
+    protected $request;
+
 
     /**
      * Layout constructor
@@ -24,10 +30,12 @@ class LayoutProcessBefore implements ObserverInterface
      */
     public function __construct(
         ConfigData $configData,
-        Resolver $layerResolver
+        Resolver $layerResolver,
+        RequestInterface $request
     ) {
         $this->configData = $configData;
         $this->layerResolver = $layerResolver;
+        $this->request = $request;
     }
 
     /**
@@ -39,16 +47,18 @@ class LayoutProcessBefore implements ObserverInterface
     public function execute(Observer $observer)
     {
         if ($this->configData->getModuleStatus()) {
-
+            $category = "";
             $category = $this->layerResolver->get()->getCurrentCategory();
-            if ($category && $category->getData('enable_conversion_category') == 1) {
+            if (($this->request->getFullActionName() ==='catalog_category_view') &&(($category->getData('enable_conversion_category') == 1) || ($this->configData->getCategorypageEnabled() == 1))) {
                 $layout = $observer->getData('layout');
                 $layout->getUpdate()->addHandle('typesense_category_handle');
             }
-            elseif(!$category && $this->configData->getAdminApiKey() ) {
+            else {
+                if($this->configData->getAdminApiKey() ) {
                 $layout = $observer->getData('layout');
                 $layout->getUpdate()->addHandle('typsense_search_handle');
             }
         }
     }
+}
 }

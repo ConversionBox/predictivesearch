@@ -314,6 +314,7 @@ class ConfigData
     *  Maximum  description line search result page
     **/  
    private const CATEGORY_MAX_DESC_LINE = 'typesense_categories/categories/max_description_lines';
+   private const CATEGORY_PAGE_ENABLED ='typesense_categories/categories/enable_Category';
     /**
      * @var ScopeConfigInterface
      */
@@ -387,7 +388,17 @@ class ConfigData
     {
         return $this->getSystemConfigValues(self::ADMIN_API_KEY);
     }
-
+    
+    /**
+     * Conversion category page Enabled
+     *
+     * @param void
+     * @return string
+     */
+    public function getCategorypageEnabled()
+    {
+        return $this->getSystemConfigValues(self::CATEGORY_PAGE_ENABLED);
+    }
     /**
      * Get Index Prefix
      *

@@ -103,6 +103,14 @@ class ConfigData
     *  Maximum  description line search result page
     **/  
    private const SEARCH_MAX_DESC_LINE = 'typesense_search_result/instant_search_result/max_description_lines';
+    /**
+    *  Show out of stock product in  search result page
+    **/  
+    private const SEARCH_OUT_OF_STOCK = 'typesense_search_result/instant_search_result/show_outof_stock';
+    /**
+    *  Show out of stock product in  category page
+    **/  
+    private const CATEGORY_OUT_OF_STOCK = 'typesense_categories/categories/show_outof_stock';
    /**
     *  Show  Price  autocomplete
     */
@@ -872,6 +880,12 @@ class ConfigData
        public function getNoProductShown(){
         return $this->getSystemConfigValues(self::CATEGORY_NO_OF_PRODUCT);
        }
+       public function getCategoryShowoutofStock(){
+        return $this->getSystemConfigValues(self::CATEGORY_OUT_OF_STOCK);
+       }
+       public function getInstantShowoutofStock(){
+        return $this->getSystemConfigValues(self::SEARCH_OUT_OF_STOCK);
+       }
        public function getCategorySearchFilters(){
         $category = $this->registry->registry('current_category');
         $filters = null;
@@ -905,6 +919,24 @@ class ConfigData
         return [];
        }
        public function enableCategorySlider(){
+        $category = $this->registry->registry('current_category');
+        $filters = null;
+        $categoryId = null;
+        if ($category) {
+            $categoryId = $category->getId();
+        }
+        if($categoryId && $category->getData('enable_conversion_category') == 1 ){
+         $filterCollection = $category->getData('conversion_categories_facet');
+         if($filterCollection){
+            foreach($filterCollection as $filter){
+                if($filter['facet'] == 'slider' && $filter['filterAttribute'] == 'price'){
+                    return 1;
+                }else{
+                    return 0;
+                }
+            }
+         }
+        }else{
         $filterCollection = $this->getCategorySearchFilters();
         foreach($filterCollection as $filter){
             if($filter['facet'] == 'slider' && $filter['filterAttribute'] == 'price'){
@@ -913,8 +945,9 @@ class ConfigData
                 return 0;
             }
         }
-       
        }
+       return 0;
+    }
        public function getCategorySortOptions(){
         $category = $this->registry->registry('current_category');
         $filters = null;

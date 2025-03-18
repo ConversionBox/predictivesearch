@@ -21,8 +21,8 @@ define(
         /**
          * Total number per page
          */
-        const NO_PRODUCTS_PAGE = typesenseConfig.category.no_products;
-        const sortOptions = typesenseConfig.category.sort_options;
+        const NO_PRODUCTS_PAGE = typesenseConfig.search_result.no_products;
+        const sortOptions = typesenseConfig.search_result.sort_options;
         const ADD_To = 1;
         const SEARCHBLE_ATTRIBUTES = typesenseConfig.products.attributes;
         const POPULAR_TERMS = typesenseConfig.search_terms.data;
@@ -38,7 +38,7 @@ define(
          * Highlights
          */
         const HIGHLIGHTS = typesenseConfig.general.highlights;
-        const SLIDER = typesenseConfig.category.price_slider;
+        const SLIDER = typesenseConfig.search_result.price_slider;
         const CURRENCY = typesenseConfig.general.store_currency;
         const STORE = typesenseConfig.general.storeCode;
         const PLACEHOLDER = typesenseConfig.general.placeholder;
@@ -55,8 +55,8 @@ define(
         const SHOW_DESCRIPTION = 1;
         const  MAX_DESCRIPTION_LINE = 1;
         const MAX_TITLE_LINE = 1;
-       const   FLIP_IMG_HOVER =typesenseConfig.category.flip_img_over;
-       const SHOW_OUT_OF_STOCK = typesenseConfig.category.show_out_of_stock;
+       const   FLIP_IMG_HOVER =typesenseConfig.search_result.flip_img_over;
+       const SHOW_OUT_OF_STOCK = typesenseConfig.search_result.show_out_of_stock;
         const urlParams = new URLSearchParams(window.location.search);
         let refine = 'Refine';
         let analyticsURL = 'https://devbackend.conversionbox.io/';
@@ -79,7 +79,7 @@ define(
         let maxValue = 100;
         let searchResultsArray = [];
         let priceSlide = null;
-        let facet = typesenseConfig.category.search_filters;
+        let facet = typesenseConfig.search_result.search_filters;
         let totalPage = 0;
         let visiblePage = 0;
         let productCount = 0;

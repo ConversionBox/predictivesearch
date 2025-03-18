@@ -1,0 +1,40 @@
+<?php
+ /**
+  * @var \Magento\Framework\Escaper $escaper
+  */
+?>
+<?php
+$hasConfiguration = $block->getLandingPageConfiguration();
+if($hasConfiguration){ ?>
+<div class="message success" id="message_parent">
+    <div id="success_message"></div>
+</div>
+<div class="search-result-page">
+    <div id="search_result_page" class="search_result_page">
+        <div class="content_wrapper">
+            <div class="search-option-insta">
+            <div id="sort_option"></div>
+            <div id="product_display_count"></div>
+        </div>
+        </div>
+        <div id="product_result" class="suggestion_section"></div>
+    </div>
+    <ul id="product-pagination" class="pagination-sm"></ul>
+    <div id="search-result-component" data-bind="scope:'search-resultcomponent'">
+        <!-- ko template: getTemplate() --><!-- /ko -->
+        <script type="text/x-magento-init">
+        {
+            "#search-result-component": {
+                "Magento_Ui/js/core/app": {
+                "components": {
+                        "search-resultcomponent": {
+                            "component": "Conversionbox_Predictivesearch/js/landing/result"
+                        }
+                    }
+                }
+            }
+        }
+        </script>
+    </div>
+</div>
+<?php } ?>

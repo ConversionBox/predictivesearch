@@ -89,7 +89,6 @@ class Landing  implements  LandingPageInterface
      */
     public function updateLandingPage($landingPageId, $title = null, $urlkey = null, $isActive = null,$metaTitle=null,$metaDescription = null,$metaKeywords=null,$content=null,$configuration=null,$customJs=null,$customCss=null)
     {
-        echo "hi"; exit;
         // Load the landing page by ID
         $landingPage = $this->landingPageFactory->create()->load($landingPageId);
 

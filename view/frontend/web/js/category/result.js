@@ -56,7 +56,7 @@ define(
 		 * @param {*} keyword 
 		 */
 		function upadteUrl(keyword) {
-			var currentUrl = window.location.href;
+			var currentUrl = window.location.href+'?q=';
 			// if (keyword !="") {
 			// 	// If the URL already has query parameters, add "&q"
 			// 	// Otherwise, add "?q" to start query parameters

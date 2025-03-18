@@ -4,16 +4,14 @@ namespace Conversionbox\Predictivesearch\Block;
 
 use Conversionbox\Predictivesearch\Model\LandingPage as LandingPageModel;
 use Conversionbox\Predictivesearch\Model\LandingPageFactory;
-use Magento\Catalog\Model\Layer\Resolver as LayerResolver;
-use Magento\CatalogSearch\Block\Result;
-use Magento\CatalogSearch\Helper\Data;
 use Magento\Cms\Model\Template\FilterProvider;
-use Magento\Search\Model\QueryFactory;
 use Conversionbox\Predictivesearch\Helper\LandingPageHelper;
+use Magento\Framework\View\Element\Template;
+
 /**
  * @method int getPageId()
  */
-class LandingPage extends Result
+class LandingPage extends Template
 {
     /** @var FilterProvider */
     protected $filterProvider;
@@ -29,9 +27,6 @@ class LandingPage extends Result
      * Construct
      *
      * @param Magento\Framework\View\Element\Template\Context $context
-     * @param LayerResolver $layerResolver
-     * @param Data $catalogSearchData
-     * @param QueryFactory $queryFactory
      * @param FilterProvider $filterProvider
      * @param LandingPageModel $landingPage
      * @param LandingPageFactory $landingPageFactory
@@ -39,23 +34,13 @@ class LandingPage extends Result
      */
     public function __construct(
         \Magento\Framework\View\Element\Template\Context $context,
-        LayerResolver $layerResolver,
-        Data $catalogSearchData,
-        QueryFactory $queryFactory,
         FilterProvider $filterProvider,
         LandingPageModel $landingPage,
         LandingPageFactory $landingPageFactory,
         LandingPageHelper $landingPageHelper,
         array $data = []
     ) {
-        parent::__construct(
-            $context,
-            $layerResolver,
-            $catalogSearchData,
-            $queryFactory,
-            $data
-        );
-
+        parent::__construct($context, $data);
         $this->filterProvider = $filterProvider;
         $this->landingPage = $landingPage;
         $this->landingPageFactory = $landingPageFactory;
@@ -90,27 +75,22 @@ class LandingPage extends Result
      */
     protected function _prepareLayout()
     {
-        $page = $this->getPage();
-        $this->pageConfig->addBodyClass('conversionbox-landingpage-' . $page->getUrlKey());
-        $metaTitle = $page->getMetaTitle();
-        $this->pageConfig->getTitle()->set($page->getTitle() ? $page->getTitle() : $metaTitle);
-        $this->pageConfig->setKeywords($page->getMetaKeywords());
-        $this->pageConfig->setDescription($page->getMetaDescription());
-
-        $this->getLayout()->getBlock('landing_page_content')->setText($this->getLandingPageContent());
-         $this->getLayout()->getBlock('landing_page_configuration')->setText($this->getLandingPageConfiguration());
-        $this->getLayout()->getBlock('landing_page_custom_js')->setText($this->getLandingCustomJs());
-        $this->getLayout()->getBlock('landing_page_custom_css')->setText($this->getLandingCustomCss());
-
+         parent::_prepareLayout();
+         $page = $this->getPage();
+         $this->pageConfig->addBodyClass('conversionbox-landingpage-' . $page->getUrlKey());
+         $metaTitle = $page->getMetaTitle();
+         $this->pageConfig->getTitle()->set($page->getTitle() ? $page->getTitle() : $metaTitle);
+         $this->pageConfig->setKeywords($page->getMetaKeywords());
+         $this->pageConfig->setDescription($page->getMetaDescription());
         return $this;
     }
 
-    protected function getLandingPageContent()
+    public function getLandingPageContent()
     {
         return $this->filterProvider->getPageFilter()->filter($this->getPage()->getContent());
     }
 
-    protected function getLandingCustomJs()
+    public function getLandingCustomJs()
     {
         $customJs = $this->getPage()->getCustomJs();
 
@@ -121,7 +101,7 @@ class LandingPage extends Result
         return '<script type="text/javascript">' . $customJs . '</script>';
     }
 
-    protected function getLandingCustomCss()
+    public function getLandingCustomCss()
     {
         $customCss = $this->getPage()->getCustomCss();
 
@@ -139,22 +119,26 @@ class LandingPage extends Result
      */
     public function getIdentities()
     {
-        return [\Algolia\AlgoliaSearch\Model\LandingPage::CACHE_TAG . '_' . $this->getPage()->getId()];
+        return [\Conversionbox\Predictivesearch\Model\LandingPage::CACHE_TAG . '_' . $this->getPage()->getId()];
     }
-    protected function isLandingPage()
-    {
-        return $this->getRequest()->getFullActionName() === 'typesense_landingpage_view';
-    }
-    protected function getLandingPageId()
+     protected function isLandingPage()
+     {
+        $landingPageId = $this->getRequest()->getParam('landing_page_id');
+        if (!$landingPageId) {
+            return false;
+        }
+        return true;
+     }
+    public function getLandingPageId()
     {
         return $this->isLandingPage() ? $this->getCurrentLandingPage()->getId() : '';
     }
 
-    protected function getLandingPageConfiguration()
+    public function getLandingPageConfiguration()
     {
         return $this->isLandingPage() ? $this->getCurrentLandingPage()->getConfiguration() :"";
     }
-    protected function getCurrentLandingPage(): LandingPageModel|null|false
+    public function getCurrentLandingPage(): LandingPageModel|null|false
     {
         $landingPageId = $this->getRequest()->getParam('landing_page_id');
         if (!$landingPageId) {

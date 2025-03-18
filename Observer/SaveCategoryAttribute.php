@@ -6,6 +6,7 @@ use Magento\Framework\Event\ObserverInterface;
 use Psr\Log\LoggerInterface;
 use Magento\Catalog\Api\CategoryRepositoryInterface;
 use Magento\Framework\App\RequestInterface;
+use Conversionbox\Predictivesearch\Model\ConfigData;
 
 class SaveCategoryAttribute implements ObserverInterface
 {
@@ -21,6 +22,11 @@ class SaveCategoryAttribute implements ObserverInterface
      * @var RequestInterface ;
      */
     protected $request;
+     /**
+     * @var ConfigData
+     */
+    private $configData;
+
 
     /**
      * Save Category Attribute constructor.
@@ -32,11 +38,13 @@ class SaveCategoryAttribute implements ObserverInterface
     public function __construct(
         LoggerInterface $logger, 
         CategoryRepositoryInterface $categoryRepository,
-        RequestInterface $request
+        RequestInterface $request,
+        ConfigData $configData
     ) {
         $this->logger = $logger;
         $this->categoryRepository = $categoryRepository;
         $this->request = $request;
+        $this->configData = $configData;
     }
     /**
      * Custom Attribute save Observer
@@ -46,6 +54,16 @@ class SaveCategoryAttribute implements ObserverInterface
      */
     public function execute(Observer $observer)
     {
+        if (!$this->configData->getModuleStatus()) {
+            return;
+        }
+
+        if (!$this->configData->getAdminApiKey() ||
+                !$this->configData->getNode() ||
+                !$this->configData->getProtocol()
+            ) {
+                return;
+        }
         $category = $observer->getEvent()->getCategory();
         $request = $this->request->getPostValue();
         $isApi = strpos($this->request->getRequestUri(), '/rest/')!== false;

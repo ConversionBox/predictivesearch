@@ -28,9 +28,8 @@ class View extends Action
      * @return \Magento\Framework\Controller\ResultInterface
      */
     public function execute()
-    {
+    { 
         $pageId = $this->getRequest()->getParam('landing_page_id');
-
         $resultPage = $this->_objectManager->get(LandingPageHelper::class)->prepareResultPage($this, $pageId);
         if (!$resultPage) {
             $resultForward = $this->resultForwardFactory->create();

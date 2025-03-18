@@ -15,6 +15,8 @@ use Magento\Framework\DataObjectFactory;
 use Magento\Directory\Model\Currency;
 use Magento\Catalog\Helper\ImageFactory as HelperFactory;
 use Magento\Framework\View\Asset\Repository;
+use Conversionbox\Predictivesearch\Helper\LandingPageHelper;
+use Conversionbox\Predictivesearch\Model\LandingPage as LandingPageModel;
 
 class Configuration extends Template implements CollectionDataSourceInterface
 {
@@ -57,6 +59,7 @@ class Configuration extends Template implements CollectionDataSourceInterface
      * @var Repository
      */
     private $assetRepos;
+    protected $landingPageHelper;
 
     /**
      * Configuration constructor
@@ -82,6 +85,7 @@ class Configuration extends Template implements CollectionDataSourceInterface
         Currency $currency,
         HelperFactory $helperFactory,
         Repository $repository,
+        LandingPageHelper $landingPageHelper,
         array $data = []
     ) {
         $this->configData = $configData;
@@ -92,6 +96,7 @@ class Configuration extends Template implements CollectionDataSourceInterface
         $this->currency = $currency;
         $this->assetRepos = $repository;
         $this->helperFactory = $helperFactory;
+        $this->landingPageHelper = $landingPageHelper;
 
         parent::__construct($context, $data);
     }
@@ -176,6 +181,10 @@ class Configuration extends Template implements CollectionDataSourceInterface
                 'attributes' => $this->configData->getCategoryAttributeConfig(),
                 'ranking' => $this->categoryRankingQuery(),
                 'show_out_of_stock' =>  $this->configData->getCategoryShowoutofStock(),
+            ],
+            'landingPage' => [
+                'isLandingpage' => $this->isLandingPage(), 
+                'configuration' => $this->getLandingPageConfiguration(),
             ],
             'search_terms' => [
                 'data' => $this->getPopularTerms()
@@ -267,6 +276,7 @@ class Configuration extends Template implements CollectionDataSourceInterface
         return $rankingQuery;
     }
 
+
     /**
      * Get PlaceHolder Image
      *
@@ -282,5 +292,28 @@ class Configuration extends Template implements CollectionDataSourceInterface
             $helper = $this->helperFactory->create();
             return $this->assetRepos->getUrl($helper->getPlaceholder('small_image'));
         }
+    }
+    public function isLandingPage()
+    { 
+        return true;
+
+        
+    }
+    public function getCurrentLandingPage(): LandingPageModel|null|false
+    {
+        $landingPageId = $this->getRequest()->getParam('landing_page_id');
+        if (!$landingPageId) {
+            return null;
+        }
+        return $this->landingPageHelper->getLandingPage($landingPageId);
+    }
+
+    protected function getLandingPageConfiguration()
+    {
+        $landingPageId = $this->getRequest()->getParam('landing_page_id');
+        if (!$landingPageId) {
+            return null;
+        }
+        return $this->isLandingPage()? $this->getCurrentLandingPage()->getConfiguration():"";
     }
 }

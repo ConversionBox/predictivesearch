@@ -223,8 +223,9 @@ define(
                     // if (SLIDER == 1 && (tmin && tmax)) {
                     //     requestQuery += requestQuery;
                     // }
+                    searchParameters.filter_by += requestQuery;
                 }
-                searchParameters.filter_by += requestQuery;
+
 
                 if (priceFilter && SLIDER == 1) {
                     priceFilter = priceFilter.split('-');
@@ -245,7 +246,9 @@ define(
                 if (sortQuery) {
                     searchParameters.sort_by = sortQuery;
                 }
-                searchParameters.filter_by = cleanQuery(searchParameters.filter_by);
+                if( searchParameters.filter_by != ""){
+                    searchParameters.filter_by = cleanQuery(searchParameters.filter_by);
+                }
                 typsenseClient.collections(INDEX_PERFIX + STORE + '-products').documents().search(searchParameters).then((searchResults) => {
                         //   sliderAction(keyword,searchParameters,searchResults.facet_counts[0].stats);
 

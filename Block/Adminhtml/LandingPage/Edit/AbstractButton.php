@@ -47,7 +47,7 @@ abstract class AbstractButton
     {
         try {
             $modelId = $this->context->getRequest()->getParam('id');
-            /** @var \Algolia\AlgoliaSearch\Model\LandingPage $landingPage */
+            /** @var \Conversionbox\Predictivesearch\Model\LandingPage $landingPage */
             $landingPage = $this->landingPageFactory->create();
             $landingPage->getResource()->load($landingPage, $modelId);
 

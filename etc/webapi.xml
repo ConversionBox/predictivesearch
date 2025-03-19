@@ -43,7 +43,7 @@
         <route method="POST" url="/V1/category/update">
         <service class="Conversionbox\Predictivesearch\Api\CategoryAttributeInterface" method="updateCategoryAttribute"/>
         <resources>
-            <resource ref="Magento_Catalog::categories"/>
+            <resource ref="Magento_Backend::admin"/>
         </resources>
     </route>
 </routes>

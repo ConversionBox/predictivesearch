@@ -67,7 +67,7 @@ class Save extends AbstractAction
             }
             $landingPageId = $data['landing_page_id'];
 
-            /** @var \Algolia\AlgoliaSearch\Model\LandingPage $landingPage */
+            /** @var \Conversionbox\Predictivesearch\Model\LandingPage $landingPage */
             $landingPage = $this->landingPageFactory->create();
 
             if ($landingPageId) {

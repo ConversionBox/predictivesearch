@@ -63,8 +63,7 @@ class Connection implements HttpGetActionInterface
      */
     public function execute()
     {
-        $response = ['success' => false, 'message' => 'Failed to connect'];
-
+        $success= true;
         try {
             $url = 'https://devmagebe.conversionbox.io/api/v1/magento/connectMagentoStore';
             $uniqueId = $this->getUniqueId();
@@ -82,28 +81,19 @@ class Connection implements HttpGetActionInterface
 
             // Get the response
             $responseBody = $this->curl->getBody();
-
             // Decode JSON response if necessary
             $decodedResponse = json_decode($responseBody, true);
-
-            if ($decodedResponse && isset($decodedResponse['success']) && $decodedResponse['success']) {
-                $response = [
-                    'success' => true,
-                    'message' => 'Successfully connected to Conversionbox Merchant account'
-                ];
+            if ($decodedResponse && isset($decodedResponse['status']) && $decodedResponse['status'] == 'success') {
+            $success = true;
             } else {
-                $response = [
-                    'success' => false,
-                    'message' => isset($decodedResponse['message']) ? $decodedResponse['message'] : 'No success message returned.'
-                ];
+            $success = false;
             }
         } catch (\Exception $e) {
-            $response = ['success' => false, 'message' => 'Error: ' . $e->getMessage()];
+           $success = false;
         }
-
         // Return JSON response
         $resultJson =  $this->jsonFactory->create();
-        return $resultJson->setData($response);
+        return $resultJson->setData(['success' => $success]);
         
     }
     /**

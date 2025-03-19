@@ -89,6 +89,9 @@ class UpdateLanding  implements  UpdatelandingPageInterface
         // Save the updated landing page
         try {
             $landingPage->save();
+            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+$cacheManager = $objectManager->get(\Magento\Framework\App\Cache\Manager::class);
+$cacheManager->flush($cacheManager->getAvailableTypes());
             return "Landing Page updated successfully!";
         } catch (\Exception $e) {
             throw new LocalizedException(__('Error saving the landing page: %1', $e->getMessage()));

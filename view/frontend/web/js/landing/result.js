@@ -32,7 +32,6 @@ define(
 					return;
 				}
                 if(typesenseConfig.landingPage.configuration !== ''){
-                    console.log(typesenseConfig.landingPage.configuration)
                     eval(typesenseConfig.landingPage.configuration);
                     if(window.landingMerchandising.query != ''){
                         queryParam = window.landingMerchandising.query;

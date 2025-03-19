@@ -48,7 +48,51 @@ require(
                 }]
             })
         });
+        $('#connection_index').click(function(e) {
+            e.preventDefault();
+            let uniqueId = $('#typesense_general_credentials_unique_id').val();
+            let indexvalue =  $('#typesense_general_credentials_index_prefix').val();
+            if (uniqueId == "" || indexvalue =="") {
+                alert({
+                    content: 'Enter the required field Unique ID or Index Name'
+                })
+                return false;
+            }
+            alert({
+               content: 'Do you want to continue.',
+               buttons: [{
+                    text: $.mage.__('OK'),
+                    class: 'action-primary action-accept',
+                    click: function () {
+                        $.ajax({
+                            showLoader: true, 
+                            url: window.baseDomian+'typesense/index/connection',
+                            data: {
+                                'uniqueId': uniqueId,
+                                'indexvalue':indexvalue
+                            },
+                            type: "GET", 
+                            dataType: 'json'
+                        }).done(function (data) { 
+                            $('#response_message').delay(1000).fadeIn();
+                            if (data.success) {
+                                $('#response_message').html('Successfully connected to Conversionbox Merchant account');
+                                $('#response_message').css('color', '#097009');
+                                $('#response_message').css('background', '#f3f310');
+                                $('#response_message').delay(1000).fadeOut();
+                            } else {
+                                $('#response_message').html('Something Went Wrong try again');
+                                $('#response_message').css('color', '#097009');
+                                $('#response_message').css('background', '#f3f310');
+                                $('#response_message').delay(1000).fadeOut();
+                            }
 
+                        });
+                        this.closeModal(true);
+                    }
+                }]
+            })
+        });
         $('#reindex_data').click(function(e) {
             e.preventDefault();
 

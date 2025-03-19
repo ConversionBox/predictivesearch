@@ -1,0 +1,10 @@
+
+<div class="pp-buttons-container">
+    <button id="<?= /* @noEscape */ $block->getId() ?>">
+        <span><?= /* @noEscape */ $block->escapeHtml($block->getButtonLabel()); ?></span>
+    </button>
+</div>
+<div id="response_message"></div>
+<script>
+    window.baseDomian = <?= /* @noEscape */ json_encode($block->getBaseUrl()) ?>;
+</script>

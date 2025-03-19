@@ -1548,3 +1548,32 @@ margin-top: 20px;
   .typesense-landingpage-view.page-layout-2columns-left .filter_main_test {
     margin-bottom: 20px;
 }
+.product_item_wrapper .item_description {
+    display: block;
+    display: -webkit-box;
+    line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-box-orient: vertical;
+    font-weight: normal;
+    margin: 0;
+    margin-bottom: 5px;
+    color: var(--cbSRProductDescription, #888);
+    font-size: 11px;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+}
+.product_item_wrapper .item_name{
+    display: block;
+    display: -webkit-box;
+    line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-box-orient: vertical;
+    font-weight: normal;
+    margin: 0;
+    margin-bottom: 5px;
+    font-size: 11px;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+}

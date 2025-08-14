@@ -23,7 +23,7 @@ define(
          */
         const NO_PRODUCTS_PAGE = typesenseConfig.category.no_products;
         const sortOptions = typesenseConfig.category.sort_options;
-        const ADD_To = 1;
+        const ADD_To = typesenseConfig.search_result.addto_cart;
         const SEARCHBLE_ATTRIBUTES = typesenseConfig.products.attributes;
         const POPULAR_TERMS = typesenseConfig.search_terms.data;
         const RANKING = typesenseConfig.products.ranking;
@@ -235,7 +235,7 @@ define(
                         if (searchResults.hits.length < 1) {
                             $('.filter_main').show();
                             let htmlhead = '<div class="popular_search_head"> No product Found </div>';
-                                html += `Try clearing the filters or changing your input`
+                                html += `Try clearing the filters or changing your input`;
                             html = htmlhead + html;
                         } else {
                             $('.filter_main').show();
@@ -395,8 +395,8 @@ define(
                                 image = val.document.small_image;
                             } else if (IMAGE_TYPE == 'product_thumbnail_image') {
                                 image = val.document.thumbnail;
-                            } else {
-                                image = PLACEHOLDER;
+                            } else if(typeof image === 'undefined' || image === null)  {
+                                image = BASE_URL+`media/catalog/product/placeholder/`+PLACEHOLDER;
                             }
 
                             html += `

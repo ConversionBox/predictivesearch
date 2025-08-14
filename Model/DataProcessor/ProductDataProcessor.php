@@ -23,7 +23,7 @@ use Conversionbox\Predictivesearch\Model\Queue\QueueProcessor;
 use Conversionbox\Predictivesearch\Api\TypesenseSearchRepositoryInterface;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Framework\Filter\FilterManager;
-
+use Magento\CatalogInventory\Api\StockRegistryInterface;
 class ProductDataProcessor
 {
     /**
@@ -120,6 +120,9 @@ class ProductDataProcessor
      * @var FilterManager
      */
     private $filterManager;
+    /**
+     * @var $stockRegistry;
+     */
 
     /**
      * ProductData processing Constructor
@@ -163,7 +166,8 @@ class ProductDataProcessor
         QueueProcessor $queueProcessor,
         TypesenseSearchRepositoryInterface $typesenseSearchRepositoryInterface,
         TimezoneInterface $timezoneInterface,
-        FilterManager $filterManager
+        FilterManager $filterManager,
+        StockRegistryInterface   $stockRegistry
     ) {
         $this->configData = $configData;
         $this->collectionFactory = $collectionFactory;
@@ -184,6 +188,7 @@ class ProductDataProcessor
         $this->typesenseSearchRepositoryInterface = $typesenseSearchRepositoryInterface;
         $this->timezoneInterface = $timezoneInterface;
         $this->filterManager = $filterManager;
+        $this->stockRegistry = $stockRegistry;
     }
 
     /**
@@ -264,7 +269,14 @@ class ProductDataProcessor
                     $collection = $this->collectionFactory->create();
                     $collection->addAttributeToSelect('*');
                     $collection->addStoreFilter($storeData->getId());
-                    
+                    $collection->addAttributeToFilter(
+                     'status',
+                     \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED
+                    );
+                    $collection->addAttributeToFilter(
+                      'visibility',
+                     ['neq' => \Magento\Catalog\Model\Product\Visibility::VISIBILITY_NOT_VISIBLE]
+                    );
                     foreach ($collection as $data) {
                         $productData = $this->createProductData(
                             $data->getId(),
@@ -328,9 +340,9 @@ class ProductDataProcessor
         $stock = $this->generalModel->getStockInfo($productId);
         if ($stock) {
             $stockStatus = $stock->getIsInStock();
-            $stockQty = $stock->getQty();
+           // $stockQty = $stock->getQty();
         }
-      
+        $stockQty = $this->getProductQty($productId);
         $product = $this->generalModel->getProductData($productId, $storeId);
         $attributesArray = [];
         $productAttCode = [];
@@ -344,19 +356,19 @@ class ProductDataProcessor
                         $productAttCode[] = $data->getAttributeCode();
                         $value = $product->getResource()->getAttribute($attributeCode)->getFrontend()
                                 ->getValue($product);
-                        $multiListArr = ['multiselect', 'dropdown', 'select'];
+                            $multiListArr = ['multiselect', 'dropdown', 'select'];
                     if (in_array($data->getFrontendInput(), $multiListArr)) {
                         if ($data->getFrontendInput() == 'multiselect') {
                             $value = str_replace(",", " ", "$value");
                         }
-                        $attributesArray[$attributeCode] = [$value];
+                        $attributesArray[$attributeCode] = $value ? [$value] : [];
                     } else {
-                        $attributesArray[$attributeCode] = $value;
+                        $attributesArray[$attributeCode] = $value  ? $value : '';
                     }
                             
-                    if ($product->getTypeId() === Configurable::TYPE_CODE) {
+                   /* if ($product->getTypeId() === Configurable::TYPE_CODE) {
                         $attributesArray = $this->handlingConfigData($product);
-                    }
+                    } */
                 }
             }
         }
@@ -373,7 +385,7 @@ class ProductDataProcessor
             }
         }
         $finalAtrArray = array_merge($attrDiffArr, $attributesArray);
-        if ($product->getVisibility() != 1) {
+       // if ($product->getVisibility() != 1) {
             $image = null;
             if ($product->getImage()) {
                 $image = $this->generalModel->getMediaUrl().'catalog/product'.$product->getImage();
@@ -410,7 +422,7 @@ class ProductDataProcessor
                         $lowestPrice = $childPrice;
                     }
                 }
-                $price = $lowestPrice;
+                $price = $lowestPrice === null ? 0 : $lowestPrice;
             }
     
             if ($product->getTypeId() == 'grouped') {
@@ -422,7 +434,7 @@ class ProductDataProcessor
                         $lowestPrice = $childPrice;
                     }
                 }
-                $price = $lowestPrice;
+                $price = $lowestPrice === null ? 0 : $lowestPrice;
             }
 
             $this->reviewFactory->create()->getEntitySummary($product, $this->generalModel->getStore()->getId());
@@ -435,7 +447,7 @@ class ProductDataProcessor
             $spAmount = $product->getSpecialPrice();
             $spPrice = ($spAmount)?$this->priceHelper->currency($spAmount, true, false):'';
 
-            if($product->getStatus() == 1){
+          //  if($product->getStatus() == 1){
             $response = [
                 'id' => $product->getId(),
                 'product_id' => $product->getId(),
@@ -446,7 +458,7 @@ class ProductDataProcessor
                 'image_url' => $image,
                 'small_image' => $smallImage,
                 'thumbnail' => $thumbNailImage,
-                'price' => $price,
+                'price' => $price??0,
                 'type_id' => $product->getTypeId(),
                 'visibility' => $product->getVisibility(),
                 'category' => $categoryNameArr,
@@ -466,12 +478,16 @@ class ProductDataProcessor
                 'short_description' => $this->removeHtmlTags($product->getShortDescription()),
                 'price_search' => round((float)$price, 2),
             ];
-            }
+           // }
             $productArray = array_merge($finalAtrArray, $response);
             return $productArray;
-        }
+        //}
     }
-
+public function getProductQty($productId)
+{
+    $stockItem = $this->stockRegistry->getStockItem($productId);
+    return $stockItem->getQty(); // returns decimal quantity
+}
     /**
      * Remove Html Tags
      *

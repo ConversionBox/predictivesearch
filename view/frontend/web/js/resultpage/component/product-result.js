@@ -292,7 +292,7 @@ define(
                         if (searchResults.hits.length < 1) {
                             $('.filter_main').show();
                             let htmlhead = '<div class="popular_search_head"> No product Found </div>';
-                                html += `Try clearing the filters or changing your input`
+                                html += `Try clearing the filters or changing your input`;
                             html = htmlhead + html;
                         } else {
                             $('.filter_main').show();
@@ -452,8 +452,8 @@ define(
                                 image = val.document.small_image;
                             } else if (IMAGE_TYPE == 'product_thumbnail_image') {
                                 image = val.document.thumbnail;
-                            } else {
-                                image = PLACEHOLDER;
+                            } else if(typeof image === 'undefined' || image === null) {
+                                image = BASE_URL+`media/catalog/product/placeholder/`+PLACEHOLDER;
                             }
 
                             html += `

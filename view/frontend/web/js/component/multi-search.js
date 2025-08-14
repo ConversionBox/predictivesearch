@@ -207,8 +207,8 @@ $('#auto_search_time').html(
                     let image = null;
                     if (val.document.thumbnail) {
                         image = val.document.thumbnail;
-                    } else {
-                        image = PLACEHOLDER;
+                    } else if(typeof image === 'undefined' || image === null) {
+                        image = BASE_URL+`media/catalog/product/placeholder/`+PLACEHOLDER;
                     }
                      html += `
                         <div class="product-item">

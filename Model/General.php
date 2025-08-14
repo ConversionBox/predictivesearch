@@ -8,7 +8,8 @@ use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\UrlInterface;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Catalog\Api\ProductRepositoryInterface;
-use Magento\CatalogInventory\Model\Stock\StockItemRepository;
+// use Magento\CatalogInventory\Model\Stock\StockItemRepository;
+use Magento\CatalogInventory\Api\Data\StockItemInterfaceFactory;
 use Magento\Framework\Url\EncoderInterface;
 use Conversionbox\Predictivesearch\Logger\Logger;
 
@@ -43,7 +44,7 @@ class General
      * @var Logger
      */
     private $logger;
-
+    protected $stockItemInterfaceFactory;
     /**
      * General Constructor
      *
@@ -58,14 +59,14 @@ class General
         StoreManagerInterface $storeManagerInterface,
         Json $json,
         ProductRepositoryInterface $productRepositoryInterface,
-        StockItemRepository $stockItemRepository,
+        \Magento\CatalogInventory\Api\Data\StockItemInterfaceFactory $stockItemInterfaceFactory,
         EncoderInterface $encoderInterface,
         Logger $logger
     ) {
         $this->storeManagerInterface = $storeManagerInterface;
         $this->json = $json;
         $this->productRepositoryInterface = $productRepositoryInterface;
-        $this->stockItemRepository =  $stockItemRepository;
+        $this->stockItemInterfaceFactory = $stockItemInterfaceFactory;
         $this->encoderInterface = $encoderInterface;
         $this->logger = $logger;
     }
@@ -153,7 +154,7 @@ class General
     public function getStockInfo($productId)
     {
         try {
-            return $this->stockItemRepository->get($productId);
+            return $this->stockItemInterfaceFactory->create()->load($productId);
         } catch (Exception $e) {
             $this->logger->error($e->getMessage());
         }

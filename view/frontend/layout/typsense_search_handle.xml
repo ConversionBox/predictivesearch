@@ -10,7 +10,7 @@
             <block class="Conversionbox\Predictivesearch\Block\Configuration" name="typesense.configuration" template="Conversionbox_Predictivesearch::configuration/configuration.phtml"/>
         </referenceBlock>
         <referenceBlock name="top.search">
-            <action method="setTemplate" ifconfig="typesense_general/credentials/enable_frontend">
+            <action method="setTemplate" ifconfig="typesense_autocomplete/autocomplete/enable_frontend">
                 <argument name="setTemplate" xsi:type="string">Conversionbox_Predictivesearch::searchautocomplete.phtml</argument>
             </action>
         </referenceBlock>

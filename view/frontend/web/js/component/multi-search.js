@@ -223,7 +223,7 @@ $('#auto_search_time').html(
                                                html += `<div class="predictive-product_description" style="-webkit-line-clamp:${Max_DESCRIPTION_LINE};">${description}</div>`;
                                            }
                                            if(SHOW_SKU == 1){
-                                        html += `<div class="predictive-product_sku">Sku: ${sku}</div>`;
+                                        html += `<div class="predictive-product_sku">SKU: ${sku}</div>`;
                                            }
                                           if(SHOW_PRICE == 1){
                                        html += `<div class="predictive-product_price" >`;

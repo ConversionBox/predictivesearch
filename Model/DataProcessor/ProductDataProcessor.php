@@ -123,7 +123,7 @@ class ProductDataProcessor
     /**
      * @var $stockRegistry;
      */
-
+      protected $stockRegistry;
     /**
      * ProductData processing Constructor
      *

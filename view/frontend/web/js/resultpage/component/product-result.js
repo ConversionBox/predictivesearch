@@ -483,12 +483,6 @@ define(
                                    html +=`${ADD_To == 1 ? `<div class="cartbutton_wrapper"><div class="btn_conatiner" id="btn_conatiner">
                                         <button class="cart_btn" id="${val.document.id}">Add to Cart</button>
                                     </div>`:''}
-                                    <div class="whishlist_wrapper_main product-item">
-                                        <a href="#" id="${val.document.id}" class="action towishlist wishlist_wrapper" data-wishlist-url="/wishlist/index/add/product/${val.document.id}" title="Add to Wish List" aria-label="Add to Wish List" data-action="add-to-wishlist" role="button">
-                                        </a>
-                                        <a href="#" id="${val.document.id}" class="action tocompare compare_wrapper" data-compare-url="/catalog/product_compare/add/product/${val.document.id}"   title="Add to Compare" aria-label="Add to Compare" data-action="add-to-compare" role="button">
-                                        </a>
-                                    </div>
                             `;
                             }
                             html +=`</div></div>`;

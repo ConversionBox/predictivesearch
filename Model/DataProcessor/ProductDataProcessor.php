@@ -123,7 +123,7 @@ class ProductDataProcessor
     /**
      * @var $stockRegistry;
      */
-
+      protected $stockRegistry;
     /**
      * ProductData processing Constructor
      *
@@ -496,9 +496,18 @@ public function getProductQty($productId)
      */
     public function removeHtmlTags($data)
     {
-        $params = ['allowableTags' => null, 'escape' => false];
         if ($data) {
-            return $this->filterManager->stripTags($data, $params);
+              // Decode entities like &lt;br&gt; into <br>
+        $decoded = html_entity_decode($data);
+
+        // Remove <style> blocks and PageBuilder inline styles
+        $decoded = preg_replace('#<style\b[^>]*>(.*?)</style>#is', '', $decoded);
+
+        // Remove PageBuilder data-pb-style attributes
+        $decoded = preg_replace('/#html-body\s*\[data-pb-style=.*?\}\s*/', '', $decoded);
+
+        // Strip any remaining tags
+        return strip_tags($decoded);
         }
         return '';
     }

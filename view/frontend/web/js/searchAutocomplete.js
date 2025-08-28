@@ -61,11 +61,15 @@ define([
 				keyword = e.target.value;
 				var keywordlength = keyword.length;
 				if (keyword && (keywordlength >= mimimumqueryLength)) {
-					//enabling the search popup
-
+				 	//enabling the search popup
 					//bind product, category and page data and suggestion data
 					multiSearchComponent.multiSearch(keyword, typsenseClient);
 					$("#search_result").addClass("autocomplete");
+                                    let searchBtn = document.querySelector('.action.search');
+                                if (searchBtn) {
+                                  searchBtn.removeAttribute('disabled');
+                               }
+                                 
 				} else {
 					$('#product_section').html('');
 					$('#cms_section').html('');
@@ -83,7 +87,19 @@ define([
 					window.location = url.build('catalogsearch/result/?q=' + e.target.value);
 				}
 			});
-
+                      document.querySelector('.action.search').addEventListener('click', function(e) {
+                      e.preventDefault();
+                      let keyword = document.getElementById('searchbox').value.trim();
+                      if (keyword) {
+                          window.location.href =  url.build('catalogsearch/result/?q=' + e.target.value);
+                          }
+                  });
+           $(document).on("click scroll", function (e) {
+                  // if click/scroll happens outside #search_result and #searchbox
+                if (!$(e.target).closest('#search_result, #searchbox').length) {
+                 $('#search_result').removeClass("autocomplete");
+              }
+           });
 			//popup toogle action when clicking on search box
 			$("#searchbox").click(function() {
 				var keywordlength = keyword.length;

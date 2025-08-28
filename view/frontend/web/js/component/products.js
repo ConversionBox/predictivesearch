@@ -114,7 +114,7 @@ define(
                                                 </div>
                                                 <div class="predictive-product_container">
                                                     <div class="predictive-product_heading">${name}</div>
-                                                    <div class="predictive-product_sku">Sku: ${sku}</div>
+                                                    <div class="predictive-product_sku">SKU: ${sku}</div>
                                                     <div class="predictive-product_price">${CURRENCY+priceUtils.formatPriceLocale(price)}</div>
                                                 </div>
                                             </div>

@@ -342,12 +342,41 @@ class ProductDataProcessor
             $stockStatus = $stock->getIsInStock();
            // $stockQty = $stock->getQty();
         }
+
         $stockQty = $this->getProductQty($productId);
         $product = $this->generalModel->getProductData($productId, $storeId);
+        if ($product->getTypeId() === Configurable::TYPE_CODE) {
+            $childProducts = $this->configurableProductType->getUsedProducts($product);
+             $isInStock = false;
+            foreach ($childProducts as $childProduct) {
+            $stock = $this->generalModel->getStockInfo($childProduct->getId());
+               if ($stock && $stock->getIsInStock()) {
+                   $isInStock = true;
+                   break;
+            }
+        }
+        $stockStatus = $isInStock;
+        }
+        if ($product->getTypeId() == 'grouped') {
+            $groupChildren = $product->getTypeInstance(true) ->getAssociatedProducts($product);
+               $isInStock = false;
+            foreach ($groupChildren as $childProduct) {
+               $stock = $this->generalModel->getStockInfo($childProduct->getId());
+               if ($stock && $stock->getIsInStock()) {
+                   $isInStock = true;
+                   break;
+            }
+            
+            }
+            $stockStatus = $isInStock;
+        }
         $attributesArray = [];
         $productAttCode = [];
         $attributes = $product->getAttributes();
         $filterableData = $this->getFilterableAttributes();
+         if ($product->getTypeId() === Configurable::TYPE_CODE) {
+             $attributesArray = $this->handlingConfigData($product);
+        } 
         foreach ($attributes as $data) {
             if ($data->getIsFilterable()) {
                 $attributeCode = $data->getAttributeCode();
@@ -366,9 +395,7 @@ class ProductDataProcessor
                         $attributesArray[$attributeCode] = $value  ? $value : '';
                     }
                             
-                   /* if ($product->getTypeId() === Configurable::TYPE_CODE) {
-                        $attributesArray = $this->handlingConfigData($product);
-                    } */
+                   
                 }
             }
         }

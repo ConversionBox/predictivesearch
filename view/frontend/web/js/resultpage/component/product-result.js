@@ -290,7 +290,7 @@ define(
                         searchResultsArray.push(searchResults);
                         let html = '';
                         if (searchResults.hits.length < 1) {
-                            $('.filter_main').show();
+                            $('.filter_main').hide();
                             let htmlhead = '<div class="popular_search_head"> No product Found </div>';
                                 html += `Try clearing the filters or changing your input`;
                             html = htmlhead + html;

@@ -58,7 +58,10 @@ define([
 			this.getSessionID();
 			//search action
 			$("#searchbox").on("keyup", function(e) {
-				keyword = e.target.value;
+				 if (e.keyCode === 13) {
+                 return;
+                }
+				keyword = e.target.value.trim();
 				var keywordlength = keyword.length;
 				if (keyword && (keywordlength >= mimimumqueryLength)) {
 				 	//enabling the search popup
@@ -102,6 +105,9 @@ define([
            });
 			//popup toogle action when clicking on search box
 			$("#searchbox").click(function() {
+				if (e.keyCode === 13) {
+                 return;
+                }
 				var keywordlength = keyword.length;
 				if (keywordlength >= mimimumqueryLength && $('#search_result').hasClass("autocomplete")) {
 					$('#search_result').removeClass("autocomplete");

@@ -291,7 +291,11 @@ define(
                         searchResultsArray.push(searchResults);
                         let html = '';
                         if (searchResults.hits.length < 1) {
+                            if(!$('#price-range').hasClass('.ui-slider')){
                             $('.filter_main').hide();
+                             }else {
+                            $('.filter_main').show();
+                             }
                             let htmlhead = '<div class="popular_search_head"> No product Found </div>';
                                 html += `Try clearing the filters or changing your input`;
                             html = htmlhead + html;
@@ -773,7 +777,6 @@ define(
                     if (item.field_name == value.filterAttribute) {
                         itemLabel = value.fieldName;
                         itemOptions = value.filterOption;
-                       
                     }
                 });
                 if (item.counts.length <= 6) {
@@ -783,7 +786,6 @@ define(
                     itemOptionsCondition = true;
                 }
                 if (filterHtml) {
-                    
                     html += `<div class="filter_main_test" id="price"></div><div class="filter_main_test" id="${item.field_name}">
                     <span class="item_label">${itemLabel}</span>
                     <div class="child_main" id="more_option_${item.field_name}">
@@ -845,7 +847,7 @@ define(
                 
                 // If we still don't have filter data, return
                 if (!singleObjectItemData) {
-                    console.error("Could not find filter data for", itemId);
+                    console.log("Could not find filter data for", itemId);
                     return;
                 }
                 
@@ -930,7 +932,7 @@ define(
                 
                 // If we still don't have filter data, return
                 if (!singleObjectItemData) {
-                    console.error("Could not find filter data for", itemId);
+                    console.log("Could not find filter data for", itemId);
                     return;
                 }
                 
@@ -1094,6 +1096,7 @@ define(
          * @returns 
          */
         function renderFilterHtml(item, maxItems = 6, isReadMore = true, fieldName) {
+            console.log("Rendering filter HTML for:", item);
             let itemFacetType = 'disjunctive'; // Default to disjunctive
             $.each(facet, function(key, value) {
                 if (fieldName == value.filterAttribute) {
@@ -1529,13 +1532,14 @@ define(
                             maxValue = parseInt(priceRange[1]);
                         }
                     }
-                    if (filterParamData != undefined || filterParamData != "") {
+                    // Ensure we have valid numeric values for min and max
+                    if (filterParamData && typeof minValue !== 'undefined' && typeof maxValue !== 'undefined' && !isNaN(minValue) && !isNaN(maxValue)) {
                         min = parseInt(minValue);
                         max = parseInt(maxValue);
-                    } else {
+                    } else if (value && typeof value.min !== 'undefined' && typeof value.max !== 'undefined' && !isNaN(value.min) && !isNaN(value.max)) {
                         min = parseInt(value.min);
                         max = parseInt(value.max);
-                    }
+                    } 
                     $("#price-range").slider({
                         step: 1,
                         range: true,
@@ -1568,4 +1572,3 @@ define(
         }
     }
 );
-

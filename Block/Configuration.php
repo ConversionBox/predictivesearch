@@ -158,7 +158,8 @@ class Configuration extends Template implements CollectionDataSourceInterface
                 'show_sku'    => $this->configData->getAutocompletesku(),
                 'show_description'=> $this->configData->getAutocompletedesc(),
                 'max_description_line' =>  $this->configData->getAutocompletemaxdescline(),
-                'see_all_button'   => $this->configData->getSeeall()
+                'see_all_button'   => $this->configData->getSeeall(),
+                'show_out_of_stock' =>  $this->configData->getAutocompleteOutofstock()
             ],
             'products' => [
                 'attributes' => $this->configData->getProductAttributeConfig(),

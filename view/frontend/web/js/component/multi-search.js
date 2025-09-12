@@ -24,6 +24,7 @@ define(
         const SHOW_DESCRIPTION = typesenseConfig.auto_complete.show_description;
         const Max_DESCRIPTION_LINE = typesenseConfig.auto_complete.max_description_line;
         const  SEE_ALL_BUTTON = typesenseConfig.auto_complete.see_all_button;
+         const SHOW_OUT_OF_STOCK = typesenseConfig.auto_complete.show_out_of_stock;
         /** Typo Tolerance */
         const TYPO_ENABLED = typesenseConfig.typotolerance.enable;
         const WORD_LENGTH = typesenseConfig.typotolerance.word_length;
@@ -156,6 +157,9 @@ define(
                 'sort_by'   : ranking,
                 'filter_by' : `storeCode:["${STORE}"]`
             }            
+             if(SHOW_OUT_OF_STOCK == 0){
+                    productSearchParameters.filter_by += ` && stock_status:=true`;
+                }
             $.each(productSearchParameters, function (key, val) {
                 if (!val) {
                     delete productSearchParameters[key];

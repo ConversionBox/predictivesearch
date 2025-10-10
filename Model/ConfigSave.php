@@ -5,18 +5,22 @@ use Conversionbox\Predictivesearch\Api\ConfigSaveInterface;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\App\Cache\TypeListInterface;
+use Magento\Store\Model\StoreManagerInterface;
 
 class ConfigSave implements ConfigSaveInterface
 {
     protected $configWriter;
     protected $cacheTypeList;
+    protected $storeManager;
 
     public function __construct(
         WriterInterface $configWriter,
-        TypeListInterface $cacheTypeList
+        TypeListInterface $cacheTypeList,
+        StoreManagerInterface $storeManager
     ) {
         $this->configWriter = $configWriter;
         $this->cacheTypeList = $cacheTypeList;
+         $this->storeManager = $storeManager;
     }
 
     /**
@@ -31,6 +35,16 @@ class ConfigSave implements ConfigSaveInterface
             foreach ($data as $data) {
                 $scope = 'default';
                 $scopeId = 0;
+           if (!empty($data['store_code'])) {
+            $store = $this->storeManager->getStore($data['store_code']);
+            $scope = 'stores';
+            $scopeId = (int)$store->getId();
+         } elseif (!empty($data['website_code'])) {
+            $website = $this->storeManager->getWebsite($data['website_code']);
+            $scope = 'websites';
+            $scopeId = (int)$website->getId();
+        }
+
                 $path = $data['path'];
                 $value = $data['value'];
                 if($path === "typesense_search_result/instant_search_result/search_filters" || $path ==="typesense_search_result/instant_search_result/sort_options"){

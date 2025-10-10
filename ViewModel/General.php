@@ -35,7 +35,7 @@ class General implements ArgumentInterface
     {
         $filterCollection = $this->configData->getSearchFilters();
         foreach($filterCollection as $filter){
-            if($filter['facet'] == 'slider' && $filter['filterAttribute'] == 'price'){
+            if($filter['facet'] == 'slider'){
                 return 1;
             }else{
                 return 0;

@@ -34,9 +34,13 @@ define(
 
 				$(document).ready(function() {
 					if (queryParam) {
-						productResult.performSearch(queryParam, page, typsenseClient, filterValue);
+                                               if (productResult && typeof productResult.performSearch === 'function') {
+						productResult.performSearch(queryParam, page, typsenseClient, filterValue); 
+                                          }
 					}
+                      if (productResult && typeof productResult.performSearch === 'function') {
                     productResult.performSearch(queryParam, page, typsenseClient, filterValue);
+                       }
 					upadteUrl(keyword);
 				});
 

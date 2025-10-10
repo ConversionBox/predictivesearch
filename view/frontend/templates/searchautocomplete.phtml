@@ -4,7 +4,7 @@
   * @var \Magento\Framework\Escaper $escaper
   */
 ?>
-<div class="search-main">
+<div class="search-main block block-search">
     <input type="text" 
            placeholder="<?= $escaper->escapeHtmlAttr(__('search here...')) ?>" 
            id="searchbox" class="searchbox" />
@@ -24,4 +24,14 @@
         }
         </script>
     </div>
+<div class="actions"><button type="submit" title="Search" class="action search" disabled=""><span>Search</span></button></div>
 </div>
+<script>
+document.querySelector('.action.search').addEventListener('click', function(e) {
+    e.preventDefault();
+    let keyword = document.getElementById('searchbox').value.trim();
+    if (keyword) {
+        window.location.href = '/catalogsearch/result/?q=' + encodeURIComponent(keyword);
+    }
+});
+</script>

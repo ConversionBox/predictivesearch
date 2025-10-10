@@ -11,7 +11,7 @@ define(
         const PRODUCT_MAX_COUNT = typesenseConfig.auto_complete.no_products;
         const PROD_SEARCHBLE_ATTRIBUTES = typesenseConfig.products.attributes;
         const PROD_RANKING = typesenseConfig.products.ranking;
-
+        const CURRENCY = typesenseConfig.general.store_currency;
         /** Category Config */
         const CAT_MAX_COUNT = typesenseConfig.auto_complete.category_count;
         const CAT_SEARCHBLE_ATTRIBUTES = typesenseConfig.category.attributes;
@@ -24,6 +24,7 @@ define(
         const SHOW_DESCRIPTION = typesenseConfig.auto_complete.show_description;
         const Max_DESCRIPTION_LINE = typesenseConfig.auto_complete.max_description_line;
         const  SEE_ALL_BUTTON = typesenseConfig.auto_complete.see_all_button;
+         const SHOW_OUT_OF_STOCK = typesenseConfig.auto_complete.show_out_of_stock;
         /** Typo Tolerance */
         const TYPO_ENABLED = typesenseConfig.typotolerance.enable;
         const WORD_LENGTH = typesenseConfig.typotolerance.word_length;
@@ -156,6 +157,9 @@ define(
                 'sort_by'   : ranking,
                 'filter_by' : `storeCode:["${STORE}"]`
             }            
+             if(SHOW_OUT_OF_STOCK == 0){
+                    productSearchParameters.filter_by += ` && stock_status:=true`;
+                }
             $.each(productSearchParameters, function (key, val) {
                 if (!val) {
                     delete productSearchParameters[key];
@@ -192,7 +196,8 @@ $('#auto_search_time').html(
                         }
                     }
                     var name = val.document.product_name;
-                    var description =  val.document.description;
+                    var proddescription =  val.document.description;
+                    var description = proddescription.replace(/<\/?[^>]+(>|$)/g, "")
                     var sku = val.document.sku;
                      if (typeof val.highlight !== 'undefined'&& HIGHLIGHTS == 1) {
                         var highlight = val.highlight.name;
@@ -207,8 +212,8 @@ $('#auto_search_time').html(
                     let image = null;
                     if (val.document.thumbnail) {
                         image = val.document.thumbnail;
-                    } else {
-                        image = PLACEHOLDER;
+                    } else if(typeof image === 'undefined' || image === null) {
+                        image = BASE_URL+`media/catalog/product/placeholder/`+PLACEHOLDER;
                     }
                      html += `
                         <div class="product-item">
@@ -223,15 +228,15 @@ $('#auto_search_time').html(
                                                html += `<div class="predictive-product_description" style="-webkit-line-clamp:${Max_DESCRIPTION_LINE};">${description}</div>`;
                                            }
                                            if(SHOW_SKU == 1){
-                                        html += `<div class="predictive-product_sku">Sku: ${sku}</div>`;
+                                        html += `<div class="predictive-product_sku">SKU: ${sku}</div>`;
                                            }
                                           if(SHOW_PRICE == 1){
                                        html += `<div class="predictive-product_price" >`;
                                         if(window.location.href != BASE_URL && $("body").hasClass('catalog-product-view') == false){
-                                            html+=`$${priceUtils.formatPriceLocale(price)}`;
+                                            html+=`${CURRENCY+priceUtils.formatPriceLocale(price)}`;
                                         }
                                         else{
-                                            html +=`${priceUtils.formatPriceLocale(price)}`;
+                                            html +=`${CURRENCY+priceUtils.formatPriceLocale(price)}`;
                                         }
                                         html +=`</div>`;
                                         }

@@ -315,6 +315,7 @@ class ConfigData
     **/  
    private const CATEGORY_MAX_DESC_LINE = 'typesense_categories/categories/max_description_lines';
    private const CATEGORY_PAGE_ENABLED ='typesense_categories/categories/enable_Category';
+   private const AUTOCOMPLETE_OUT_OF_STOCK ='typesense_autocomplete/autocomplete/show_outof_stock';
     /**
      * @var ScopeConfigInterface
      */
@@ -851,6 +852,9 @@ class ConfigData
      }
     public function getSeeall(){
      return $this->getSystemConfigValues(self::SEE_ALL_BUTTON);
+    }
+     public function getAutocompleteOutofstock(){
+     return $this->getSystemConfigValues(self::AUTOCOMPLETE_OUT_OF_STOCK);
     }
     public function getInstantsku(){
       return $this->getSystemConfigValues(self::SEARCH_SHOW_SKU);

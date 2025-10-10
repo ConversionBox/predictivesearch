@@ -33,15 +33,18 @@ define(
 				}
 
 				$(document).ready(function() {
+				 $('.filter_main').hide();
 					if (queryParam) {
-						productResult.performSearch(queryParam, page, typsenseClient, filterValue);
+                                               if (productResult && typeof productResult.performSearch === 'function') {
+						productResult.performSearch(queryParam, page, typsenseClient, filterValue); }
 					}
 				});
 
 				$("#search-result-box").on("keyup", function(e) {
 					keyword = e.target.value;
 					upadteUrl(keyword);
-					productResult.performSearch(keyword, page, typsenseClient, filterValue);
+                                       if (productResult && typeof productResult.performSearch === 'function') {
+					productResult.performSearch(keyword, page, typsenseClient, filterValue); }
 					if(SLIDER == 1){
 						productResult.sliderComponent(keyword);
 					}

@@ -10,7 +10,7 @@
     <event name="catalog_category_save_after">
         <observer name="updateto_typesense" instance="Conversionbox\Predictivesearch\Observer\Category\CategoryChangeAfter"/>
     </event>
-    <event name="catalog_category_delete_after_done">
+    <event name="catalog_category_delete_after">
         <observer name="delete_category_typesense" instance="Conversionbox\Predictivesearch\Observer\Category\CategoryChangeAfter"/>
     </event>
     <event name="cms_page_save_after">
@@ -22,7 +22,7 @@
     <event name="catalog_product_save_after">
         <observer name="update_typsense_product" instance="Conversionbox\Predictivesearch\Observer\Product\ProductChange" />
     </event>
-    <event name="catalog_product_delete_after_done">
+    <event name="catalog_product_delete_after">
         <observer name="delete_typsense_product" instance="Conversionbox\Predictivesearch\Observer\Product\ProductChange" />
     </event>
  </config>

@@ -97,8 +97,7 @@ define(
             loadParams.split('&&').forEach(function(param) {
                 let stringArr = param.split(':=');
                 if (stringArr[1] != undefined) {
-                    // Properly decode all URL-encoded characters
-                    let filterText = decodeURIComponent(stringArr[1]);
+                    let filterText = stringArr[1].replace("%20", " ");
                     filterparamArr[stringArr[0]] = filterText;
                 }
             });
@@ -198,7 +197,7 @@ define(
          * @param {*} page 
          * @param {*} typsenseClient 
          */
-        function productSearch(keyword, page, typsenseClient, filterValue, sortQuery, priceFilter, perPage = null, originalFacetCounts = null, isDisjunctive = false) {
+        function productSearch(keyword, page, typsenseClient, filterValue, sortQuery, priceFilter, perPage = null, disjunctiveFacet = null, callback = null, facetQuery = null) {
             priceSlide = priceFilter;
             try {
                 let searchAttributes = SEARCHBLE_ATTRIBUTES.map((item) => {
@@ -212,13 +211,18 @@ define(
                     ranking = RANKING;
                 }
 
+                let facetQueryParam = facetParam;
+                if (disjunctiveFacet) {
+                    facetQueryParam = disjunctiveFacet;
+                }
+
                 let searchParameters = {
                     'q': keyword,
                     'query_by': searchAttributes,
                     'per_page': NO_PRODUCTS_PAGE,
                     'filter_by' :`storeCode:["${STORE}"]`,
                     'page': page,
-                    'facet_by': facetParam,
+                    'facet_by': facetQueryParam,
                     'sort_by': ranking,
                     'typo_tokens_threshold': TYPO_ENABLED,
                     'num_typos': 2,
@@ -251,7 +255,7 @@ define(
                 //make request query
                 let requestQuery = '';
                 $.each(finalRequestParam, function(key, val) {
-                    if (val != '') {
+                    if (val != '' && key !== disjunctiveFacet) {
                         requestQuery += '&&'+ key + ':=[' + val + '] &&';
                     }
                 });
@@ -284,18 +288,26 @@ define(
                 if (sortQuery) {
                     searchParameters.sort_by = sortQuery;
                 }
+
+                if (facetQuery) {
+                    searchParameters.facet_query = facetQuery;
+                }
                 searchParameters.filter_by = cleanQuery(searchParameters.filter_by);
                 typsenseClient.collections(INDEX_PERFIX + STORE + '-products').documents().search(searchParameters).then((searchResults) => {
+                        if (callback) {
+                            callback(searchResults);
+                            return;
+                        }
                         //   sliderAction(keyword,searchParameters,searchResults.facet_counts[0].stats);
 
                         searchResultsArray.push(searchResults);
                         let html = '';
                         if (searchResults.hits.length < 1) {
-                            if(!$('#price-range').hasClass('.ui-slider')){
+                             if(!$('#price-range').hasClass('.ui-slider') && requestQuery == ''){
                             $('.filter_main').hide();
                              }else {
                             $('.filter_main').show();
-                             }
+                            }
                             let htmlhead = '<div class="popular_search_head"> No product Found </div>';
                                 html += `Try clearing the filters or changing your input`;
                             html = htmlhead + html;
@@ -431,7 +443,7 @@ define(
                                 let startDate = new Date(val.document.special_from_date);
                                 let endDate = new Date(val.document.special_to_date);
                                 if (startDate <= currentDate && endDate >= currentDate) {
-                                    price = `<span class="special_price">${val.document.special_price}</span>
+                                    price = `<span class="special_p rice">${val.document.special_price}</span>
                                             <span class="normal_price">${val.document.price}</span>
                                     `;
                                 }
@@ -494,16 +506,7 @@ define(
 
                         });
                         $('#product_result').html(html);
-                        // If we have original facet counts, use them for rendering filter options
-                        if (originalFacetCounts) {
-                            // Create a copy of searchResults to avoid modifying the original
-                            const searchResultsWithOriginalFacets = JSON.parse(JSON.stringify(searchResults));
-                            // Replace the facet_counts with the original ones to preserve all options
-                            searchResultsWithOriginalFacets.facet_counts = originalFacetCounts;
-                            renderFilterOptions(searchResultsWithOriginalFacets);
-                        } else {
-                            renderFilterOptions(searchResults);
-                        }
+                        renderFilterOptions(searchResults);
                         showSelectedFilter(filterParam)
                         if(SLIDER == 1){
                         if (searchParameters.filter_by == "") {
@@ -535,7 +538,7 @@ define(
                     })
                     .catch((error) => {
                         $('#product_result').html('Configuration issues try again');
-                        console.log(error);
+                        console.error(error);
                     });
             } catch (error) {
                 console.log(error)
@@ -662,147 +665,88 @@ define(
          * 
          * @param {*} searchData 
          */
-        // Global variables for tracking search state
-        var currentSearchKeyword = '';
-        var allFacetData = null;
-        var forceUpdateFacets = false;
-        
+
+
         function renderFilterOptions(searchData) {
-            
-            // Get current search keyword
-            let currentKeyword = $('#search-result-box').val();
-            
-            // Reset facet data when search keyword changes
-            if (currentKeyword !== currentSearchKeyword) {
-                allFacetData = null;
-                currentSearchKeyword = currentKeyword;
-            }
-            
-            // Store the complete facet data when it's a fresh search
-            if ((!allFacetData || forceUpdateFacets) && searchData.facet_counts) {
-                allFacetData = JSON.parse(JSON.stringify(searchData.facet_counts));
-                forceUpdateFacets = false;
-            }
-            
-            // For disjunctive filters, we need to ensure all options are shown but with updated counts
-            // Use the current search results for counts, but ensure all options from allFacetData are included
-            let facetData = [];
-            
-            // First, create a deep copy of the current search data facet counts
-            if (searchData.facet_counts && searchData.facet_counts.length > 0) {
-                facetData = JSON.parse(JSON.stringify(searchData.facet_counts));
-            } else if (allFacetData) {
-                facetData = JSON.parse(JSON.stringify(allFacetData));
-            }
-            
-            // If we have both current facet data and stored facet data, merge them
-            // to show all options but with updated counts
-            if (allFacetData && searchData.facet_counts && searchData.facet_counts.length > 0) {
-                // For each facet field in allFacetData
-                allFacetData.forEach(storedFacet => {
-                    // Find the corresponding facet in the current results
-                    const currentFacet = facetData.find(f => f.field_name === storedFacet.field_name);
-                    
-                    // If this facet exists in current results
-                    if (currentFacet) {
-                        // Create a map of current counts for quick lookup
-                        const currentCountsMap = {};
-                        currentFacet.counts.forEach(count => {
-                            currentCountsMap[count.value] = count.count;
-                        });
-                        
-                        // For each option in the stored facet data
-                        storedFacet.counts.forEach(storedCount => {
-                            // Check if this option exists in current results
-                            const existsInCurrent = currentFacet.counts.some(c => c.value === storedCount.value);
-                            
-                            // If not, add it with original count from stored data (not 0)
-                            if (!existsInCurrent) {
-                                currentFacet.counts.push({
-                                    value: storedCount.value,
-                                    count: storedCount.count // Use original count instead of 0
-                                });
-                            }
-                        });
-                    } else {
-                        // If this facet doesn't exist in current results, add it with counts set to 0
-                        const newFacet = JSON.parse(JSON.stringify(storedFacet));
-                        newFacet.counts = newFacet.counts.map(count => ({
-                            value: count.value,
-                            count: count.count // Use original count from stored data
-                        }));
-                        facetData.push(newFacet);
-                    }
-                });
-            }
-            
-            let filterArray = facetData.filter((item) => {
+            let filterArray = searchData.facet_counts.filter((item) => {
                 if ($.inArray(item.field_name, facetArr) !== -1) {
                     return item;
                 }
             });
-            
             if (SLIDER == 1) {
                 $('#price').html('')
-                function sliderAction(keyword, filterParamData = null, currentValue = null) {
-            // Force facet update when price filter changes
-            window.forceUpdateFacets = true;
-            
-            const typsenseClient = searchConfig.createClient(typesenseConfig);
-            let minPrice = 0;
-            let maxPrice = 0;
-            if (currentValue) {
-                minPrice = currentValue.min;
-                maxPrice = currentValue.max;
-            } else {
-                minPrice = 0;
-                maxPrice = 10000;
-            }
                 priceSlider(filterArray);
-            }
             }
             const typsenseClient = searchConfig.createClient(typesenseConfig);
             let keyword = $('#search-result-box').val();
 
             let html = '';
-            let filterHtml = '';
-            searchOptionFilter(filterArray)
             $.each(filterArray, function(key, item) {
-                let condition = true;
-                let itemOptionsCondition = false;
-                let itemOptions = 6;
-                filterHtml = renderFilterHtml(item, 6, false, item.field_name);
+                let filterHtml = renderFilterHtml(item, 6, false, item.field_name);
                 let itemLabel = item.field_name.toUpperCase();
+                let itemOptions = 6;
+                let itemOptionsCondition = false;
+                let condition = true;
+
                 $.each(facet, function(key, value) {
                     if (item.field_name == value.filterAttribute) {
                         itemLabel = value.fieldName;
                         itemOptions = value.filterOption;
                     }
                 });
+
                 if (item.counts.length <= 6) {
                     condition = false;
                 }
                 if (itemOptions == 1) {
                     itemOptionsCondition = true;
                 }
+
                 if (filterHtml) {
                     html += `<div class="filter_main_test" id="price"></div><div class="filter_main_test" id="${item.field_name}">
-                    <span class="item_label">${itemLabel}</span>
-                    <div class="child_main" id="more_option_${item.field_name}">
-                        ${itemOptionsCondition ? `
-                            <div class="search_bar_option">
-                                <input class="search_option_filter" data-attr="${item.field_name}" type="search" id="search_filter_${item.field_name}" placeholder="Search by option">
-                            </div>` : ''}
-                        <div id="filtermore_attribute_${item.field_name}" class="filter_check">${filterHtml}</div>
-                        <div class="read_more_less_buttons">
-                        ${condition ? `<button data-info="${item.field_name}" data-count="${item.counts.length}" data-toggle-state="more" id="toggle_${item.field_name}" class="read_toggle_link">Read More</button>` : ''}
+                        <span class="item_label">${itemLabel}</span>
+                        <div class="child_main" id="more_option_${item.field_name}">
+                            ${itemOptionsCondition ? `
+                                <div class="search_bar_option">
+                                    <input class="search_option_filter" data-attr="${item.field_name}" type="search" id="search_filter_${item.field_name}" placeholder="Search by option">
+                                </div>` : ''}
+                            <div id="filtermore_attribute_${item.field_name}" class="filter_check">${filterHtml}</div>
+                            <div class="read_more_less_buttons">
+                            ${condition ? `<button data-info="${item.field_name}" data-count="${item.counts.length}" data-toggle-state="more" id="toggle_${item.field_name}" class="read_toggle_link">Read More</button>` : ''}
+                            </div>
                         </div>
-                    </div>
-                </div>`;
+                    </div>`;
                 }
             });
 
             $('#filter_container').html(html);
+
+            // Trigger disjunctive search for active filters
+            for (const key in filterParam) {
+                if (filterParam[key]) {
+                    productSearch(keyword, 1, typsenseClient, null, null, null, null, key, function(results) {
+                        if (results.facet_counts.length > 0) {
+                            let filterHtml = renderFilterHtml(results.facet_counts[0], results.facet_counts[0].counts.length, true, key);
+                            $('#filtermore_attribute_' + key).html(filterHtml);
+                        }
+                    });
+                }
+            }
+
+            $(document).on('keyup', '.search_option_filter', function() {
+                let attribute = $(this).data('attr');
+                let query = $(this).val();
+                let keyword = $('#search-result-box').val();
+                const typsenseClient = searchConfig.createClient(typesenseConfig);
+
+                productSearch(keyword, 1, typsenseClient, null, null, null, null, attribute, function(results) {
+                    if (results.facet_counts.length > 0) {
+                        let filterHtml = renderFilterHtml(results.facet_counts[0], results.facet_counts[0].counts.length, true, attribute);
+                        $('#filtermore_attribute_' + attribute).html(filterHtml);
+                    }
+                }, `${attribute}:${query}`);
+            });
+
             //setting data after refresh
             for (let key of Object.keys(filterParam)) {
                 let paramValues = filterParam[key].split(',');
@@ -819,157 +763,40 @@ define(
                 let itemId = $button.data('info');
                 let itemCount = $button.data('count');
                 let toggleState = $button.data('toggle-state');
-                
-                // Get the filter data from current search results
                 let filterArr = [];
-                let currentFacetData = null;
-                
-                // First try to get from current search results
-                if (searchResultsArray && searchResultsArray.length > 0) {
-                    searchResultsArray[searchResultsArray.length - 1].facet_counts.filter((item) => {
-                        if (item.field_name === itemId) {
-                            filterArr.push(item);
-                        }
-                    });
-                }
-                
-                // If not found in current results, try to get from allFacetData
-                if (filterArr.length === 0 && allFacetData) {
-                    allFacetData.filter((item) => {
-                        if (item.field_name === itemId) {
-                            filterArr.push(item);
-                        }
-                    });
-                }
-                
-                // Get the filter data
-                const singleObjectItemData = filterArr[0];
-                
-                // If we still don't have filter data, return
-                if (!singleObjectItemData) {
-                    console.log("Could not find filter data for", itemId);
-                    return;
-                }
-                
-                // Ensure we have the complete set of options by merging with allFacetData
-                let completeItemData = JSON.parse(JSON.stringify(singleObjectItemData));
-                
-                // If we have stored facet data, make sure all options are included
-                if (allFacetData) {
-                    const storedFacet = allFacetData.find(f => f.field_name === itemId);
-                    if (storedFacet) {
-                        // Create a map of current counts
-                        const currentCountsMap = {};
-                        completeItemData.counts.forEach(count => {
-                            currentCountsMap[count.value] = count.count;
-                        });
-                        
-                        // Add any missing options from stored data
-                        storedFacet.counts.forEach(storedCount => {
-                            const existsInCurrent = completeItemData.counts.some(c => c.value === storedCount.value);
-                            if (!existsInCurrent) {
-                                completeItemData.counts.push({
-                                    value: storedCount.value,
-                                    count: storedCount.count // Use original count
-                                });
-                            }
-                        });
+                searchResultsArray[searchResultsArray.length - 1].facet_counts.filter((item) => {
+                    if (item.field_name === itemId) {
+                        filterArr.push(item);
                     }
-                }
-                
+                });
+                const singleObjectItemData = filterArr[0];
                 var isReadMore = true;
                 $('#toggle_' + itemId).text("Read Less");
                 $('#toggle_' + itemId).attr('data-toggle-state', 'less');
                 $('#toggle_' + itemId).removeClass('read_toggle_link');
                 $('#toggle_' + itemId).addClass('read_less');
-                
-                // Show all options by passing the full count and isReadMore=true
-                var filterHtml = renderFilterHtml(completeItemData, completeItemData.counts.length, isReadMore, itemId);
+                var filterHtml = renderFilterHtml(singleObjectItemData, itemCount, isReadMore, itemId);
                 $('#filtermore_attribute_' + itemId).html(filterHtml);
                 $('#toggle_' + itemId).css("display", "block");
-                
-                // Restore checked state for any previously selected filters
-                for (let key of Object.keys(filterParam)) {
-                    if (key === itemId) {
-                        let paramValues = filterParam[key].split(',');
-                        paramValues.forEach(function(value) {
-                            if (document.getElementById(value)) {
-                                document.getElementById(value).setAttribute('checked', 'checked');
-                            }
-                        });
-                    }
-                }
             });
             // Read less Toggle
             $(document).on('click', '.read_less', function(e) {
                 let $button = $(this);
                 let itemId = $button.data('info');
                 let toggleState = $button.data('toggle-state');
-                
-                // Get the filter data from current search results
                 let filterArr = [];
-                
-                // First try to get from current search results
-                if (searchResultsArray && searchResultsArray.length > 0) {
-                    searchResultsArray[searchResultsArray.length - 1].facet_counts.filter((item) => {
-                        if (item.field_name === itemId) {
-                            filterArr.push(item);
-                        }
-                    });
-                }
-                
-                // If not found in current results, try to get from allFacetData
-                if (filterArr.length === 0 && allFacetData) {
-                    allFacetData.filter((item) => {
-                        if (item.field_name === itemId) {
-                            filterArr.push(item);
-                        }
-                    });
-                }
-                
-                // Get the filter data
-                const singleObjectItemData = filterArr[0];
-                
-                // If we still don't have filter data, return
-                if (!singleObjectItemData) {
-                    console.log("Could not find filter data for", itemId);
-                    return;
-                }
-                
-                // Ensure we have the complete set of options by merging with allFacetData
-                let completeItemData = JSON.parse(JSON.stringify(singleObjectItemData));
-                
-                // If we have stored facet data, make sure all options are included
-                if (allFacetData) {
-                    const storedFacet = allFacetData.find(f => f.field_name === itemId);
-                    if (storedFacet) {
-                        // Create a map of current counts
-                        const currentCountsMap = {};
-                        completeItemData.counts.forEach(count => {
-                            currentCountsMap[count.value] = count.count;
-                        });
-                        
-                        // Add any missing options from stored data
-                        storedFacet.counts.forEach(storedCount => {
-                            const existsInCurrent = completeItemData.counts.some(c => c.value === storedCount.value);
-                            if (!existsInCurrent) {
-                                completeItemData.counts.push({
-                                    value: storedCount.value,
-                                    count: storedCount.count // Use original count
-                                });
-                            }
-                        });
+                searchResultsArray[searchResultsArray.length - 1].facet_counts.filter((item) => {
+                    if (item.field_name === itemId) {
+                        filterArr.push(item);
                     }
-                }
-                
-                var isReadMore = false; // We're showing less items now
+                });
+                const singleObjectItemData = filterArr[0];
+                var isReadMore = toggleState === "less";
                 $button.text("Read More");
                 $button.attr('data-toggle-state', 'more');
                 $button.removeClass('read_less');
                 $('#toggle_' + itemId).addClass('read_toggle_link');
-                
-                // Show limited options (6) and isReadMore=false
-                var filterHtml = renderFilterHtml(completeItemData, 6, isReadMore, itemId);
+                var filterHtml = renderFilterHtml(singleObjectItemData, 6, isReadMore, itemId);
                 $('#filtermore_attribute_' + itemId).html(filterHtml);
             });
             const resetbutton = document.querySelector('#clear_all');
@@ -998,15 +825,12 @@ define(
                                 if (checkField.checked) {
                                     checkField.setAttribute("checked", "checked");
                                     if (filterParam[attributeFieldname]) {
-                                        // Check if the value is already in the filter to avoid duplicates
-                                        if (filterParam[attributeFieldname].split(',').indexOf(e.target.id) === -1) {
-                                            filterParam[attributeFieldname] += ',' + e.target.id;
-                                        }
+                                        filterParam[attributeFieldname] += ',' + e.target.id;
                                     } else {
                                         filterParam[attributeFieldname] = e.target.id;
                                     }
 
-                                    if ($.inArray(attributeFieldname, selectedFilters.map(item => item.key)) === -1) {
+                                    if ($.inArray(attributeFieldname, selectedFilters) === -1) {
                                         stableContent = $('#' + attributeFieldname)[0].outerHTML;
                                         selectedFilters.push({
                                             key: attributeFieldname,
@@ -1035,13 +859,7 @@ define(
                                     });
                                     updateParam.updateParams(filterParam);
                                 }
-                                // Store the original facet counts before making a new search
-                                const originalFacetCounts = JSON.parse(JSON.stringify(searchResultsArray[searchResultsArray.length - 1].facet_counts));
-                                
-                                // Make the search with the filter
-                                // For disjunctive filters, we need to pass a flag to indicate we want to preserve multi-select
-                                const isDisjunctive = checkField.getAttribute('data-facettype') === 'disjunctive';
-                                productSearch(keyword, 1, typsenseClient, filterParam, null, null, null, originalFacetCounts, isDisjunctive);
+                                productSearch(keyword, 1, typsenseClient, filterParam);
                             }
                         } else {
                             if (e.target.type === 'radio') {
@@ -1061,26 +879,25 @@ define(
                                     if (checkField.checked) {
                                         // Handle the checked state
                                         checkField.setAttribute("checked", "checked");
-                                        filterParam[attributeFieldname] = e.target.id; // Store the selected radio button ID
+                                        filterParam[attributeFieldname] = checkField.getAttribute('data-range'); // Store the selected radio button value
                                         stableContent = $('#' + attributeFieldname)[0].outerHTML;
                                         selectedFilters.push({
                                             key: attributeFieldname,
                                             content: stableContent
                                         });
-                                        selectedRadio = [];
-                                        // Update selectedIndex if necessary
-                                        selectedRadio.push(e.target.id);
+                                        
+                                        // Create attribute-specific identifiers for selected radio buttons
+                                        // Remove any previous selection for this attribute
+                                        selectedRadio = selectedRadio.filter(item => !item.startsWith(attributeFieldname + '_'));
+                                        // Add the new selection with attribute prefix
+                                        selectedRadio.push(attributeFieldname + '_' + checkField.getAttribute('data-range'));
                                         if (selectedRadio >= 1) {
                                             $('#clear_all').show();
                                         }
                                     }
 
                                     updateParam.updateParams(filterParam);
-                                    // Store the original facet counts before making a new search
-                                    const originalFacetCounts = JSON.parse(JSON.stringify(searchResultsArray[searchResultsArray.length - 1].facet_counts));
-                                    
-                                    // Make the search with the filter
-                                    productSearch(keyword, 1, typsenseClient, filterParam, null, null, null, originalFacetCounts);
+                                    productSearch(keyword, 1, typsenseClient, filterParam);
                                 }
                             }
                         }
@@ -1096,87 +913,30 @@ define(
          * @returns 
          */
         function renderFilterHtml(item, maxItems = 6, isReadMore = true, fieldName) {
-            console.log("Rendering filter HTML for:", item);
-            let itemFacetType = 'disjunctive'; // Default to disjunctive
             $.each(facet, function(key, value) {
                 if (fieldName == value.filterAttribute) {
                     itemFacetType = value.facet;
                 }
             });
             let html = '';
-            
-            // If isReadMore is true, show all filter options, otherwise limit by maxItems
-            let counts = isReadMore ? item.counts : item.counts.slice(0, maxItems);
-            
-            // Make sure we have counts to display
-            if (counts.length === 0 && allFacetData) {
-                // Try to find this field in the stored complete facet data
-                allFacetData.forEach(facet => {
-                    if (facet.field_name === fieldName) {
-                        counts = isReadMore ? facet.counts : facet.counts.slice(0, maxItems);
-                    }
-                });
-            }
-            
-            // For disjunctive filters, ensure we show options that are relevant to current results
-            // but also include any selected options that might not be in current results
-            if (itemFacetType === 'disjunctive' && filterParam && filterParam[fieldName]) {
-                // Get selected values for this field
-                const selectedValues = filterParam[fieldName].split(',');
-                
-                // Check if any selected values are missing from current counts
-                if (selectedValues.length > 0) {
-                    selectedValues.forEach(selectedValue => {
-                        // Check if this selected value exists in current counts
-                        const valueExists = counts.some(count => count.value === selectedValue);
-                        
-                        // If not, add it from allFacetData if available
-                        if (!valueExists && allFacetData) {
-                            // Look for this value in the original facet data to preserve its count
-                            allFacetData.forEach(facet => {
-                                if (facet.field_name === fieldName) {
-                                    const originalOption = facet.counts.find(count => count.value === selectedValue);
-                                    if (originalOption) {
-                                        counts.push({
-                                            value: selectedValue,
-                                            count: originalOption.count
-                                        });
-                                    }
-                                }
-                            });
-                        }
-                    });
-                }
-            }
-            
-            // Sort counts by value for consistent display
-            counts.sort((a, b) => a.value.localeCompare(b.value));
-            
-            // Get selected values for checkbox and radio inputs
-            let selectedIndex = [];
-            let selectedRadio = [];
-            
-            if (filterParam && filterParam[fieldName]) {
-                selectedIndex = filterParam[fieldName].split(',');
-                selectedRadio = filterParam[fieldName].split(',');
-            }
-            
-            // Generate HTML for each filter option
-            $.each(counts, function(key, itemValue) {
+            let counts = item ? item.counts.slice(0, maxItems) : item.counts.slice(0, 2);
+
+            $.each(counts, function(itemkey, itemValue) {
                 if (itemValue.value && itemFacetType == 'disjunctive') {
                     html += `
                         <div class="form-check col-md-12 filter_${item.field_name}">
-                        <input type="checkbox" class="form-check-input rangeCheck" name="[${item.field_name}]" id="${itemValue.value}" ${$.inArray(itemValue.value, selectedIndex) != -1 ? 'checked' : 'null'}  data-range="${itemValue.value}" data-typename="${item.field_name}" data-facettype="disjunctive" readonly="true">
+                        <input type="checkbox" class="form-check-input rangeCheck" name="[${item.field_name}]" id="${itemValue.value}" ${$.inArray(itemValue.value, selectedIndex) != -1 ? 'checked' : 'null'}  data-range="${itemValue.value}" data-typename="${item.field_name}" readonly="true">
                         <label class="form-check-label" for="${itemValue.value}">${itemValue.value} (${itemValue.count})</label>
                         </div>
                     `;
                 } else if (itemValue.value && itemFacetType == 'conjunctive') {
                     html += `
                         <div class="form-check col-md-12 filter_${item.field_name}">
-                        <input type="radio" class="form-check-input radioCheck" name="[${item.field_name}]" id="${itemValue.value}" data-range="${itemValue.value}" data-typename="${item.field_name}" ${$.inArray(itemValue.value, selectedRadio) != -1 ? 'checked' : 'null'}  readonly="true">
+                        <input type="radio" class="form-check-input radioCheck" name="[${item.field_name}]" id="${item.field_name}[${itemValue.value}]" data-range="${itemValue.value}" data-typename="${item.field_name}" ${$.inArray(item.field_name + '_' + itemValue.value, selectedRadio) != -1 ? 'checked' : 'null'}  readonly="true">
                         <label class="form-check-label" for="${itemValue.value}">${itemValue.value} (${itemValue.count})</label>
                         </div>
                     `;
+
                 }
             });
             return html;
@@ -1277,8 +1037,10 @@ define(
             let expandItems = true;
             let itemData = item.counts;
             if (!filterKeyword) {
+               if(item.counts.length  >=6){
                 expandItems = false;
-                itemData = item.counts.slice(0, 2);
+                }
+                itemData = item.counts.slice(0, 6);
             }
             $.each(itemData, function(itemkey, itemValue) {
                 if (itemValue.value) {
@@ -1317,141 +1079,6 @@ define(
         }
 
         function priceSlider(filterArray) {
-            // Process all attributes that should have sliders
-            $.each(facet, function(key, filterConfig) {
-                // Check if this filter is configured as a slider type
-                if (filterConfig.filterType && filterConfig.filterType === 'slider') {
-                    const attributeName = filterConfig.filterAttribute;
-                    const attributeLabel = filterConfig.fieldName;
-                    const currencySymbol = attributeName === 'price' ? '$' : ''; // Use currency symbol only for price
-                    
-                    // Find the attribute data in filter array
-                    const attrArr = filterArray.filter((item) => {
-                        if (item.field_name == attributeName) {
-                            return item.counts;
-                        }
-                    });
-                    
-                    const attrArrItem = attrArr.filter((val) => {
-                        return val.stats;
-                    });
-                    
-                    if (attrArrItem.length > 0 && attrArrItem[0].stats != undefined) {
-                        const minVal = attrArrItem[0].stats.min;
-                        const maxVal = attrArrItem[0].stats.max;
-                        
-                        // Create slider container if it doesn't exist
-                        const sliderId = attributeName + '-slider';
-                        const sliderContainerId = attributeName + '-slider-container';
-                        
-                        if (!$('#' + sliderContainerId).length) {
-                            // Create slider container with key-value inputs
-                            $('#' + attributeName).append(
-                                `<div id="${sliderContainerId}" class="slider-container">
-                                    <div class="slider-input-fields">
-                                        <div class="slider-input-field">
-                                            <label for="${attributeName}-min">Min:</label>
-                                            <div class="input-group">
-                                                <span class="input-group-addon">${currencySymbol}</span>
-                                                <input type="number" id="${attributeName}-min" class="form-control" min="${minVal}" max="${maxVal}" value="${Math.floor(minVal)}" />
-                                            </div>
-                                        </div>
-                                        <div class="slider-input-field">
-                                            <label for="${attributeName}-max">Max:</label>
-                                            <div class="input-group">
-                                                <span class="input-group-addon">${currencySymbol}</span>
-                                                <input type="number" id="${attributeName}-max" class="form-control" min="${minVal}" max="${maxVal}" value="${Math.ceil(maxVal)}" />
-                                            </div>
-                                        </div>
-                                        <button id="${attributeName}-apply" class="btn btn-primary btn-sm">Apply</button>
-                                    </div>
-                                    <div id="${sliderId}" class="slider-range"></div>
-                                </div>`
-                            );
-                            
-                            // Add CSS for slider inputs if not already added
-                            if (!$('#slider-styles').length) {
-                                $('head').append(
-                                    `<style id="slider-styles">
-                                        .slider-container { margin: 15px 0; }
-                                        .slider-input-fields { display: flex; align-items: center; margin-bottom: 10px; }
-                                        .slider-input-field { margin-right: 10px; }
-                                        .slider-input-field label { display: block; margin-bottom: 5px; font-size: 12px; }
-                                        .slider-input-field .input-group { display: flex; }
-                                        .slider-input-field .input-group-addon { padding: 5px 10px; background: #f5f5f5; border: 1px solid #ccc; border-right: none; }
-                                        .slider-input-field input { width: 80px; padding: 5px; border: 1px solid #ccc; }
-                                        .slider-range { margin-top: 10px; }
-                                        .slider-range .ui-slider-handle .point { position: absolute; top: -25px; left: 50%; transform: translateX(-50%); white-space: nowrap; }
-                                        .btn-primary { margin-left: 10px; padding: 5px 10px; background-color: #1979c3; color: white; border: none; }
-                                    </style>`
-                                );
-                            }
-                            
-                            // Initialize the slider
-                            $('#' + sliderId).slider({
-                                range: true,
-                                min: minVal,
-                                max: maxVal,
-                                step: 1,
-                                values: [minVal, maxVal],
-                                slide: function(event, ui) {
-                                    // Update the handles with values
-                                    $(ui.handle).html(`<span class="point">${currencySymbol}${ui.value}</span>`);
-                                    
-                                    // Update the input fields
-                                    $('#' + attributeName + '-min').val(ui.values[0]);
-                                    $('#' + attributeName + '-max').val(ui.values[1]);
-                                },
-                                stop: function(event, ui) {
-                                    // Create filter parameter
-                                    const filterValue = ui.values[0] + '..' + ui.values[1];
-                                    filterParam[attributeName] = filterValue;
-                                    
-                                    // Force facet update when price filter changes
-                                    forceUpdateFacets = true;
-                                    
-                                    // Trigger search with new filter
-                                    productSearch($('#search-result-box').val(), 1, searchConfig.createClient(typesenseConfig));
-                                }
-                            });
-                            
-                            // Add initial values to slider handles
-                            const sliderHandles = $('#' + sliderId).find('.ui-slider-handle');
-                            sliderHandles.eq(0).html(`<span class='point'>${currencySymbol}${Math.floor(minVal)}</span>`);
-                            sliderHandles.eq(1).html(`<span class='point'>${currencySymbol}${Math.ceil(maxVal)}</span>`);
-                            
-                            // Handle apply button click
-                            $('#' + attributeName + '-apply').on('click', function() {
-                                const minInputVal = parseFloat($('#' + attributeName + '-min').val()) || minVal;
-                                const maxInputVal = parseFloat($('#' + attributeName + '-max').val()) || maxVal;
-                                
-                                // Validate input values
-                                let validMinVal = Math.max(minVal, Math.min(maxInputVal, minInputVal));
-                                let validMaxVal = Math.min(maxVal, Math.max(minInputVal, maxInputVal));
-                                
-                                // Update slider position
-                                $('#' + sliderId).slider('values', 0, validMinVal);
-                                $('#' + sliderId).slider('values', 1, validMaxVal);
-                                
-                                // Update slider handles
-                                sliderHandles.eq(0).html(`<span class='point'>${currencySymbol}${validMinVal}</span>`);
-                                sliderHandles.eq(1).html(`<span class='point'>${currencySymbol}${validMaxVal}</span>`);
-                                
-                                // Update input fields with validated values
-                                $('#' + attributeName + '-min').val(validMinVal);
-                                $('#' + attributeName + '-max').val(validMaxVal);
-                                
-                                // Create filter parameter and trigger search
-                                const filterValue = validMinVal + '..' + validMaxVal;
-                                filterParam[attributeName] = filterValue;
-                                productSearch($('#search-result-box').val(), 1, searchConfig.createClient(typesenseConfig));
-                            });
-                        }
-                    }
-                }
-            });
-            
-            // For backward compatibility, handle the price slider specifically if needed
             const priceArr = filterArray.filter((item) => {
                 if (item.field_name == 'price') {
                     return item.counts;
@@ -1461,14 +1088,29 @@ define(
                 return val.stats;
             });
 
-            if (priceArrItem.length > 0 && priceArrItem[0].stats != undefined) {
+            if (priceArrItem[0].stats != undefined) {
                 if (!priceSlide) {
                     minValue = priceArrItem[0].stats.min;
                     maxValue = priceArrItem[0].stats.max;
                 }
             }
 
+            // Hide the price slider container if price values are NaN
+            if (isNaN(minValue) || isNaN(maxValue)) {
+                $('.filter_price_slider').hide();
+                return;
+            } else {
+                $('.filter_price_slider').show();
+            }
+
             tmin = minValue;
+            let i = 0;
+            if (!isSlide) {
+                $("#price-range>span:eq(0)").html("<span class='point'>$" + Math.floor(minValue) + "</span>");
+                $("#price-range>span:eq(1)").html("<span class='point'>$" + Math.ceil(maxValue) + "</span>");
+
+            }
+            i++;
         }
 
         function hitSearchAnalytics(searchParameters, searchResults) {
@@ -1495,11 +1137,11 @@ define(
                             }
                         },
                         error: function(xhr, status, error) {
-                            console.log('Error:', error);
+                            console.error('Error:', error);
                         }
                     });
                 } catch (error) {
-                    console.log('Error:', error);
+                    console.error('Error:', error);
                 }
             }, 6000);
 
@@ -1532,14 +1174,20 @@ define(
                             maxValue = parseInt(priceRange[1]);
                         }
                     }
-                    // Ensure we have valid numeric values for min and max
-                    if (filterParamData && typeof minValue !== 'undefined' && typeof maxValue !== 'undefined' && !isNaN(minValue) && !isNaN(maxValue)) {
+                    if (filterParamData != undefined || filterParamData != "") {
                         min = parseInt(minValue);
                         max = parseInt(maxValue);
-                    } else if (value && typeof value.min !== 'undefined' && typeof value.max !== 'undefined' && !isNaN(value.min) && !isNaN(value.max)) {
+                    } else {
                         min = parseInt(value.min);
                         max = parseInt(value.max);
-                    } 
+                    }
+                     // Hide the price slider container if price values are NaN
+                     if (isNaN(min) || isNaN(max)) {
+                         $('.filter_price_slider').hide();
+                         return;
+                     } else {
+                         $('.filter_price_slider').show();
+                     }
                     $("#price-range").slider({
                         step: 1,
                         range: true,

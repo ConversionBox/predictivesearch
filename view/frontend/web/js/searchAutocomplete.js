@@ -7,7 +7,7 @@ define([
 	'Conversionbox_Predictivesearch/js/component/category',
 	'Conversionbox_Predictivesearch/js/component/pages',
 	'mage/url',
-	'Conversionbox_Predictivesearch/js/typesense/browser.min',
+         'Conversionbox_Predictivesearch/js/uuid4',
 	'ko'
 ], function($, Component, searchConfig, multiSearchComponent, productComponent, categoryComponent, pageComponent, url,browser, ko) {
 	'use strict';
@@ -20,7 +20,7 @@ define([
 	let cookieName = '_conversion_box_track_id';
 	let sessionID = '';
 
-	let mimimumqueryLength = typesenseConfig.auto_complete.minimum_char_length;
+	let mimimumqueryLength = typesenseConfig.auto_complete.minimum_char_length||1;
 	//initialize the typsense client
 	const typsenseClient = searchConfig.createClient(typesenseConfig);
 	const CATEGORY_SECTION = typesenseConfig.auto_complete.category_enabled;
@@ -104,11 +104,11 @@ define([
               }
            });
 			//popup toogle action when clicking on search box
-			$("#searchbox").click(function() {
+			$("#searchbox").click(function(e) {
 				if (e.keyCode === 13) {
                  return;
                 }
-				var keywordlength = keyword.length;
+				var keywordlength = keyword.trim().length;
 				if (keywordlength >= mimimumqueryLength && $('#search_result').hasClass("autocomplete")) {
 					$('#search_result').removeClass("autocomplete");
 				} else if (keywordlength >= mimimumqueryLength) {
@@ -127,16 +127,12 @@ define([
 
 			if (!cookieID && storageId) {
 				sessionID = storageId;
-				setCookie("_conversion_box_track_id", storageId);
+				this.setCookie("_conversion_box_track_id", storageId);
 			} else if (!storageId && cookieID) {
 				sessionID = cookieID;
 				localStorage.setItem("_conversion_box_track_id", cookieID);
 			} else if (!cookieID && !storageId) {
-				 if (typeof uuid4 === 'function') {
-			      sessionID = uuid4();
-			        } else {
-			            console.error('uuid4 is not defined or not a function');
-			        }
+			      sessionID = this.uuid4();
 				this.setCookie("_conversion_box_track_id", sessionID);
 				localStorage.setItem("_conversion_box_track_id", sessionID);
 			} else {
@@ -152,9 +148,15 @@ define([
 				}
 			}
 			return null;
-		},
+	 	},
 
-
+                uuid4:function(){
+           return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = Math.random() * 16 | 0,
+                v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+               },
 		setCookie: function(cookieKey, cookieValue) {
 			// Set the session ID in a cookie with a longer expiration time (e.g., 30 days)
 			document.cookie = `${cookieKey}=${cookieValue}; expires=${new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toUTCString()}; path=/`;

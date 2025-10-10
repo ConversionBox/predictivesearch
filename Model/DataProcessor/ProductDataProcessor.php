@@ -202,12 +202,6 @@ class ProductDataProcessor
         if (!$this->configData->getModuleStatus()) {
             return;
         }
-        // if (!$this->configData->getAdminApiKey() ||
-        //         !$this->configData->getNode() ||
-        //         !$this->configData->getProtocol()
-        //     ) {
-        //         return;
-        // }
         $this->syncAllProducts($ids, $storeId);
     }
 
@@ -225,30 +219,8 @@ class ProductDataProcessor
         }
 
         if (!empty($ids)) {
-            $storeCode = '';
-            if ($storeId == 0) {
-                $storeId = 1;
-            }
-            $stores = $this->generalModel->getStore($storeId);
-            $storeCode = $stores->getCode();
-            $indexName  =  $this->getStoreCode($storeCode);
-            $productObj = $this->productFactory->create();
-            foreach ($ids as $id) {
-                $productObj->load($id);
-                if (!$productObj->getId()) {
-                    //removing deleted product from typesense
-                    $this->typeSenseApi->deleteDocument($indexName, $id);
-                } else {
-                    if (in_array($storeId, $productObj->getStoreIds()) || $storeId == 0) {
-                        $updatedDocument = $this->createProductData($id, $storeCode, $storeId);
-                        //Update or create data to collection
-                        $response = $this->typeSenseApi->upsertDocument($indexName, $updatedDocument);
-                    }
-                    if (!in_array($storeId, $productObj->getStoreIds())) {
-                        $this->typeSenseApi->deleteDocument($indexName, $id);
-                    }
-                }
-            }
+            // Optimize single product updates
+            $this->processIndividualProducts($ids, $storeId);
             return;
         }
 
@@ -257,57 +229,146 @@ class ProductDataProcessor
             $prdCollection = [];
             try {
                 $storeCode = $storeData->getCode();
-                $indexName =  $this->getStoreCode($storeCode);
-                //Get collections from typesense and check if the collections exist.
-                $collectionData = $this->typeSenseApi->retriveCollectionData();
+                $indexName = $this->getStoreCode($storeCode);
+                
+                // Cache collection data to avoid repeated API calls
+                static $collectionDataCache = [];
+                if (!isset($collectionDataCache[$indexName])) {
+                    $collectionDataCache[$indexName] = $this->typeSenseApi->retriveCollectionData();
+                }
+                $collectionData = $collectionDataCache[$indexName];
+                
                 if (!in_array($indexName, $collectionData) || $mode) {
-                    //Get product schema structure
+                    // Create schema only if needed
                     $productSchemaData = $this->productSchema->getProductSchema($indexName);
-                    //Create schema with structure
                     $this->typeSenseApi->createSchema($productSchemaData);
 
-                    $collection = $this->collectionFactory->create();
-                    $collection->addAttributeToSelect('*');
-                    $collection->addStoreFilter($storeData->getId());
-                    $collection->addAttributeToFilter(
-                     'status',
-                     \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED
-                    );
-                    $collection->addAttributeToFilter(
-                      'visibility',
-                     ['neq' => \Magento\Catalog\Model\Product\Visibility::VISIBILITY_NOT_VISIBLE]
-                    );
+                    // Optimize collection by limiting attributes and using batch processing
+                    $collection = $this->getOptimizedProductCollection($storeData->getId());
+                    
+                    // Process in batches to avoid memory issues
+                    $batchSize = 100; // Adjust based on your server capacity
+                    $currentBatch = [];
+                    $batchCount = 0;
+                    
                     foreach ($collection as $data) {
                         $productData = $this->createProductData(
                             $data->getId(),
                             $storeData->getCode(),
                             $storeData->getId()
                         );
+                        
                         if ($productData) {
                             $productData = $this->generalModel->encodeData($productData);
                             $productData = trim($productData, '[]');
-                            $prdCollection[] = $productData;
+                            $currentBatch[] = $productData;
+                            $batchCount++;
+                            
+                            // Process batch when it reaches the batch size
+                            if ($batchCount >= $batchSize) {
+                                $this->processBatch($currentBatch, $indexName, $mode);
+                                $currentBatch = [];
+                                $batchCount = 0;
+                            }
                         }
                     }
-    
-                }
-
-                if ($this->configData->isCronEnbaled() || $mode == 'cron') {
-                    $this->queueProcessor->processProductQueue($prdCollection, $indexName);
-                } else {
-                    $prdCollection = implode(PHP_EOL, $prdCollection);
-                    //sync typesense products here...
-                    $response = $this->typeSenseApi->importCollectionData($indexName, $prdCollection);
-        
-                    //log response
-                    $this->logger->error($response);
-                    //error handling section need to be implemented here....
+                    
+                    // Process any remaining products
+                    if (!empty($currentBatch)) {
+                        $this->processBatch($currentBatch, $indexName, $mode);
+                    }
                 }
             } catch (Exception $e) {
                 $this->logger->error($e->getMessage());
             }
         }
     }
+    
+    /**
+     * Process individual product updates
+     * 
+     * @param array $ids
+     * @param int $storeId
+     * @return void
+     */
+    private function processIndividualProducts($ids, $storeId)
+    {
+        $storeCode = '';
+        if ($storeId == 0) {
+            $storeId = 1;
+        }
+        $stores = $this->generalModel->getStore($storeId);
+        $storeCode = $stores->getCode();
+        $indexName = $this->getStoreCode($storeCode);
+        
+        // Use repository pattern instead of creating new product instances
+        $productRepository = \Magento\Framework\App\ObjectManager::getInstance()
+            ->get(\Magento\Catalog\Api\ProductRepositoryInterface::class);
+            
+        foreach ($ids as $id) {
+            try {
+                $productObj = $productRepository->getById($id, false, $storeId);
+                if (in_array($storeId, $productObj->getStoreIds()) || $storeId == 0) {
+                    $updatedDocument = $this->createProductData($id, $storeCode, $storeId);
+                    $this->typeSenseApi->upsertDocument($indexName, $updatedDocument);
+                } else {
+                    $this->typeSenseApi->deleteDocument($indexName, $id);
+                }
+            } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
+                // Product doesn't exist, remove from index
+                $this->typeSenseApi->deleteDocument($indexName, $id);
+            } catch (Exception $e) {
+                $this->logger->error($e->getMessage());
+            }
+        }
+    }
+    /**
+     * Get optimized product collection
+     * 
+     * @param int $storeId
+     * @return \Magento\Catalog\Model\ResourceModel\Product\Collection
+     */
+    private function getOptimizedProductCollection($storeId)
+    {
+        $collection = $this->collectionFactory->create();
+        
+        // Only select necessary attributes instead of '*'
+        $collection->addAttributeToSelect(['entity_id', 'name', 'sku', 'price', 'type_id', 'visibility', 'status']);
+        $collection->addStoreFilter($storeId);
+        $collection->addAttributeToFilter(
+            'status',
+            \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED
+        );
+        $collection->addAttributeToFilter(
+            'visibility',
+            ['neq' => \Magento\Catalog\Model\Product\Visibility::VISIBILITY_NOT_VISIBLE]
+        );
+        return $collection;
+    }
+    
+    /**
+     * Process a batch of products
+     * 
+     * @param array $batch
+     * @param string $indexName
+     * @param string|null $mode
+     * @return void
+     */
+    private function processBatch($batch, $indexName, $mode = null)
+    {
+        if ($this->configData->isCronEnbaled() || $mode == 'cron') {
+            $this->queueProcessor->processProductQueue($batch, $indexName);
+        } else {
+            $batchData = implode(PHP_EOL, $batch);
+            $response = $this->typeSenseApi->importCollectionData($indexName, $batchData);
+            
+            // Only log errors, not successful responses
+            if (isset($response['error'])) {
+                $this->logger->error(json_encode($response));
+            }
+        }
+    }
+
 
     /**
      * Get Index name
@@ -333,14 +394,16 @@ class ProductDataProcessor
      * @return array
      */
     public function createProductData($productId, $storeCode, $storeId)
-    {
+    {   
+        $minimalPrice = "";
+        $min="";
+        $max="";
         $response = [];
         $stockStatus = false;
         $stockQty = 0;
         $stock = $this->generalModel->getStockInfo($productId);
         if ($stock) {
             $stockStatus = $stock->getIsInStock();
-           // $stockQty = $stock->getQty();
         }
 
         $stockQty = $this->getProductQty($productId);
@@ -350,7 +413,8 @@ class ProductDataProcessor
              $isInStock = false;
             foreach ($childProducts as $childProduct) {
             $stock = $this->generalModel->getStockInfo($childProduct->getId());
-               if ($stock && $stock->getIsInStock()) {
+            $stockqty = $this->getProductQty($childProduct->getId());
+               if ($stockqty > 0  && $stock->getIsInStock()) {
                    $isInStock = true;
                    break;
             }
@@ -370,6 +434,50 @@ class ProductDataProcessor
             }
             $stockStatus = $isInStock;
         }
+        if ($product->getTypeId() == 'bundle') {
+                /** @var \Magento\Bundle\Model\Product\Type $typeInstance */
+                $typeInstance = $product->getTypeInstance();
+                $optionCollection = $typeInstance->getOptionsCollection($product);
+                $selectionCollection = $typeInstance->getSelectionsCollection(
+                    $typeInstance->getOptionsIds($product),
+                    $product
+                );
+
+               // Group selections by option
+    $selectionsByOption = [];
+    foreach ($selectionCollection as $selection) {
+        $selectionsByOption[$selection->getOptionId()][] = $selection;
+    }
+
+    $isInStock = true; // assume true until proven otherwise
+
+    foreach ($optionCollection as $option) {
+        if (!$option->getRequired()) {
+            // Skip non-required options
+            continue;
+        }
+
+        $hasInStockSelection = false;
+
+        if (isset($selectionsByOption[$option->getOptionId()])) {
+            foreach ($selectionsByOption[$option->getOptionId()] as $selection) {
+                $stock = $this->generalModel->getStockInfo($selection->getId());
+                if ($stock && $stock->getIsInStock()) {
+                    $hasInStockSelection = true;
+                    break;
+                }
+            }
+        }
+
+                // If a required option has no in-stock selection → bundle not salable
+                if (!$hasInStockSelection) {
+                    $isInStock = false;
+                    break;
+                }
+            }
+
+             $stockStatus = $isInStock;
+            }
         $attributesArray = [];
         $productAttCode = [];
         $attributes = $product->getAttributes();
@@ -412,7 +520,6 @@ class ProductDataProcessor
             }
         }
         $finalAtrArray = array_merge($attrDiffArr, $attributesArray);
-       // if ($product->getVisibility() != 1) {
             $image = null;
             if ($product->getImage()) {
                 $image = $this->generalModel->getMediaUrl().'catalog/product'.$product->getImage();
@@ -464,6 +571,33 @@ class ProductDataProcessor
                 $price = $lowestPrice === null ? 0 : $lowestPrice;
             }
 
+            if ($product->getTypeId() == 'bundle') {
+                $priceModel = $product->getPriceModel();
+                list($minPrice, $maxPrice) = $product->getPriceModel()->getTotalPrices($product, null, true);
+                $priceType =  $product->getPriceType();
+                if($priceType == 1){
+                $min = $minPrice;
+                $max = $maxPrice;
+                if($minPrice == $maxPrice){
+                $minimalPrice = "$".$minPrice;
+                }else{
+                $minimalPrice = "$".$minPrice ."-". "$".$maxPrice; 
+                }
+                $price = $minPrice;
+                }
+                else
+                {
+                $min = $product->getPriceInfo()->getPrice('final_price')->getMinimalPrice()->getValue();
+                $max = $product->getPriceInfo()->getPrice('final_price')->getMaximalPrice()->getValue();
+                if($min == $max){
+                $minimalPrice =  "$".$min;
+                }else{
+                $minimalPrice = "$".$min ."-". "$".$max;
+                }
+                $price = $min;
+                }
+            }
+
             $this->reviewFactory->create()->getEntitySummary($product, $this->generalModel->getStore()->getId());
             $ratingSummary = $product->getRatingSummary()->getRatingSummary();
             
@@ -472,9 +606,10 @@ class ProductDataProcessor
                 $productStore = $storeCode;
             }
             $spAmount = $product->getSpecialPrice();
-            $spPrice = ($spAmount)?$this->priceHelper->currency($spAmount, true, false):'';
-
-          //  if($product->getStatus() == 1){
+            $spPrice = ($spAmount)?$spAmount:'';
+            $priceRange = ($minimalPrice)?:'';
+            $priceMin =($min)?:'';
+            $priceMax=($max)?:'';
             $response = [
                 'id' => $product->getId(),
                 'product_id' => $product->getId(),
@@ -486,6 +621,9 @@ class ProductDataProcessor
                 'small_image' => $smallImage,
                 'thumbnail' => $thumbNailImage,
                 'price' => $price??0,
+                'price_range' => $priceRange,
+                'price_min' => $priceMin,
+                'price_max' => $priceMax,
                 'type_id' => $product->getTypeId(),
                 'visibility' => $product->getVisibility(),
                 'category' => $categoryNameArr,
@@ -494,7 +632,7 @@ class ProductDataProcessor
                 'product_status' => $product->getStatus(),
                 'created_at' => $product->getCreatedAt(),
                 'stock_qty' => $stockQty,
-                'special_price' => $spPrice,
+                'special_price' => round((float)$spPrice, 2),
                 'rating_summary' => ($ratingSummary)? $ratingSummary: '',
                 'special_from_date' => ($product->getSpecialFromDate())?$product->getSpecialFromDate():'',
                 'special_to_date' => ($product->getSpecialToDate())?$product->getSpecialToDate():'',
@@ -505,11 +643,11 @@ class ProductDataProcessor
                 'short_description' => $this->removeHtmlTags($product->getShortDescription()),
                 'price_search' => round((float)$price, 2),
             ];
-           // }
             $productArray = array_merge($finalAtrArray, $response);
             return $productArray;
-        //}
     }
+
+
 public function getProductQty($productId)
 {
     $stockItem = $this->stockRegistry->getStockItem($productId);
@@ -694,43 +832,6 @@ public function getProductQty($productId)
         } catch (\Exception $e) {
             $this->logger->error($e->getMessage());
         }
-    }
-
-    /**
-     * Update Product Data
-     *
-     * @param array $productData
-     * @param int $queueId
-     * @param string $index
-     * @return void
-     */
-    public function updateProductCron($productData, $queueId, $index)
-    {
-        if (!empty($productData)) {
-            try {
-                $productObj = $this->productFactory->create();
-                $productObj->load($productData['productId']);
-                if ($productObj->getId()) {
-                    $updatedDocument = $this->createProductData(
-                        $productData['productId'],
-                        $productData['storeCode'],
-                        $productData['storeId']
-                    );
-                    $response = $this->typeSenseApi->upsertDocument($index, $updatedDocument);
-                } else {
-                    $response = $this->typeSenseApi->deleteDocument($index, $productData['productId']);
-                }
         
-                if ($queueId) {
-                    $currentQueue = $this->typesenseSearchRepositoryInterface->getById($queueId);
-                    $currentQueue->setJobStatus(1);
-                    $currentQueue->setErrors($this->generalModel->encodeData($response));
-                    $currentQueue->setUpdatedAt($this->timezoneInterface->date()->format('Y-m-d H:i:s'));
-                    $this->typesenseSearchRepositoryInterface->save($currentQueue);
-                }
-            } catch (\Exception $e) {
-                $this->logger->error($e->getMessage());
-            }
-        }
     }
 }

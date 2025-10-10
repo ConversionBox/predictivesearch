@@ -1,0 +1,9 @@
+<?php
+$category = $block->getLayout()->getBlock('category.products.list')->getCurrentCategory();
+if ($category) {
+    $categoryId = $category->getId();?>
+    <script>
+    window.categoryId = <?= /* @noEscape */ json_encode($categoryId); ?>;
+</script>
+<?php }
+?>

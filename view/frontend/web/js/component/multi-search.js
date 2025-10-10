@@ -24,7 +24,7 @@ define(
         const SHOW_DESCRIPTION = typesenseConfig.auto_complete.show_description;
         const Max_DESCRIPTION_LINE = typesenseConfig.auto_complete.max_description_line;
         const  SEE_ALL_BUTTON = typesenseConfig.auto_complete.see_all_button;
-         const SHOW_OUT_OF_STOCK = typesenseConfig.auto_complete.show_out_of_stock;
+        const SHOW_OUT_OF_STOCK = typesenseConfig.auto_complete.show_out_of_stock;
         /** Typo Tolerance */
         const TYPO_ENABLED = typesenseConfig.typotolerance.enable;
         const WORD_LENGTH = typesenseConfig.typotolerance.word_length;
@@ -156,10 +156,10 @@ define(
                 'per_page'  : PRODUCT_MAX_COUNT,
                 'sort_by'   : ranking,
                 'filter_by' : `storeCode:["${STORE}"]`
-            }            
+            }    
              if(SHOW_OUT_OF_STOCK == 0){
                     productSearchParameters.filter_by += ` && stock_status:=true`;
-                }
+                }        
             $.each(productSearchParameters, function (key, val) {
                 if (!val) {
                     delete productSearchParameters[key];
@@ -184,17 +184,24 @@ $('#auto_search_time').html(
                             `<div>Found <a href="${searchUrl}">${found}</a> out of ${out_of} Results in ${search_time_ms} ms</div>`
                         );
             $.each(hits, function (key, val) {
-                    let price = val.document.price;
-                    if (val.document.special_price) {
+                let price =  CURRENCY + parseFloat(val.document.price).toFixed(2);
+                if(val.document.type_id == 'bundle'){
+                      price = formatPriceRange(val.document.price_range);
+                      }
+                  let priceval = Number(price);
+                  priceval = Math.floor(priceval * 100) / 100; // truncate instead of round
+                  if (val.document.special_price) {
                         let currentDate = new Date();
                         let startDate = new Date(val.document.special_from_date);
                         let endDate = new Date(val.document.special_to_date);
-                        if (startDate <= currentDate && endDate >= currentDate) {
-                            price = `<span class="special_price">${val.document.special_price}</span>
-                                 <span class="normal_price">${val.document.price}</span>
-                            `;
+        if (isDateInRange(new Date(), new Date(val.document.special_from_date), new Date(val.document.special_to_date))) {
+                            let splval = Number(val.document.special_price);
+                               splval = Math.floor(splval * 100) / 100;
+                               price = CURRENCY + parseFloat(val.document.special_price).toFixed(2);
+
                         }
                     }
+
                     var name = val.document.product_name;
                     var proddescription =  val.document.description;
                     var description = proddescription.replace(/<\/?[^>]+(>|$)/g, "")
@@ -203,8 +210,6 @@ $('#auto_search_time').html(
                         var highlight = val.highlight.name;
                         if (val.highlight.name) {
                             var name = val.highlight.name.snippet;
-                        } else if (highlight == 'price') {
-                            price  = val.highlight.price.snippet;
                         } else if (highlight == 'sku') {
                             var sku =  val.highlight.sku.snippet;
                         }
@@ -231,14 +236,9 @@ $('#auto_search_time').html(
                                         html += `<div class="predictive-product_sku">SKU: ${sku}</div>`;
                                            }
                                           if(SHOW_PRICE == 1){
-                                       html += `<div class="predictive-product_price" >`;
-                                        if(window.location.href != BASE_URL && $("body").hasClass('catalog-product-view') == false){
-                                            html+=`${CURRENCY+priceUtils.formatPriceLocale(price)}`;
-                                        }
-                                        else{
-                                            html +=`${CURRENCY+priceUtils.formatPriceLocale(price)}`;
-                                        }
-                                        html +=`</div>`;
+                                         html += `<div class="predictive-product_price" >`;
+                                         html+=`${price}`;
+                                         html +=`</div>`;
                                         }
                                    html +=`</div>
                                 </div>
@@ -256,6 +256,36 @@ $('#auto_search_time').html(
             }
             $('#product_section').html(html);
         }
+      function normalizeDate(date) {
+            return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+            }
+    function formatPriceRange(priceRange) {
+        // Remove all $ signs
+        let cleaned = priceRange.replace(/\$/g, "").trim();
+        const format = (value) => {
+        let num = parseFloat(value);
+        if (isNaN(num)) return "0.00";
+        return num.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    };
+
+        // Check if it's a range (contains "-")
+        if (cleaned.includes("-")) {
+            let [min, max] = cleaned.split("-");
+               return `$${format(min)} - $${format(max)}`;
+        } else {
+                return `$${format(cleaned)}`;
+        }
+        }
+
+        function isDateInRange(current, start, end) {
+            const c = normalizeDate(current);
+            const s = normalizeDate(start);
+            const e = normalizeDate(end);
+            return c >= s && c <= e;
+            }
 
         /**
          * 

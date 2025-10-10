@@ -46,6 +46,10 @@ class LayoutProcessBefore implements ObserverInterface
      */
     public function execute(Observer $observer)
     {
+          $autocomplete = $this->configData->getAutocompleteEnabled();
+        if ($this->request->isXmlHttpRequest() || strpos($this->request->getPathInfo(), '/rest/') !== false) {
+            return;
+        }
         if ($this->configData->getModuleStatus()) {
             $category = "";
             $category = $this->layerResolver->get()->getCurrentCategory();
@@ -54,7 +58,10 @@ class LayoutProcessBefore implements ObserverInterface
                 $layout->getUpdate()->addHandle('typesense_category_handle');
             }
             else {
-                if($this->configData->getAdminApiKey() ) {
+                if($this->configData->getModuleStatus() && $this->configData->getAutocompleteEnabled() == 1 &&
+    !in_array($this->request->getFullActionName(), [
+        'weltpixel_quickview_catalog_product_view'
+    ]) ) {
                 $layout = $observer->getData('layout');
                 $layout->getUpdate()->addHandle('typsense_search_handle');
             }

@@ -10,8 +10,9 @@
         <button id="clear_all"><?= $escaper->escapeHtmlAttr(__('Clear All')) ?></button>
         <div id="filter-items"></div>
     </div>
+
     <?php if ($viewModel->priceSlider() == 1): ?>
-       <div class="filter_price_slider">
+        <div class="filter_price_slider">
         <span class="item_label" style="padding:0 13px;"><?= $escaper->escapeHtmlAttr(__('Price')) ?></span>
         <div class="slider-box">
             <div id="price-range" class="slider"></div>

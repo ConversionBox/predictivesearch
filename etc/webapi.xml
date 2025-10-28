@@ -29,10 +29,6 @@
         <resources>
             <resource ref="Magento_Backend::admin" />
         </resources>
-        <parameters>
-            <parameter name="page" xsi:type="int" required="false"/>
-            <parameter name="page_size" xsi:type="int" required="false"/>
-        </parameters>
     </route>
        <route url="/V1/landingpage/edit/:landingPageId" method="POST">
         <service class="Conversionbox\Predictivesearch\Api\UpdatelandingPageInterface" method="updateLandingPage"/>

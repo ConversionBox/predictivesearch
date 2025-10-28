@@ -3,13 +3,9 @@ define([
 	'uiComponent',
 	'Conversionbox_Predictivesearch/js/config/typesenseSearchConfig',
 	'Conversionbox_Predictivesearch/js/component/multi-search',
-	'Conversionbox_Predictivesearch/js/component/products',
-	'Conversionbox_Predictivesearch/js/component/category',
-	'Conversionbox_Predictivesearch/js/component/pages',
 	'mage/url',
-         'Conversionbox_Predictivesearch/js/uuid4',
 	'ko'
-], function($, Component, searchConfig, multiSearchComponent, productComponent, categoryComponent, pageComponent, url,browser, ko) {
+], function($, Component, searchConfig, multiSearchComponent, url, ko) {
 	'use strict';
 
 	let keyword = '';
@@ -105,10 +101,7 @@ define([
            });
 			//popup toogle action when clicking on search box
 			$("#searchbox").click(function(e) {
-				if (e.keyCode === 13) {
-                 return;
-                }
-				var keywordlength = keyword.trim().length;
+				var keywordlength = keyword.length.trim();
 				if (keywordlength >= mimimumqueryLength && $('#search_result').hasClass("autocomplete")) {
 					$('#search_result').removeClass("autocomplete");
 				} else if (keywordlength >= mimimumqueryLength) {
@@ -132,7 +125,7 @@ define([
 				sessionID = cookieID;
 				localStorage.setItem("_conversion_box_track_id", cookieID);
 			} else if (!cookieID && !storageId) {
-			      sessionID = this.uuid4();
+				sessionID = this.uuid4();
 				this.setCookie("_conversion_box_track_id", sessionID);
 				localStorage.setItem("_conversion_box_track_id", sessionID);
 			} else {
@@ -148,15 +141,19 @@ define([
 				}
 			}
 			return null;
-	 	},
+		},
+		 uuid4:function(){
 
-                uuid4:function(){
            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+
             var r = Math.random() * 16 | 0,
+
                 v = c === 'x' ? r : (r & 0x3 | 0x8);
+
             return v.toString(16);
+
         });
-               },
+      },
 		setCookie: function(cookieKey, cookieValue) {
 			// Set the session ID in a cookie with a longer expiration time (e.g., 30 days)
 			document.cookie = `${cookieKey}=${cookieValue}; expires=${new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toUTCString()}; path=/`;

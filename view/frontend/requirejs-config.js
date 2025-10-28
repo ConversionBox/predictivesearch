@@ -1,10 +1,11 @@
 var config = {
-    paths: {
-          'uuid': 'Conversionbox_Predictivesearch/js/uuid4'
-    },
-    shim: {
-        'uuid': {
-            deps: ['jquery']
+    map: {
+        '*': {
+            'typesenseSearchConfig': 'Conversionbox_Predictivesearch/js/config/typesenseSearchConfig',
+            'multiSearch': 'Conversionbox_Predictivesearch/js/component/multi-search'
         }
-    }
+    },
+	paths: {
+		'typesense': 'Conversionbox_Predictivesearch/typesense/typesense.min',
+	}
 };

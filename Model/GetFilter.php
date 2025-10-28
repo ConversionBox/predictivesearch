@@ -32,15 +32,16 @@ class GetFilter implements FilterInterface
             [[1, 2], 1]
         );
 
-        $response = [];
+        $response = []; 
+        // Always add Category as first filter option
+$response[] = [
+    'label' => 'Category',
+    'value' => 'category'
+];
         foreach ($productAttributes as $item) {
-            if ($item->getData('attribute_code') == 'category_gear') {
-                $attibuteCode = 'category';
-                $categoryLabel = 'Category';
-            } else {
+        
                 $attibuteCode = $item->getData('attribute_code');
                 $categoryLabel = $item->getData('frontend_label');
-            }
             
             $response[] = [
                 'label' => $categoryLabel,

@@ -160,7 +160,6 @@ class Configuration extends Template implements CollectionDataSourceInterface
                 'max_description_line' =>  $this->configData->getAutocompletemaxdescline(),
                 'see_all_button'   => $this->configData->getSeeall(),
                 'show_out_of_stock' =>  $this->configData->getAutocompleteOutofstock()
-
             ],
             'products' => [
                 'attributes' => $this->configData->getProductAttributeConfig(),
@@ -229,10 +228,10 @@ class Configuration extends Template implements CollectionDataSourceInterface
     {
         $response = [];
         $queryCollection = $this->collectionFactory->create();
+        $queryCollection->setPageSize(6)->setOrder('popularity', 'DESC');
         foreach ($queryCollection as $data) {
             $response[] = $data->getQueryText();
         }
-        $response = array_slice($response, -6);
         return $response;
     }
 

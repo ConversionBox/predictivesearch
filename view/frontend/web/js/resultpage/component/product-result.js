@@ -443,7 +443,7 @@ define(
                                 let startDate = new Date(val.document.special_from_date);
                                 let endDate = new Date(val.document.special_to_date);
                                 if (startDate <= currentDate && endDate >= currentDate) {
-                                    price = `<span class="special_p rice">${val.document.special_price}</span>
+                                    price = `<span class="special_price">${val.document.special_price}</span>
                                             <span class="normal_price">${val.document.price}</span>
                                     `;
                                 }

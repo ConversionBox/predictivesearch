@@ -315,9 +315,8 @@ class ConfigData
     **/  
    private const CATEGORY_MAX_DESC_LINE = 'typesense_categories/categories/max_description_lines';
    private const CATEGORY_PAGE_ENABLED ='typesense_categories/categories/enable_Category';
-   private const AUTOCOMPLETE_ENABLED ='typesense_autocomplete/autocomplete/enable_frontend';
    private const AUTOCOMPLETE_OUT_OF_STOCK ='typesense_autocomplete/autocomplete/show_outof_stock';
-
+   private const AUTOCOMPLETE_ENABLED ='typesense_autocomplete/autocomplete/enable_frontend';
     /**
      * @var ScopeConfigInterface
      */
@@ -380,16 +379,7 @@ class ConfigData
     {
         return $this->getSystemConfigValues(self::SEARCH_API_KEY);
     }
-    /**
-     * Conversion autocomplete search Enabled
-     *
-     * @param void
-     * @return string
-     */
-    public function getAutocompleteEnabled()
-    {
-        return $this->getSystemConfigValues(self::AUTOCOMPLETE_ENABLED);
-    }
+
     /**
      * Get Admin Api Key
      *
@@ -410,6 +400,16 @@ class ConfigData
     public function getCategorypageEnabled()
     {
         return $this->getSystemConfigValues(self::CATEGORY_PAGE_ENABLED);
+    }
+    /**
+     * Conversion autocomplete search Enabled
+     *
+     * @param void
+     * @return string
+     */
+    public function getAutocompleteEnabled()
+    {
+        return $this->getSystemConfigValues(self::AUTOCOMPLETE_ENABLED);
     }
     /**
      * Get Index Prefix
@@ -486,9 +486,7 @@ class ConfigData
     {
         return $this->getSystemConfigValues(self::RESULT_PAGE);
     }
-    public function getAutocompleteOutofstock(){
-     return $this->getSystemConfigValues(self::AUTOCOMPLETE_OUT_OF_STOCK);
-    }
+
     /**
      * Search Filters
      *
@@ -865,6 +863,9 @@ class ConfigData
      }
     public function getSeeall(){
      return $this->getSystemConfigValues(self::SEE_ALL_BUTTON);
+    }
+     public function getAutocompleteOutofstock(){
+     return $this->getSystemConfigValues(self::AUTOCOMPLETE_OUT_OF_STOCK);
     }
     public function getInstantsku(){
       return $this->getSystemConfigValues(self::SEARCH_SHOW_SKU);

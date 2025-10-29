@@ -31,10 +31,10 @@ interface LandingPageInterface
      * @return array
      */
     public function getData($page = 1, $pageSize = 10);
-   /**
-     * Edit a landing page by ID
+    /**
+     * Edit a landing page by ID.
      *
-     * @param int $id
+     * @param int $landingPageId
      * @param string|null $title
      * @param string|null $urlkey
      * @param string|null $isActive
@@ -47,6 +47,17 @@ interface LandingPageInterface
      * @param string|null $customCss
      * @return string
      */
-    public function updateLandingPage($landingPageId, $title = null, $urlkey = null, $isActive = null,$metaTitle=null,$metaDescription = null,$metaKeywords=null,$content=null,$configuration=null,$customJs=null,$customCss=null);
-    
+    public function updateLandingPage(
+        $landingPageId,
+        $title = null,
+        $urlkey = null,
+        $isActive = null,
+        $metaTitle = null,
+        $metaDescription = null,
+        $metaKeywords = null,
+        $content = null,
+        $configuration = null,
+        $customJs = null,
+        $customCss = null
+    );
 }

@@ -88,4 +88,3 @@ class SaveCategoryAttribute implements ObserverInterface
         }
   } 
 }
-?>

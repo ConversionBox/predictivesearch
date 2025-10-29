@@ -17,6 +17,9 @@ class Suggestions implements \Magento\Framework\View\Element\Block\ArgumentInter
         $this->landingPageCollectionFactory = $landingPageCollectionFactory;
     }
 
+    /**
+     * @return int
+     */
     public function getNbOfLandingPages()
     {
         $landingPageCollection = $this->landingPageCollectionFactory->create();

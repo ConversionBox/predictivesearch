@@ -4,9 +4,8 @@ namespace Conversionbox\Predictivesearch\Api;
 interface SortInterface
 {
     /**
-     * sortby  attribute colletcion
+     * Sortby attribute collection.
      *
-     * 
      * @return array
      */
     public function getSortby();

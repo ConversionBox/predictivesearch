@@ -13,4 +13,3 @@ class Tab extends \Magento\Backend\Block\Template
         parent::__construct($context, $data);
     }
 }
-?>

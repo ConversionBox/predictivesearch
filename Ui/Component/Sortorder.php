@@ -1,9 +1,13 @@
 <?php
 namespace Conversionbox\Predictivesearch\Ui\Component;
+
 use Magento\Framework\Option\ArrayInterface;
 
 class Sortorder implements ArrayInterface
 {
+    /**
+     * @return array
+     */
     public function toOptionArray()
     {
         $response = [

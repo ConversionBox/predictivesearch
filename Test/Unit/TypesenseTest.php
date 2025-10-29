@@ -9,17 +9,20 @@ use Typesense\Collections;
 use Typesense\Collection;
 use Typesense\Documents;
 
-class TypesenseTest extends TestCase {
+class TypesenseTest extends TestCase
+{
     /**
-     * typesense Helper
+     * @var Typesense
      */
     protected $typesenseHelper;
+
     /**
-     * Client
+     * @var Client
      */
     protected $client;
 
-    protected function setUp(): void {
+    protected function setUp(): void
+    {
         $context = $this->createMock(Context::class);
 
         $this->typesenseHelper = $this->getMockBuilder(Typesense::class)
@@ -51,12 +54,12 @@ class TypesenseTest extends TestCase {
                 ],
                 'default_sorting_field' => 'price'
             ]);
-           $this->client->collections = $collections;
-         $documents->method('import')->willReturn([
+        $this->client->collections = $collections;
+        $documents->method('import')->willReturn([
             ['id' => '1', 'name' => 'Product 1', 'price' => 100, 'category' => 'Category 1'],
             ['id' => '2', 'name' => 'Product 2', 'price' => 200, 'category' => 'Category 2']
-         ]);
-            
+        ]);
+
         $searchResults = [
             'hits' => [
                 ['document' => ['name' => 'Product 1']]
@@ -83,7 +86,7 @@ class TypesenseTest extends TestCase {
      */
     public function testTypesenseSearch()
     {
-      $schema = [
+        $schema = [
             'name' => 'products',
             'fields' => [
                 ['name' => 'name', 'type' => 'string'],
@@ -101,9 +104,9 @@ class TypesenseTest extends TestCase {
             ['id' => '1', 'name' => 'Product 1', 'price' => 100, 'category' => 'Category 1'],
             ['id' => '2', 'name' => 'Product 2', 'price' => 200, 'category' => 'Category 2']
         ];
-       $documents = $this->client->collections->__get('products')->getDocuments();
+        $documents = $this->client->collections->__get('products')->getDocuments();
         $documents->import($documentsData);
-       
+
         // Perform a search query
         $searchParameters = [
             'q' => 'Product 1',

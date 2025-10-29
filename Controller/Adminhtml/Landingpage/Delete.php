@@ -7,7 +7,9 @@ use Magento\Framework\Controller\ResultFactory;
 
 class Delete extends AbstractAction
 {
-    /** @return \Magento\Framework\View\Result\Page */
+    /**
+     * @return \Magento\Framework\Controller\Result\Redirect
+     */
     public function execute()
     {
         /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */

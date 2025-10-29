@@ -1,9 +1,13 @@
 <?php
 namespace Conversionbox\Predictivesearch\Ui\Component;
+
 use Magento\Framework\Option\ArrayInterface;
 
 class FacetType implements ArrayInterface
 {
+    /**
+     * @return array
+     */
     public function toOptionArray()
     {
         return [

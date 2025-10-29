@@ -50,8 +50,9 @@ class LandingPageActions extends Column
     }
 
     /**
-     * @param array $dataSource
+     * Prepare Data Source.
      *
+     * @param array $dataSource
      * @return array
      */
     public function prepareDataSource(array $dataSource)

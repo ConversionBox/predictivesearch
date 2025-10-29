@@ -1,5 +1,6 @@
 <?php
 namespace Conversionbox\Predictivesearch\Ui\Component;
+
 use Magento\Catalog\Model\ResourceModel\Product\Attribute\CollectionFactory;
 use Magento\Framework\Option\ArrayInterface;
 
@@ -12,19 +13,17 @@ class FacetOptions implements ArrayInterface
     private $collectionFactory;
 
     /**
-     * Attribute Constructor
-     *
-     * @param Context $context
      * @param CollectionFactory $collectionFactory
-     * @param array $data
      */
     public function __construct(
-        CollectionFactory $collectionFactory,
-        array $data = []
+        CollectionFactory $collectionFactory
     ) {
         $this->collectionFactory = $collectionFactory;
     }
 
+    /**
+     * @return array
+     */
     public function toOptionArray()
     {
         $productAttributes = $this->collectionFactory->create();
@@ -34,14 +33,14 @@ class FacetOptions implements ArrayInterface
         );
 
         $response = [];
-         // Always add Category as first filter option
-          $response[] = [
-             'label' => 'Category',
-             'value' => 'category'
-          ];
+        // Always add Category as first filter option
+        $response[] = [
+            'label' => 'Category',
+            'value' => 'category'
+        ];
         foreach ($productAttributes as $item) {
-                $attibuteCode = $item->getData('attribute_code');
-                $categoryLabel = $item->getData('frontend_label');
+            $attibuteCode = $item->getData('attribute_code');
+            $categoryLabel = $item->getData('frontend_label');
             $response[] = [
                 'label' => $categoryLabel,
                 'value' => $attibuteCode

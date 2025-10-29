@@ -1,7 +1,7 @@
 
 <div class="pp-buttons-container">
     <button id="<?= /* @noEscape */ $block->getId() ?>">
-        <span><?= /* @noEscape */ $block->escapeHtml($block->getButtonLabel()); ?></span>
+        <span><?= /* @noEscape */ $escaper->escapeHtml($block->getButtonLabel()); ?></span>
     </button>
 </div>
 <div id="response_message"></div>

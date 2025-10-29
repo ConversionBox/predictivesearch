@@ -34,12 +34,11 @@ class General implements ArgumentInterface
     public function priceSlider()
     {
         $filterCollection = $this->configData->getSearchFilters();
-        foreach($filterCollection as $filter){
-            if($filter['facet'] == 'slider' && $filter['filterAttribute'] == 'price'){
+        foreach ($filterCollection as $filter) {
+            if ($filter['facet'] == 'slider' && $filter['filterAttribute'] == 'price') {
                 return 1;
-            }else{
-                return 0;
             }
         }
+        return 0;
     }
 }

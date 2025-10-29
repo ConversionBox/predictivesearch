@@ -3,8 +3,8 @@ namespace Conversionbox\Predictivesearch\Api;
 
 interface UpdatelandingPageInterface
 {
-     /**
-     * Edit a landing page by ID
+    /**
+     * Edit a landing page by ID.
      *
      * @param int $landingPageId
      * @param string|null $title
@@ -18,20 +18,19 @@ interface UpdatelandingPageInterface
      * @param string|null $customJs
      * @param string|null $customCss
      * @return string
-     * @throws LocalizedException
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function updateLandingPage(
-      $landingPageId,
-      $title = null,
-      $urlkey = null,
-      $isActive = null,
-      $metaTitle = null,
-      $metaDescription = null,
-      $metaKeywords = null,
-      $content = null,
-      $configuration = null,
-      $customJs = null,
-      $customCss = null
+        $landingPageId,
+        $title = null,
+        $urlkey = null,
+        $isActive = null,
+        $metaTitle = null,
+        $metaDescription = null,
+        $metaKeywords = null,
+        $content = null,
+        $configuration = null,
+        $customJs = null,
+        $customCss = null
     );
-    
 }

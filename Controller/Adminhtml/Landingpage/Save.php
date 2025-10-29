@@ -22,23 +22,20 @@ class Save extends AbstractAction
     protected $backendSession;
 
     /**
-     * PHP Constructor
+     * Save constructor.
      *
      * @param \Magento\Backend\App\Action\Context $context
      * @param SessionManagerInterface $backendSession
      * @param LandingPageFactory $landingPageFactory
-     * @param MerchandisingHelper $merchandisingHelper
      * @param StoreManagerInterface $storeManager
      * @param DataPersistorInterface $dataPersistor
-     * @param CollectionFactory $customerGroupCollectionFactory
-     * @return Save
      */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
         SessionManagerInterface $backendSession,
         LandingPageFactory $landingPageFactory,
         StoreManagerInterface $storeManager,
-        DataPersistorInterface $dataPersistor,
+        DataPersistorInterface $dataPersistor
     ) {
         $this->dataPersistor = $dataPersistor;
         parent::__construct(

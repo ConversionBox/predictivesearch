@@ -33,7 +33,6 @@ define(
 				}
 
 				$(document).ready(function() {
-				 $('.filter_main').hide();
 					if (queryParam) {
                                                if (productResult && typeof productResult.performSearch === 'function') {
 						productResult.performSearch(queryParam, page, typsenseClient, filterValue); }

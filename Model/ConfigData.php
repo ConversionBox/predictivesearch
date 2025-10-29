@@ -305,7 +305,7 @@ class ConfigData
     /**
     *  Flip Image On Hover Search result page
     **/  
-   private const CATEGORY_FLIP_IMG_HOVER = 'typesense_categories/categories//flip_image_on_hover';
+   private const CATEGORY_FLIP_IMG_HOVER = 'typesense_categories/categories/flip_image_on_hover';
    /**
     *  Show description Search result page
     **/  
@@ -673,15 +673,23 @@ class ConfigData
         }
         return [];
     }
-    public function getMinimumChar(){
-        
+    /**
+     * Get minimum char length
+     *
+     * @return string
+     */
+    public function getMinimumChar()
+    {
         return $this->getSystemConfigValues(self::MINIMUM_LENGTH);
-
     }
-    public function getUniqueId(){
-        
+    /**
+     * Get unique ID
+     *
+     * @return string
+     */
+    public function getUniqueId()
+    {
         return $this->getSystemConfigValues(self::UNIQUEID);
-
     }
     /**
      * Enable Logging
@@ -775,13 +783,12 @@ class ConfigData
     public function enableSlider()
     {
         $filterCollection = $this->getSearchFilters();
-        foreach($filterCollection as $filter){
-            if($filter['facet'] == 'slider' && $filter['filterAttribute'] == 'price'){
+        foreach ($filterCollection as $filter) {
+            if ($filter['facet'] == 'slider' && $filter['filterAttribute'] == 'price') {
                 return 1;
-            }else{
-                return 0;
             }
         }
+        return 0;
     }
 
     /**
@@ -849,163 +856,301 @@ class ConfigData
     {
         return $this->getSystemConfigValues(self::IMG_WIDTH);
     }
-    public function getAutocompletesku(){
-      return $this->getSystemConfigValues(self::AUTOCOMPLETE_SHOW_SKU);
-     }
-    public function getAutocompleteprice(){
-     return $this->getSystemConfigValues(self::AUTOCOMPLTE_SHOW_PRICE);
+    /**
+     * Get autocomplete SKU
+     *
+     * @return string
+     */
+    public function getAutocompletesku()
+    {
+        return $this->getSystemConfigValues(self::AUTOCOMPLETE_SHOW_SKU);
     }
-    public function getAutocompletedesc(){
-     return $this->getSystemConfigValues(self::AUTOCOMPLETE_SHOW_DESC);
+    /**
+     * Get autocomplete price
+     *
+     * @return string
+     */
+    public function getAutocompleteprice()
+    {
+        return $this->getSystemConfigValues(self::AUTOCOMPLTE_SHOW_PRICE);
     }
-     public function getAutocompletemaxdescline(){
-     return $this->getSystemConfigValues(self::AUTOCOMPLETE_MAX_DESC_LINE);
-     }
-    public function getSeeall(){
-     return $this->getSystemConfigValues(self::SEE_ALL_BUTTON);
+    /**
+     * Get autocomplete description
+     *
+     * @return string
+     */
+    public function getAutocompletedesc()
+    {
+        return $this->getSystemConfigValues(self::AUTOCOMPLETE_SHOW_DESC);
     }
-     public function getAutocompleteOutofstock(){
-     return $this->getSystemConfigValues(self::AUTOCOMPLETE_OUT_OF_STOCK);
+    /**
+     * Get autocomplete max description line
+     *
+     * @return string
+     */
+    public function getAutocompletemaxdescline()
+    {
+        return $this->getSystemConfigValues(self::AUTOCOMPLETE_MAX_DESC_LINE);
     }
-    public function getInstantsku(){
-      return $this->getSystemConfigValues(self::SEARCH_SHOW_SKU);
-     }
-    public function getInstantprice(){
-     return $this->getSystemConfigValues(self::SEARCH_SHOW_PRICE);
+    /**
+     * Get see all button status
+     *
+     * @return string
+     */
+    public function getSeeall()
+    {
+        return $this->getSystemConfigValues(self::SEE_ALL_BUTTON);
     }
-    public function getInstantdesc(){
-     return $this->getSystemConfigValues(self::SEARCH_SHOW_DESC);
+    /**
+     * Get autocomplete out of stock status
+     *
+     * @return string
+     */
+    public function getAutocompleteOutofstock()
+    {
+        return $this->getSystemConfigValues(self::AUTOCOMPLETE_OUT_OF_STOCK);
     }
-     public function getInstantmaxdescline(){
-     return $this->getSystemConfigValues(self::SEARCH_MAX_DESC_LINE);
-     }
-    public function getInstanttitle(){
-     return $this->getSystemConfigValues(self::SEARCH_MAX_TITLE_LINE);
-     }
-     public function getInstantflipImghover(){
-     return $this->getSystemConfigValues(self::SEARCH_FLIP_IMG_HOVER);
-     }
-     public function getCategoryInstantsku(){
+    /**
+     * Get instant SKU
+     *
+     * @return string
+     */
+    public function getInstantsku()
+    {
+        return $this->getSystemConfigValues(self::SEARCH_SHOW_SKU);
+    }
+    /**
+     * Get instant price
+     *
+     * @return string
+     */
+    public function getInstantprice()
+    {
+        return $this->getSystemConfigValues(self::SEARCH_SHOW_PRICE);
+    }
+    /**
+     * Get instant description
+     *
+     * @return string
+     */
+    public function getInstantdesc()
+    {
+        return $this->getSystemConfigValues(self::SEARCH_SHOW_DESC);
+    }
+    /**
+     * Get instant max description line
+     *
+     * @return string
+     */
+    public function getInstantmaxdescline()
+    {
+        return $this->getSystemConfigValues(self::SEARCH_MAX_DESC_LINE);
+    }
+    /**
+     * Get instant title
+     *
+     * @return string
+     */
+    public function getInstanttitle()
+    {
+        return $this->getSystemConfigValues(self::SEARCH_MAX_TITLE_LINE);
+    }
+    /**
+     * Get instant flip image on hover status
+     *
+     * @return string
+     */
+    public function getInstantflipImghover()
+    {
+        return $this->getSystemConfigValues(self::SEARCH_FLIP_IMG_HOVER);
+    }
+    /**
+     * Get category instant SKU
+     *
+     * @return string
+     */
+    public function getCategoryInstantsku()
+    {
         return $this->getSystemConfigValues(self::CATEGORY_SHOW_SKU);
-       }
-      public function getCategoryInstantprice(){
-       return $this->getSystemConfigValues(self::CATEGORY_SHOW_PRICE);
-      }
-      public function getCategoryInstantdesc(){
-       return $this->getSystemConfigValues(self::CATEGORY_SHOW_DESC);
-      }
-       public function getCategoryInstantmaxdescline(){
-       return $this->getSystemConfigValues(self::CATEGORY_MAX_DESC_LINE);
-       }
-      public function getCategoryInstanttitle(){
-       return $this->getSystemConfigValues(self::CATEGORY_MAX_TITLE_LINE);
-      }
-      public function getCategoryInstantflipImghover(){
+    }
+    /**
+     * Get category instant price
+     *
+     * @return string
+     */
+    public function getCategoryInstantprice()
+    {
+        return $this->getSystemConfigValues(self::CATEGORY_SHOW_PRICE);
+    }
+    /**
+     * Get category instant description
+     *
+     * @return string
+     */
+    public function getCategoryInstantdesc()
+    {
+        return $this->getSystemConfigValues(self::CATEGORY_SHOW_DESC);
+    }
+    /**
+     * Get category instant max description line
+     *
+     * @return string
+     */
+    public function getCategoryInstantmaxdescline()
+    {
+        return $this->getSystemConfigValues(self::CATEGORY_MAX_DESC_LINE);
+    }
+    /**
+     * Get category instant title
+     * 
+     * @return string
+     */
+    public function getCategoryInstanttitle()
+    {
+        return $this->getSystemConfigValues(self::CATEGORY_MAX_TITLE_LINE);
+    }
+    /**
+     * Get category instant flip image on hover status
+     *
+     * @return string
+     */
+    public function getCategoryInstantflipImghover()
+    {
         return $this->getSystemConfigValues(self::CATEGORY_FLIP_IMG_HOVER);
-       }
-       public function getNoProductShown(){
+    }
+    /**
+     * Get number of products shown
+     *
+     * @return string
+     */
+    public function getNoProductShown()
+    {
         return $this->getSystemConfigValues(self::CATEGORY_NO_OF_PRODUCT);
-       }
-       public function getCategoryShowoutofStock(){
+    }
+    /**
+     * Get category show out of stock status
+     *
+     * @return string
+     */
+    public function getCategoryShowoutofStock()
+    {
         return $this->getSystemConfigValues(self::CATEGORY_OUT_OF_STOCK);
-       }
-       public function getInstantShowoutofStock(){
+    }
+    /**
+     * Get instant show out of stock status
+     *
+     * @return string
+     */
+    public function getInstantShowoutofStock()
+    {
         return $this->getSystemConfigValues(self::SEARCH_OUT_OF_STOCK);
-       }
-       public function getCategorySearchFilters(){
+    }
+    /**
+     * Get category search filters
+     *
+     * @return array
+     */
+    public function getCategorySearchFilters()
+    {
         $category = $this->registry->registry('current_category');
         $filters = null;
         $categoryId = null;
         if ($category) {
             $categoryId = $category->getId();
         }
-        if($categoryId && $category->getData('enable_conversion_category') == 1 ){
+        if ($categoryId && $category->getData('enable_conversion_category') == 1) {
             $filters = $category->getData('conversion_categories_facet');
-            if($filters){
-            $outputArray = [];
-            foreach ($filters as $filter) {
-                $uniqueKey = "_" .round(microtime(true) * 1000) . '_'. rand(100, 999);
-                $outputArray[$uniqueKey] = [
-                    "filterAttribute" => $filter["filterAttribute"],
-                    "facet" => $filter["facet"],
-                    "fieldName" => $filter["fieldName"],
-                    "filterOption" => (string) $filter["filterOption"] // Ensure it's a string
-                ];
+            if ($filters) {
+                $outputArray = [];
+                foreach ($filters as $filter) {
+                    $uniqueKey = "_" . round(microtime(true) * 1000) . '_' . rand(100, 999);
+                    $outputArray[$uniqueKey] = [
+                        "filterAttribute" => $filter["filterAttribute"],
+                        "facet" => $filter["facet"],
+                        "fieldName" => $filter["fieldName"],
+                        "filterOption" => (string) $filter["filterOption"]
+                    ];
+                }
+                return $outputArray;
             }
-            return $outputArray;
-           }
+        } else {
+            $filters = $this->getSystemConfigValues(self::CATEGORY_FILTERS);
+            if ($filters) {
+                $filters = $this->generalModel->decodeData($filters);
+                return $filters;
             }
-        else{
-        $filters = $this->getSystemConfigValues(self::CATEGORY_FILTERS);
-        if ($filters) {
-            $filters = $this->generalModel->decodeData($filters);
-            return $filters;
         }
-         }
         return [];
-       }
-       public function enableCategorySlider(){
+    }
+    /**
+     * Enable category slider
+     *
+     * @return int
+     */
+    public function enableCategorySlider()
+    {
         $category = $this->registry->registry('current_category');
         $filters = null;
         $categoryId = null;
         if ($category) {
             $categoryId = $category->getId();
         }
-        if($categoryId && $category->getData('enable_conversion_category') == 1 ){
-         $filterCollection = $category->getData('conversion_categories_facet');
-         if($filterCollection){
-            foreach($filterCollection as $filter){
-                if($filter['facet'] == 'slider' && $filter['filterAttribute'] == 'price'){
-                    return 1;
-                }else{
-                    return 0;
+        if ($categoryId && $category->getData('enable_conversion_category') == 1) {
+            $filterCollection = $category->getData('conversion_categories_facet');
+            if ($filterCollection) {
+                foreach ($filterCollection as $filter) {
+                    if ($filter['facet'] == 'slider' && $filter['filterAttribute'] == 'price') {
+                        return 1;
+                    }
                 }
             }
-         }
-        }else{
-        $filterCollection = $this->getCategorySearchFilters();
-        foreach($filterCollection as $filter){
-            if($filter['facet'] == 'slider' && $filter['filterAttribute'] == 'price'){
-                return 1;
-            }else{
-                return 0;
+        } else {
+            $filterCollection = $this->getCategorySearchFilters();
+            foreach ($filterCollection as $filter) {
+                if ($filter['facet'] == 'slider' && $filter['filterAttribute'] == 'price') {
+                    return 1;
+                }
             }
         }
-       }
-       return 0;
+        return 0;
     }
-       public function getCategorySortOptions(){
+    /**
+     * Get category sort options
+     *
+     * @return array
+     */
+    public function getCategorySortOptions()
+    {
         $category = $this->registry->registry('current_category');
         $filters = null;
         $categoryId = null;
         if ($category) {
             $categoryId = $category->getId();
         }
-        if($categoryId && $category->getData('enable_conversion_category') == 1 ){
+        if ($categoryId && $category->getData('enable_conversion_category') == 1) {
             $filters = $category->getData('conversion_categories_sortorder');
-            if($filters){
-            $outputArray = [];
-             foreach ($filters as $filter) {
-                 $uniqueKey = "_" .round(microtime(true) * 1000) . '_'. rand(100, 999);
-                 $outputArray[$uniqueKey] = [
-                     "sortAttribute" => $filter["sortAttribute"],
-                     "sortDirection" => $filter["sortDirection"],
-                     "fieldName" => $filter["fieldName"],
-                     "position" => (string) $filter["position"] // Ensure it's a string
-                 ];
-             }
-             return $outputArray;
+            if ($filters) {
+                $outputArray = [];
+                foreach ($filters as $filter) {
+                    $uniqueKey = "_" . round(microtime(true) * 1000) . '_' . rand(100, 999);
+                    $outputArray[$uniqueKey] = [
+                        "sortAttribute" => $filter["sortAttribute"],
+                        "sortDirection" => $filter["sortDirection"],
+                        "fieldName" => $filter["fieldName"],
+                        "position" => (string) $filter["position"]
+                    ];
+                }
+                return $outputArray;
             }
-            }else{
+        } else {
             $sortOption = $this->getSystemConfigValues(self::CATEGORY_SORT_ATTRIBUTES);
             if ($sortOption) {
                 $sortOption = $this->generalModel->decodeData($sortOption);
-               // print_r($sortOption);exit(0);
                 return $sortOption;
             }
-           }
+        }
         return [];
-       }
+    }
     /**
      * Cron staus
      *
@@ -1061,3 +1206,4 @@ class ConfigData
         return $this->getSystemConfigValues(self::NEAREST_NODE);
     }
 }
+

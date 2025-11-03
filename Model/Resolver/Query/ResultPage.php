@@ -41,8 +41,8 @@ class ResultPage implements ResolverInterface
         Field $field,
         $context,
         ResolveInfo $info,
-        array $value = null,
-        array $args = null
+        ?array $value = null,
+        ?array $args = null
     ) {
         $response = [];
         if (!isset($args['keyword'])) {
@@ -53,3 +53,4 @@ class ResultPage implements ResolverInterface
         return $response;
     }
 }
+

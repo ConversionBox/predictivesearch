@@ -402,8 +402,9 @@ class ProductDataProcessor
         $stockStatus = false;
         $stockQty = 0;
         $stock = $this->generalModel->getStockInfo($productId);
-        if ($stock) {
-            $stockStatus = $stock->getIsInStock();
+        $stockQty = $this->getProductQty($productId);
+        if ($stockQty > 0  && $stock->getIsInStock()) {
+            $stockStatus = true;
         }
 
         $stockQty = $this->getProductQty($productId);
@@ -493,7 +494,7 @@ class ProductDataProcessor
                         $productAttCode[] = $data->getAttributeCode();
                         $value = $product->getResource()->getAttribute($attributeCode)->getFrontend()
                                 ->getValue($product);
-                            $multiListArr = ['multiselect', 'dropdown', 'select'];
+                            $multiListArr = ['multiselect', 'dropdown', 'select','swatch_visual'];
                     if (in_array($data->getFrontendInput(), $multiListArr)) {
                         if ($data->getFrontendInput() == 'multiselect') {
                             $value = str_replace(",", " ", "$value");
@@ -723,9 +724,13 @@ public function getProductQty($productId)
         }
         foreach ($childArrayAttributes as $key => $data) {
             $attributeData = $this->productAttributeRespository->get($key);
-            $multiListArr = ['multiselect', 'dropdown', 'select'];
+            $multiListArr = ['multiselect', 'dropdown', 'select','swatch_visual'];
             if (in_array($attributeData->getFrontendInput(), $multiListArr)) {
-                $uniqueArray = array_values(array_unique($data));
+                // Filter out false values before creating unique array
+                $filteredData = array_filter($data, function($value) {
+                    return $value !== false;
+                });
+                $uniqueArray = array_values(array_unique($filteredData));
                 $childArrayAttributes[$key] = $uniqueArray;
             } elseif ($key == 'price') {
                 $childArrayAttributes[$key] = min($data);

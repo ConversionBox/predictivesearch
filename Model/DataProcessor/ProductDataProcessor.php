@@ -484,6 +484,9 @@ class ProductDataProcessor
         $filterableData = $this->getFilterableAttributes();
          if ($product->getTypeId() === Configurable::TYPE_CODE) {
              $attributesArray = $this->handlingConfigData($product);
+        }
+        if ($product->getTypeId() == 'bundle') {
+            $attributesArray = $this->handlingBundleData($product);
         } 
         foreach ($attributes as $data) {
             if ($data->getIsFilterable()) {
@@ -707,6 +710,54 @@ public function getProductQty($productId)
         $childProducts = $this->configurableProductType->getUsedProducts($product);
         $childArrayAttributes = [];
         foreach ($childProducts as $childProduct) {
+            $childAttributes = $childProduct->getAttributes();
+            foreach ($childAttributes as $item) {
+                if ($item->getIsFilterable()) {
+                    $productAttCode[] = $item->getAttributeCode();
+                    $value = $childProduct->getResource()->getAttribute($item->getAttributeCode())->getFrontend()
+                            ->getValue($childProduct);
+                    if ($item->getFrontendInput() == 'multiselect') {
+                        $value = str_replace(",", " ", "$value");
+                    }
+
+                    $childArrayAttributes[$item->getAttributeCode()][] = $value;
+                }
+            }
+        }
+        foreach ($childArrayAttributes as $key => $data) {
+            $attributeData = $this->productAttributeRespository->get($key);
+            $multiListArr = ['multiselect', 'dropdown', 'select'];
+            if (in_array($attributeData->getFrontendInput(), $multiListArr)) {
+                $uniqueArray = array_values(array_unique($data));
+                $childArrayAttributes[$key] = $uniqueArray;
+            } elseif ($key == 'price') {
+                $childArrayAttributes[$key] = min($data);
+            } else {
+                $childArrayAttributes[$key] = end($data);
+            }
+        }
+        return $childArrayAttributes;
+    }
+
+    /**
+     * Handling Bundle product Data
+     *
+     * @param object $product
+     * @return array
+     */
+    public function handlingBundleData($product)
+    {
+        /** @var \Magento\Bundle\Model\Product\Type $typeInstance */
+        $typeInstance = $product->getTypeInstance();
+        $optionCollection = $typeInstance->getOptionsCollection($product);
+        $selectionCollection = $typeInstance->getSelectionsCollection(
+            $typeInstance->getOptionsIds($product),
+            $product
+        );
+
+        $childArrayAttributes = [];
+        foreach ($selectionCollection as $selection) {
+            $childProduct = $selection;
             $childAttributes = $childProduct->getAttributes();
             foreach ($childAttributes as $item) {
                 if ($item->getIsFilterable()) {

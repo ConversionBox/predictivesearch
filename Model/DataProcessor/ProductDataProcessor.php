@@ -781,7 +781,10 @@ public function getProductQty($productId)
             $attributeData = $this->productAttributeRespository->get($key);
             $multiListArr = ['multiselect', 'dropdown', 'select'];
             if (in_array($attributeData->getFrontendInput(), $multiListArr)) {
-                $uniqueArray = array_values(array_unique($data));
+                 $filteredData = array_filter($data, function($value) {
+                    return $value !== false;
+                });
+                $uniqueArray = array_values(array_unique($filteredData));
                 $childArrayAttributes[$key] = $uniqueArray;
             } elseif ($key == 'price') {
                 $childArrayAttributes[$key] = min($data);

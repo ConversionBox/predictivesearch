@@ -316,9 +316,10 @@ define(
                         }
 
                         perPage = $('#product_count_page').val() ? $('#product_count_page').val() : perPage;
-                        if (searchResults.found > NO_PRODUCTS_PAGE) {
+                        let actualPerPage = perPage || NO_PRODUCTS_PAGE;
+                        if (searchResults.found > actualPerPage) {
                             $('#product-pagination').show();
-                            totalPage = searchResults.found / NO_PRODUCTS_PAGE;
+                            totalPage = searchResults.found / actualPerPage;
                             totalPage = Math.ceil(totalPage);
                             if (totalPage > 4) {
                                 visiblePage = 3;
@@ -332,7 +333,7 @@ define(
                         if (perPage > searchResults.found) {
                             $('#product-pagination').hide();
                         } else {
-                            if (searchResults.found > NO_PRODUCTS_PAGE) {
+                            if (searchResults.found > actualPerPage) {
                                 $('#product-pagination').show();
                             }
                         }
@@ -340,10 +341,10 @@ define(
                         let loadedProductCount = 0;
                         if (totalPage == searchResults.page) {
                             loadedProductCount = searchResults.found;
-                        } else if (searchResults.found < NO_PRODUCTS_PAGE) {
+                        } else if (searchResults.found < actualPerPage) {
                             loadedProductCount = searchResults.found;
                         } else {
-                            loadedProductCount = (NO_PRODUCTS_PAGE * searchResults.page);
+                            loadedProductCount = (actualPerPage * searchResults.page);
                         }
 
                         if (perPage || $('#product_count_page').val()) {
@@ -653,8 +654,9 @@ define(
                             });
                         }
                     }
-                    updateParam.updateParams(filterParam);
-                    productSearch(keyword, 1, typsenseClient, filterParam, '');
+                    updateParam.updateParams(filterParam, null, 1);
+                    let currentPerPage = $('#product_count_page').val() || null;
+                    productSearch(keyword, 1, typsenseClient, filterParam, '', null, currentPerPage);
 
                 };
 
@@ -809,7 +811,8 @@ define(
                     selectedRadio = [];
                     $('#clear_all').hide();
                     sliderAction(keyword, filterParam);
-                    productSearch(keyword, 1, typsenseClient, null);
+                    let currentPerPage = $('#product_count_page').val() || null;
+                    productSearch(keyword, 1, typsenseClient, null, null, null, currentPerPage);
                 };
             }
 
@@ -841,7 +844,7 @@ define(
                                     if ($.inArray(e.target.id, selectedIndex) === -1) {
                                         selectedIndex.push(e.target.id);
                                     }
-                                    updateParam.updateParams(filterParam);
+                                    updateParam.updateParams(filterParam, null, 1);
                                 } else {
                                     checkField.removeAttribute('checked');
                                     const currentarray = filterParam[attributeFieldname].toString().split(',');
@@ -857,9 +860,10 @@ define(
                                         key: attributeFieldname,
                                         content: stableContent
                                     });
-                                    updateParam.updateParams(filterParam);
+                                    updateParam.updateParams(filterParam, null, 1);
                                 }
-                                productSearch(keyword, 1, typsenseClient, filterParam);
+                                let currentPerPage = $('#product_count_page').val() || null;
+                                productSearch(keyword, 1, typsenseClient, filterParam, null, null, currentPerPage);
                             }
                         } else {
                             if (e.target.type === 'radio') {
@@ -896,8 +900,9 @@ define(
                                         }
                                     }
 
-                                    updateParam.updateParams(filterParam);
-                                    productSearch(keyword, 1, typsenseClient, filterParam);
+                                    updateParam.updateParams(filterParam, null, 1);
+                                    let currentPerPage = $('#product_count_page').val() || null;
+                                    productSearch(keyword, 1, typsenseClient, filterParam, null, null, currentPerPage);
                                 }
                             }
                         }
@@ -1204,9 +1209,10 @@ define(
                         stop: function(event, ui) {
                             let priceParam = ui.values[0] + ".." + ui.values[1];
                             filterParam['price'] = priceParam;
-                            //     updateParam.updateParams(filterParam);
+                            updateParam.updateParams(filterParam, null, 1);
                             if (filterParam['price'] && isSlide == 1) {
-                                productSearch($('#search-result-box').val(), 1, searchConfig.createClient(typesenseConfig), '', '', ui.values[0] + '-' + ui.values[1]);
+                                let currentPerPage = $('#product_count_page').val() || null;
+                                productSearch($('#search-result-box').val(), 1, searchConfig.createClient(typesenseConfig), '', '', ui.values[0] + '-' + ui.values[1], currentPerPage);
                             }
                         }
                     });

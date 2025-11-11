@@ -308,6 +308,13 @@ class ProductDataProcessor
         foreach ($ids as $id) {
             try {
                 $productObj = $productRepository->getById($id, false, $storeId);
+                
+                // Check if product status is disabled (2) - delete from Typesense
+                if ($productObj->getStatus() == \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_DISABLED) {
+                    $this->typeSenseApi->deleteDocument($indexName, $id);
+                    continue;
+                }
+                
                 if (in_array($storeId, $productObj->getStoreIds()) || $storeId == 0) {
                     $updatedDocument = $this->createProductData($id, $storeCode, $storeId);
                     $this->typeSenseApi->upsertDocument($indexName, $updatedDocument);

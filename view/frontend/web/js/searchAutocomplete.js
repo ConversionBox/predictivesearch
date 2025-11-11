@@ -86,13 +86,15 @@ define([
 					window.location = url.build('catalogsearch/result/?q=' + e.target.value);
 				}
 			});
-                      document.querySelector('.action.search').addEventListener('click', function(e) {
-                      e.preventDefault();
-                      let keyword = document.getElementById('searchbox').value.trim();
-                      if (keyword) {
-                          window.location.href =  url.build('catalogsearch/result/?q=' + e.target.value);
-                          }
-                  });
+
+			//search button click action
+			$(document).on('click', '.action.search', function(e) {
+				e.preventDefault();
+				let keyword = $('#searchbox').val().trim();
+				if (keyword) {
+					window.location.href = url.build('catalogsearch/result/?q=' + keyword);
+				}
+			});
            $(document).on("click scroll", function (e) {
                   // if click/scroll happens outside #search_result and #searchbox
                 if (!$(e.target).closest('#search_result, #searchbox').length) {

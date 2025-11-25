@@ -61,6 +61,7 @@ define(
                             getProductAttributes(keyword),
                             getCategoryAttributes(keyword),
                             getPageAttributes(keyword),
+                            getQuerySuggestions(keyword),
                         ]
                     }
                     let commonSearchParams = {}
@@ -75,7 +76,9 @@ define(
                             if (value.request_params.collection_name === INDEX_PERFIX+STORE+'-pages') {
                                 renderPages(value.hits);
                             }
-
+                            if (value.request_params.collection_name === INDEX_PERFIX+STORE+'-suggestions') {
+                                renderSuggestions(value.hits);
+                            }
                         });
                        hitSearchAnalytics(keyword,searchResults.results)
                     });
@@ -167,7 +170,38 @@ define(
             })
             return productSearchParameters;
         }
+                /**
+         * 
+         * @param {*} hits 
+         */
+        function renderSuggestions(hits) {
+            let html = '';
+            if (hits.length < 1) {
+                let htmlhead = '<div class="popular_search_head">Popular Searches </div>';
+                $.each(POPULAR_TERMS, function (key, val) {
+                    let valkeyword = val.split(" ")[0];
+                    html += `
+                        <a href="${urlFormatter.build('catalogsearch/result/?q='+val)}">
+                            <div class="popular_items">${val.toUpperCase()}</div>
+                        </a>
+                    `
+                });
+                html = htmlhead+html;
+            }
 
+            $.each(hits, function (key, val) {
+                let name = val.document.q;
+                if (HIGHLIGHTS == 1) {
+                    name = val.highlight.q.snippet;
+                }
+                html += ` <div class="suggestion_container">
+                    <a href="${urlFormatter.build('catalogsearch/result/?q='+val.document.q)}">
+                        <div class="suggest_category">${name}</div>
+                    </a>
+                </div>`;
+            });
+            $('#suggestion_section').html(html);
+        }
         /**
          * 
          * @param {*} hits 
@@ -180,9 +214,6 @@ define(
             }
 
             let count = 0;
-$('#auto_search_time').html(
-                            `<div>Found <a href="${searchUrl}">${found}</a> out of ${out_of} Results in ${search_time_ms} ms</div>`
-                        );
             $.each(hits, function (key, val) {
                 let price =  CURRENCY + parseFloat(val.document.price).toFixed(2);
                 if(val.document.type_id == 'bundle'){
@@ -194,7 +225,7 @@ $('#auto_search_time').html(
                         let currentDate = new Date();
                         let startDate = new Date(val.document.special_from_date);
                         let endDate = new Date(val.document.special_to_date);
-        if (isDateInRange(new Date(), new Date(val.document.special_from_date), new Date(val.document.special_to_date))) {
+                         if (isDateInRange(new Date(), new Date(val.document.special_from_date), new Date(val.document.special_to_date))) {
                             let splval = Number(val.document.special_price);
                                splval = Math.floor(splval * 100) / 100;
                                price = CURRENCY + parseFloat(val.document.special_price).toFixed(2);
@@ -256,6 +287,7 @@ $('#auto_search_time').html(
             }
             $('#product_section').html(html);
         }
+        
       function normalizeDate(date) {
             return new Date(date.getFullYear(), date.getMonth(), date.getDate());
             }

@@ -306,15 +306,14 @@ class ProductDataProcessor
             ->get(\Magento\Catalog\Api\ProductRepositoryInterface::class);
             
         foreach ($ids as $id) {
+            
             try {
                 $productObj = $productRepository->getById($id, false, $storeId);
-                
-                // Check if product status is disabled (2) - delete from Typesense
+                  // Check if product status is disabled (2) - delete from Typesense
                 if ($productObj->getStatus() == \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_DISABLED) {
                     $this->typeSenseApi->deleteDocument($indexName, $id);
                     continue;
                 }
-                
                 if (in_array($storeId, $productObj->getStoreIds()) || $storeId == 0) {
                     $updatedDocument = $this->createProductData($id, $storeCode, $storeId);
                     $this->typeSenseApi->upsertDocument($indexName, $updatedDocument);
@@ -408,37 +407,62 @@ class ProductDataProcessor
         $response = [];
         $stockStatus = false;
         $stockQty = 0;
-        $stock = $this->generalModel->getStockInfo($productId);
-        $stockQty = $this->getProductQty($productId);
-        if ($stockQty > 0  && $stock->getIsInStock()) {
+        $stock = $this->stockRegistry->getStockItem($productId);
+        $stockQty = $stock->getQty();
+        
+        // Check if stock management is enabled
+        if ($stock && $stock->getManageStock()) {
+            // Stock management enabled: check qty and stock status
+            if ($stockQty > 0 && $stock->getIsInStock()) {
+                $stockStatus = true;
+            }
+        } else {
+            // Stock management disabled: always in stock
             $stockStatus = true;
+            $stockQty = 0;
         }
 
-        $stockQty = $this->getProductQty($productId);
         $product = $this->generalModel->getProductData($productId, $storeId);
         if ($product->getTypeId() === Configurable::TYPE_CODE) {
             $childProducts = $this->configurableProductType->getUsedProducts($product);
-             $isInStock = false;
+            $isInStock = false;
             foreach ($childProducts as $childProduct) {
-            $stock = $this->generalModel->getStockInfo($childProduct->getId());
-            $stockqty = $this->getProductQty($childProduct->getId());
-               if ($stockqty > 0  && $stock->getIsInStock()) {
-                   $isInStock = true;
-                   break;
+                $stock = $this->stockRegistry->getStockItem($childProduct->getId());
+                $stockqty = $this->getProductQty($childProduct->getId());
+                
+                // Check if stock management is enabled for child
+                if ($stock && $stock->getManageStock()) {
+                    // Stock management enabled: check qty and stock status
+                    if ($stockqty > 0 && $stock->getIsInStock()) {
+                        $isInStock = true;
+                        break;
+                    }
+                } else {
+                    // Stock management disabled: child is in stock
+                    $isInStock = true;
+                    break;
+                }
             }
-        }
-        $stockStatus = $isInStock;
+            $stockStatus = $isInStock;
         }
         if ($product->getTypeId() == 'grouped') {
-            $groupChildren = $product->getTypeInstance(true) ->getAssociatedProducts($product);
-               $isInStock = false;
+            $groupChildren = $product->getTypeInstance(true)->getAssociatedProducts($product);
+            $isInStock = false;
             foreach ($groupChildren as $childProduct) {
-               $stock = $this->generalModel->getStockInfo($childProduct->getId());
-               if ($stock && $stock->getIsInStock()) {
-                   $isInStock = true;
-                   break;
-            }
-            
+                $stock = $this->stockRegistry->getStockItem($childProduct->getId());
+                
+                // Check if stock management is enabled for child
+                if ($stock && $stock->getManageStock()) {
+                    // Stock management enabled: check stock status
+                    if ($stock->getIsInStock()) {
+                        $isInStock = true;
+                        break;
+                    }
+                } else {
+                    // Stock management disabled: child is in stock
+                    $isInStock = true;
+                    break;
+                }
             }
             $stockStatus = $isInStock;
         }
@@ -469,8 +493,19 @@ class ProductDataProcessor
 
         if (isset($selectionsByOption[$option->getOptionId()])) {
             foreach ($selectionsByOption[$option->getOptionId()] as $selection) {
-                $stock = $this->generalModel->getStockInfo($selection->getId());
-                if ($stock && $stock->getIsInStock()) {
+                $selectionProductId = $selection->getProductId();
+                $stock = $this->stockRegistry->getStockItem($selectionProductId);
+                
+                // Check if stock management is enabled for selection
+                if ($stock && $stock->getManageStock()) {
+                    // Stock management enabled: check stock status and quantity
+                    $stockQty = $this->getProductQty($selectionProductId);
+                    if ($stock->getIsInStock() && $stockQty > 0) {
+                        $hasInStockSelection = true;
+                        break;
+                    }
+                } else if ($stock) {
+                    // Stock management disabled: selection is in stock
                     $hasInStockSelection = true;
                     break;
                 }
@@ -571,11 +606,32 @@ class ProductDataProcessor
             }
     
             if ($product->getTypeId() == 'grouped') {
-                $groupChildren = $product->getTypeInstance(true) ->getAssociatedProducts($product);
+                $groupChildren = $product->getTypeInstance(true)->getAssociatedProducts($product);
                 $lowestPrice = null;
                 foreach ($groupChildren as $childProduct) {
-                    $childPrice = $childProduct->getPrice();
-                    if ($lowestPrice === null || $childPrice < $lowestPrice) {
+                    // Load the child product to ensure price data is available
+                    if (!$childProduct->getId()) {
+                        continue;
+                    }
+                    
+                    // Reload child product to get complete price data
+                    try {
+                        $loadedChild = $this->productFactory->create()->load($childProduct->getId());
+                        if ($loadedChild->getId()) {
+                            $childProduct = $loadedChild;
+                        }
+                    } catch (\Exception $e) {
+                        // Continue with original child product if reload fails
+                    }
+                    
+                    // Try to get final price first, fallback to regular price
+                    $childPrice = $childProduct->getFinalPrice();
+                    if ($childPrice === null || $childPrice == 0) {
+                        $childPrice = $childProduct->getPrice();
+                    }
+                    
+                    // Only consider non-zero prices
+                    if ($childPrice > 0 && ($lowestPrice === null || $childPrice < $lowestPrice)) {
                         $lowestPrice = $childPrice;
                     }
                 }
@@ -583,29 +639,45 @@ class ProductDataProcessor
             }
 
             if ($product->getTypeId() == 'bundle') {
-                $priceModel = $product->getPriceModel();
-                list($minPrice, $maxPrice) = $product->getPriceModel()->getTotalPrices($product, null, true);
-                $priceType =  $product->getPriceType();
-                if($priceType == 1){
-                $min = $minPrice;
-                $max = $maxPrice;
-                if($minPrice == $maxPrice){
-                $minimalPrice = "$".$minPrice;
-                }else{
-                $minimalPrice = "$".$minPrice ."-". "$".$maxPrice; 
-                }
-                $price = $minPrice;
-                }
-                else
-                {
-                $min = $product->getPriceInfo()->getPrice('final_price')->getMinimalPrice()->getValue();
-                $max = $product->getPriceInfo()->getPrice('final_price')->getMaximalPrice()->getValue();
-                if($min == $max){
-                $minimalPrice =  "$".$min;
-                }else{
-                $minimalPrice = "$".$min ."-". "$".$max;
-                }
-                $price = $min;
+                $priceType = $product->getPriceType();
+                
+                // Price Type: 1 = Fixed (Ship Bundle Together), 0 = Dynamic
+                if ($priceType == 1) {
+                    // Fixed Price Bundle
+                    list($minPrice, $maxPrice) = $product->getPriceModel()->getTotalPrices($product, null, true);
+                    $min = $minPrice;
+                    $max = $maxPrice;
+                    if ($minPrice == $maxPrice) {
+                        $minimalPrice = "$" . $minPrice;
+                    } else {
+                        $minimalPrice = "$" . $minPrice . "-" . "$" . $maxPrice; 
+                    }
+                    $price = $minPrice;
+                } else {
+                    // Dynamic Price Bundle
+                    try {
+                        $priceInfo = $product->getPriceInfo();
+                        $finalPrice = $priceInfo->getPrice('final_price');
+                        $min = $finalPrice->getMinimalPrice()->getValue();
+                        $max = $finalPrice->getMaximalPrice()->getValue();
+                        
+                        // Fallback to getTotalPrices if price info returns 0
+                        if ($min == 0 && $max == 0) {
+                            list($min, $max) = $product->getPriceModel()->getTotalPrices($product, null, true);
+                        }
+                        
+                        if ($min == $max) {
+                            $minimalPrice = "$" . $min;
+                        } else {
+                            $minimalPrice = "$" . $min . "-" . "$" . $max;
+                        }
+                        $price = $min;
+                    } catch (\Exception $e) {
+                        // Fallback to getTotalPrices on error
+                        list($min, $max) = $product->getPriceModel()->getTotalPrices($product, null, true);
+                        $minimalPrice = ($min == $max) ? "$" . $min : "$" . $min . "-" . "$" . $max;
+                        $price = $min;
+                    }
                 }
             }
 

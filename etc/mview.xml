@@ -31,4 +31,6 @@
             <table name="cms_page" entity_column="page_id" />
         </subscriptions>
     </view>
+    <view id="conversionbox_suggestions" class="Conversionbox\Predictivesearch\Model\Indexer\Suggestions" group="indexer"> 
+    </view>
 </config>

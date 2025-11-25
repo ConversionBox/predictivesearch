@@ -15,4 +15,8 @@
         <title translate="true">Conversionbox Search Pages</title>
         <description translate="true">Rebuild pages index with Conversionbox.</description>
     </indexer>
+    <indexer id="suggestions" view_id="suggestions" class="Conversionbox\Predictivesearch\Model\Indexer\Suggestions">
+        <title translate="true">Conversionbox Search Suggestions</title>
+        <description translate="true">Rebuild suggestion index with typesense.</description>
+   </indexer>
 </config>

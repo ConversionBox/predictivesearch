@@ -84,6 +84,18 @@
                         <field id="enable_frontend">1</field>
                     </depends>
                 </field>
+                 <field id="analytic_url" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Analytics URL</label>
+                    <depends>
+                        <field id="enable_frontend">1</field>
+                    </depends>
+                </field>
+                <field id="connection_url" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Conversionbox Merchant Connection URL</label>
+                    <depends>
+                        <field id="enable_frontend">1</field>
+                    </depends>
+                </field>
                    <field id="connection_index" translate="label" type="button" sortOrder="81" showInDefault="1" showInWebsite="1" showInStore="1">
                     <frontend_model>Conversionbox\Predictivesearch\Block\System\Config\Connection</frontend_model>
                      <comment>Establish the connection with conversionbox Merchant Account</comment>

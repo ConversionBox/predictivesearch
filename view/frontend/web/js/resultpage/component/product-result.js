@@ -253,11 +253,11 @@ define(
                 let requestQuery = '';
                 $.each(finalRequestParam, function(key, val) {
                     if (val != '' && key !== disjunctiveFacet) {
-                        // Escape special characters in filter values
-                        let escapedValues = val.map(function(v) {
-                            return v.replace(/([()[\]{}])/g, '\\$1');
+                        // Wrap each filter value in single quotes
+                        let quotedValues = val.map(function(v) {
+                            return "'" + v + "'";
                         });
-                        requestQuery += '&&'+ key + ':=[' + escapedValues.join(',') + '] &&';
+                        requestQuery += '&&'+ key + ':=[' + quotedValues.join(',') + '] &&';
                     }
                 });
 

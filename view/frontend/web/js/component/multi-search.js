@@ -53,8 +53,9 @@ define(
              * 
              * @param {*} keyword 
              * @param {*} typsenseClient 
+             * @param {*} callback - Optional callback function to execute after search completes
              */
-            multiSearch: function(keyword, typsenseClient) {
+            multiSearch: function(keyword, typsenseClient,callback) {
                 try {
                     let searchRequests = {
                         'searches': [
@@ -80,7 +81,11 @@ define(
                                 renderSuggestions(value.hits);
                             }
                         });
-                       hitSearchAnalytics(keyword,searchResults.results)
+                       hitSearchAnalytics(keyword,searchResults.results);
+                        // Execute callback if provided
+                       if (typeof callback === 'function') {
+                           callback();
+                       }
                     });
                 } catch (error) {
                     console.log(error)
@@ -176,19 +181,15 @@ define(
          */
         function renderSuggestions(hits) {
             let html = '';
+            
             if (hits.length < 1) {
-                let htmlhead = '<div class="popular_search_head">Popular Searches </div>';
-                $.each(POPULAR_TERMS, function (key, val) {
-                    let valkeyword = val.split(" ")[0];
-                    html += `
-                        <a href="${urlFormatter.build('catalogsearch/result/?q='+val)}">
-                            <div class="popular_items">${val.toUpperCase()}</div>
-                        </a>
-                    `
-                });
-                html = htmlhead+html;
+                // Hide suggestion section when no hits
+                    $('#suggestion_section').parent().hide();
+                    return;
             }
 
+            // Add Suggestions heading when there are hits
+            let htmlhead = '<span class="autocomplete_head">Popular Searches</span>';
             $.each(hits, function (key, val) {
                 let name = val.document.q;
                 if (HIGHLIGHTS == 1) {
@@ -200,7 +201,9 @@ define(
                     </a>
                 </div>`;
             });
+            html = htmlhead + html;
             $('#suggestion_section').html(html);
+            $('#suggestion_section').parent().show();
         }
         /**
          * 
@@ -356,12 +359,16 @@ define(
          * @param {*} hits 
          */
         function renderCategory(hits) {
-            let html = '';
             if (hits.length < 1) {
-                html = 'No Categories found';
+                $('#category_section').parent().hide();
+                return;
             }
+            
+            let html = '';
+            let hasValidCategory = false;
             $.each(hits, function (key, val) {
                 if (val.document.status == 1) {
+                    hasValidCategory = true;
                     var path = val.document.path;
                     if (HIGHLIGHTS == 1) {
                         if (typeof val.highlight.path !== 'undefined' && typeof val.highlight.path.snippet !== 'undefined') {
@@ -375,7 +382,15 @@ define(
                     `;
                 }
             });
-            $('#category_section').html(html);
+            
+            if (hasValidCategory && html.trim() !== '') {
+                // Add heading when there are valid categories
+                let fullHtml = '<span class="autocomplete_head">Categories</span>' + html;
+                $('#category_section').html(fullHtml);
+                $('#category_section').parent().show();
+            } else {
+                $('#category_section').parent().hide();
+            }
         }
 
         /**
@@ -403,27 +418,36 @@ define(
          * @param {*} hits 
          */
         function renderPages(hits) {
-            let html = '';
             if (hits.length < 1) {
-                html = 'No Pages found';
+                $('#cms_section').parent().hide();
+                return;
             }
 
+            let html = '';
+            let hasValidPage = false;
             $.each(hits, function (key, val) {
                 var title =  val.document.page_title;
                 if (HIGHLIGHTS == 1 && typeof(val.highlights[0].field) != "undefined" && val.highlights[0].field == 'page_title') {
                     var title = val.highlight.page_title.snippet;
                 }
                 if (val.document.status == 1 && $.inArray(val.document.identifier, excludedPageArr) === -1) {
+                    hasValidPage = true;
                     html += `
                         <div>
                             <a href="${val.document.url}">${title}</a>
                         </div>
                     `;
-                } else {
-                    html = 'No Pages found';
                 }
             });
-            $('#cms_section').html(html);
+            
+            if (hasValidPage && html.trim() !== '') {
+                // Add heading when there are valid pages
+                let fullHtml = '<span class="autocomplete_head">Pages</span>' + html;
+                $('#cms_section').html(fullHtml);
+                $('#cms_section').parent().show();
+            } else {
+                $('#cms_section').parent().hide();
+            }
         }
 
     }

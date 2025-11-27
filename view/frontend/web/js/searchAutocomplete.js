@@ -55,15 +55,17 @@ define([
 			//search action
 			$("#searchbox").on("keyup", function(e) {
 				 if (e.keyCode === 13) {
-                 return;
-                }
+                                 return;
+                                 }
 				keyword = e.target.value.trim();
 				var keywordlength = keyword.length;
 				if (keyword && (keywordlength >= mimimumqueryLength)) {
 				 	//enabling the search popup
 					//bind product, category and page data and suggestion data
-					multiSearchComponent.multiSearch(keyword, typsenseClient);
-					$("#search_result").addClass("autocomplete");
+                                       multiSearchComponent.multiSearch(keyword, typsenseClient, function() {
+                                               // Add autocomplete class only after typesense binding is complete
+                                               $("#search_result").addClass("autocomplete");
+                                       });
                                     let searchBtn = document.querySelector('.action.search');
                                 if (searchBtn) {
                                   searchBtn.removeAttribute('disabled');
@@ -107,7 +109,7 @@ define([
 				if (keywordlength >= mimimumqueryLength && $('#search_result').hasClass("autocomplete")) {
 					$('#search_result').removeClass("autocomplete");
 				} else if (keywordlength >= mimimumqueryLength) {
-					$("#search_result").addClass("autocomplete");
+				//	$("#search_result").addClass("autocomplete");
 				}
 				event.stopPropagation();
 			});

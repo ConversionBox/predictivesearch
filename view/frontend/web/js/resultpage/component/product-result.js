@@ -104,12 +104,9 @@ define(
             filterParam = filterparamArr;
             sliderAction(location.search.split('=')[1], filterParam);
             /* Mobile filter toggle */
-            $('body').on('click', '#refine-toggle', function() {
+            $('body').on('click', '.refineToggle, .mobileFilterClose', function() {
                 $('.filter_main').toggleClass('hidden-sm').toggleClass('hidden-xs');
-                if ($(this).html().trim()[0] === '+')
-                    $(this).html('- ' + refine);
-                else
-                    $(this).html('+ ' + refine);
+		$('.sidebar.mobile-sidebar').toggleClass('active');
             });
             /* Mobile slider issue */
             $(document).on('touchstart', '#price-range .ui-slider-handle', function(e) {
@@ -247,9 +244,9 @@ define(
                 }
 
                 if (selectedIndex.length >= 1 || selectedRadio.length >= 1) {
-                    $('#clear_all').show();
+                    $('#clear_all').show();$('.SelectedFiltersContainer').show();$('#selected-filter').addClass('withValue');
                 } else {
-                    $('#clear_all').hide();
+                    $('#clear_all').hide();$('.SelectedFiltersContainer').hide();$('#selected-filter').removeClass('withValue');
                 }
 
                 //make request query
@@ -438,17 +435,23 @@ define(
                         paginationAction(totalPage, visiblePage, keyword, productCount);
 
                         $.each(searchResults.hits, function(key, val) {
-                            let price = val.document.price;
-                            if (val.document.special_price) {
-                                let currentDate = new Date();
-                                let startDate = new Date(val.document.special_from_date);
-                                let endDate = new Date(val.document.special_to_date);
-                                if (startDate <= currentDate && endDate >= currentDate) {
-                                    price = `<span class="special_price">${val.document.special_price}</span>
-                                            <span class="normal_price">${val.document.price}</span>
-                                    `;
-                                }
-                            }
+                 let price =  CURRENCY + parseFloat(val.document.price).toFixed(2);
+                     if(val.document.type_id == 'bundle'){
+                      price = formatPriceRange(val.document.price_range);
+                      }
+                  let priceval = Number(price);
+                  priceval = Math.floor(priceval * 100) / 100; // truncate instead of round
+                  if (val.document.special_price) {
+                        let currentDate = new Date();
+                        let startDate = new Date(val.document.special_from_date);
+                        let endDate = new Date(val.document.special_to_date);
+                           if (isDateInRange(new Date(), new Date(val.document.special_from_date), new Date(val.document.special_to_date))) {
+                            let splval = Number(val.document.special_price);
+                               splval = Math.floor(splval * 100) / 100;
+                               price = CURRENCY + parseFloat(val.document.special_price).toFixed(2);
+
+                        }
+                    }
                             var name = val.document.product_name;
                             var sku = val.document.sku;
                             var description = val.document.description;
@@ -490,7 +493,7 @@ define(
                                               html +=`<div class="item_sku">SKU: ${sku}</div>`;
                                                }
                                                if(SHOW_PRICE == 1){
-                                                html +=`<div class="item_price">${CURRENCY+priceUtils.formatPriceLocale(price)}</div>`;
+                                                html +=`<div class="item_price">${price}</div>`;
                                                 }
                                           html +=`</div>
                                         </div>
@@ -545,6 +548,36 @@ define(
                 console.log(error)
             }
         }
+      function normalizeDate(date) {
+            return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+            }
+    function formatPriceRange(priceRange) {
+        // Remove all $ signs
+        let cleaned = priceRange.replace(/\$/g, "").trim();
+        const format = (value) => {
+        let num = parseFloat(value);
+        if (isNaN(num)) return "0.00";
+        return num.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    };
+
+        // Check if it's a range (contains "-")
+        if (cleaned.includes("-")) {
+            let [min, max] = cleaned.split("-");
+               return `$${format(min)} - $${format(max)}`;
+        } else {
+                return `$${format(cleaned)}`;
+        }
+        }
+
+        function isDateInRange(current, start, end) {
+            const c = normalizeDate(current);
+            const s = normalizeDate(start);
+            const e = normalizeDate(end);
+            return c >= s && c <= e;
+            }
         function cleanQuery(query) {
             // Remove extra spaces and ensure uniform spacing around "&&"
             query = query.replace(/\s*&&+\s*/g, " && ");
@@ -611,45 +644,51 @@ define(
             $('#filter-items').html(selectedHtml);
 
             const clearButton = document.querySelector('#filter-items');
-            if (clearButton) {
+          if (clearButton) {
                 clearButton['onclick'] = function(e) {
-                    $('#product-pagination').twbsPagination('destroy');
+                    try {
+                        $('#product-pagination').twbsPagination('destroy');
+                    } catch(e) {}
                     let keyword = $('#search-result-box').val();
                     const typsenseClient = searchConfig.createClient(typesenseConfig);
                     let selectedId = e.target.id;
-                    let selectArr = selectedId.split('-');
-                    if (selectArr.length > 1) {
-                        if (filterParam[selectArr[0]]) {
-                            let currentValue = filterParam[selectArr[0]].toString().split(',');
-                            var selectFiled = document.getElementById(selectArr[1]);
+                    // Split only on the first hyphen to handle values with hyphens
+                    let firstHyphenIndex = selectedId.indexOf('-');
+                    if (firstHyphenIndex > -1) {
+                        let attributeName = selectedId.substring(0, firstHyphenIndex);
+                        let attributeValue = selectedId.substring(firstHyphenIndex + 1);
+                        
+                        if (filterParam[attributeName]) {
+                            let currentValue = filterParam[attributeName].toString().split(',');
+                            var selectFiled = document.getElementById(attributeValue);
                             if (selectFiled) {
                                 selectFiled.removeAttribute('checked');
                             } else {
                                 currentValue.splice(0, 1);
                             }
-                            const index = currentValue.indexOf(selectArr[1]);
+                            const index = currentValue.indexOf(attributeValue);
                             if (index > -1) {
                                 currentValue.splice(index, 1);
                             }
-                            filterParam[selectArr[0]] = currentValue.toString();
-                            //const itemIndex = selectedRadio.indexOf(selectArr[1]);
-                            const itemIndex = selectedIndex.indexOf(selectArr[1]);
+                            filterParam[attributeName] = currentValue.toString();
+                            //const itemIndex = selectedRadio.indexOf(attributeValue);
+                            const itemIndex = selectedIndex.indexOf(attributeValue);
                             if (itemIndex > -1) {
                                 selectedIndex.splice(itemIndex, 1);
                             }
-                            const itemRadioindex = selectedRadio.indexOf(selectArr[1]);
+                            const itemRadioindex = selectedRadio.indexOf(attributeValue);
                             if (itemRadioindex > -1) {
                                 selectedRadio.splice(itemIndex, 1);
                             }
-                            if (selectArr[0] != 'price') {
-                                stableContent = $('#' + selectArr[0])[0].outerHTML;
+                            if (attributeName != 'price') {
+                                stableContent = $('#' + attributeName)[0].outerHTML;
                             }
                             if (filterParam == '') {
                                 selectedRadio = [];
                                 $('#clear_all').hide();
                             }
                             selectedFilters.push({
-                                key: selectArr[0],
+                                key: attributeName,
                                 content: stableContent
                             });
                         }
@@ -684,11 +723,10 @@ define(
 
             let html = '';
             $.each(filterArray, function(key, item) {
-                let filterHtml = renderFilterHtml(item, 6, false, item.field_name);
+                let filterHtml = renderFilterHtml(item, 300, false, item.field_name);
                 let itemLabel = item.field_name.toUpperCase();
                 let itemOptions = 6;
                 let itemOptionsCondition = false;
-                let condition = true;
 
                 $.each(facet, function(key, value) {
                     if (item.field_name == value.filterAttribute) {
@@ -697,25 +735,19 @@ define(
                     }
                 });
 
-                if (item.counts.length <= 6) {
-                    condition = false;
-                }
                 if (itemOptions == 1) {
                     itemOptionsCondition = true;
                 }
 
                 if (filterHtml) {
                     html += `<div class="filter_main_test" id="price"></div><div class="filter_main_test" id="${item.field_name}">
-                        <span class="item_label">${itemLabel}</span>
+                        <span class="item_label active">${itemLabel}</span>
                         <div class="child_main" id="more_option_${item.field_name}">
                             ${itemOptionsCondition ? `
                                 <div class="search_bar_option">
                                     <input class="search_option_filter" data-attr="${item.field_name}" type="search" id="search_filter_${item.field_name}" placeholder="Search by option">
                                 </div>` : ''}
                             <div id="filtermore_attribute_${item.field_name}" class="filter_check">${filterHtml}</div>
-                            <div class="read_more_less_buttons">
-                            ${condition ? `<button data-info="${item.field_name}" data-count="${item.counts.length}" data-toggle-state="more" id="toggle_${item.field_name}" class="read_toggle_link">Read More</button>` : ''}
-                            </div>
                         </div>
                     </div>`;
                 }
@@ -734,19 +766,26 @@ define(
                     });
                 }
             }
-
-            $(document).on('keyup', '.search_option_filter', function() {
-                let attribute = $(this).data('attr');
-                let query = $(this).val();
-                let keyword = $('#search-result-box').val();
-                const typsenseClient = searchConfig.createClient(typesenseConfig);
-
-                productSearch(keyword, 1, typsenseClient, null, null, null, null, attribute, function(results) {
-                    if (results.facet_counts.length > 0) {
-                        let filterHtml = renderFilterHtml(results.facet_counts[0], results.facet_counts[0].counts.length, true, attribute);
-                        $('#filtermore_attribute_' + attribute).html(filterHtml);
-                    }
-                }, `${attribute}:${query}`);
+            $(document).on('keyup', '.search_option_filter', function(e) {
+                let filterKeyword = e.target.value;
+                let filterId = $(this).attr("data-attr");
+                let filterItem = '';
+                $('.filter_' + filterId).hide();
+                
+                // Get the filter item from the last search results
+                if (searchResultsArray.length > 0) {
+                    $.each(searchResultsArray[searchResultsArray.length - 1].facet_counts, function(key, item) {
+                        if (item.field_name === filterId) {
+                            filterItem = item;
+                        }
+                    });
+                }
+                
+                const searchOptionsContainer = document.getElementById('filtermore_attribute_' + filterId);
+                if (searchOptionsContainer && filterItem) {
+                    const generatedHTML = searchOpitonHtml(filterItem, filterKeyword, filterId);
+                    searchOptionsContainer.innerHTML = generatedHTML;
+                }
             });
 
             //setting data after refresh
@@ -759,48 +798,6 @@ define(
                 });
             }
 
-            // Read more Toggle
-            $(document).on('click', '.read_toggle_link', function(e) {
-                let $button = $(this);
-                let itemId = $button.data('info');
-                let itemCount = $button.data('count');
-                let toggleState = $button.data('toggle-state');
-                let filterArr = [];
-                searchResultsArray[searchResultsArray.length - 1].facet_counts.filter((item) => {
-                    if (item.field_name === itemId) {
-                        filterArr.push(item);
-                    }
-                });
-                const singleObjectItemData = filterArr[0];
-                var isReadMore = true;
-                $('#toggle_' + itemId).text("Read Less");
-                $('#toggle_' + itemId).attr('data-toggle-state', 'less');
-                $('#toggle_' + itemId).removeClass('read_toggle_link');
-                $('#toggle_' + itemId).addClass('read_less');
-                var filterHtml = renderFilterHtml(singleObjectItemData, itemCount, isReadMore, itemId);
-                $('#filtermore_attribute_' + itemId).html(filterHtml);
-                $('#toggle_' + itemId).css("display", "block");
-            });
-            // Read less Toggle
-            $(document).on('click', '.read_less', function(e) {
-                let $button = $(this);
-                let itemId = $button.data('info');
-                let toggleState = $button.data('toggle-state');
-                let filterArr = [];
-                searchResultsArray[searchResultsArray.length - 1].facet_counts.filter((item) => {
-                    if (item.field_name === itemId) {
-                        filterArr.push(item);
-                    }
-                });
-                const singleObjectItemData = filterArr[0];
-                var isReadMore = toggleState === "less";
-                $button.text("Read More");
-                $button.attr('data-toggle-state', 'more');
-                $button.removeClass('read_less');
-                $('#toggle_' + itemId).addClass('read_toggle_link');
-                var filterHtml = renderFilterHtml(singleObjectItemData, 6, isReadMore, itemId);
-                $('#filtermore_attribute_' + itemId).html(filterHtml);
-            });
             const resetbutton = document.querySelector('#clear_all');
 
             if (resetbutton) {
@@ -917,7 +914,7 @@ define(
          * @param {*} item 
          * @returns 
          */
-        function renderFilterHtml(item, maxItems = 6, isReadMore = true, fieldName) {
+        function renderFilterHtml(item, maxItems = 300, isReadMore = true, fieldName) {
             $.each(facet, function(key, value) {
                 if (fieldName == value.filterAttribute) {
                     itemFacetType = value.facet;
@@ -931,14 +928,16 @@ define(
                     html += `
                         <div class="form-check col-md-12 filter_${item.field_name}">
                         <input type="checkbox" class="form-check-input rangeCheck" name="[${item.field_name}]" id="${itemValue.value}" ${$.inArray(itemValue.value, selectedIndex) != -1 ? 'checked' : 'null'}  data-range="${itemValue.value}" data-typename="${item.field_name}" readonly="true">
-                        <label class="form-check-label" for="${itemValue.value}">${itemValue.value} (${itemValue.count})</label>
+                        <label class="form-check-label" for="${itemValue.value}">${itemValue.value}</label>
+			<span class="form-check-label-count">${itemValue.count}</span>
                         </div>
                     `;
                 } else if (itemValue.value && itemFacetType == 'conjunctive') {
                     html += `
                         <div class="form-check col-md-12 filter_${item.field_name}">
                         <input type="radio" class="form-check-input radioCheck" name="[${item.field_name}]" id="${item.field_name}[${itemValue.value}]" data-range="${itemValue.value}" data-typename="${item.field_name}" ${$.inArray(item.field_name + '_' + itemValue.value, selectedRadio) != -1 ? 'checked' : 'null'}  readonly="true">
-                        <label class="form-check-label" for="${itemValue.value}">${itemValue.value} (${itemValue.count})</label>
+                        <label class="form-check-label" for="${itemValue.value}">${itemValue.value}</label>
+			<span class="form-check-label-count">${itemValue.count}</span>
                         </div>
                     `;
 
@@ -980,7 +979,8 @@ define(
                         html += `
                         <div class="form-check col-md-12 searchOption_${item.field_name}">
                             <input type="checkbox" class="form-check-input rangeCheck" name="[${item.field_name}]" id="${itemValue.value}" ${$.inArray(itemValue.value, selectedIndex) != -1? 'checked' : 'null'} data-range="${itemValue.value}" data-typename="${item.field_name}" readonly="true">
-                            <label class="form-check-label" for="range1">${itemValue.value} (${itemValue.count})</label>
+                            <label class="form-check-label" for="range1">${itemValue.value}</label>
+			    <span class="form-check-label-count">${itemValue.count}</span>
                         </div>
                         `;
                     }
@@ -997,7 +997,6 @@ define(
             $(document).on('keyup', '.search_option_filter', function(e) {
                 let filterKeyword = e.target.value;
                 let filterId = $(this).attr("data-attr");
-                $('#toggle_' + filterId).hide();
                 let filterItem = '';
                 $('.filter_' + filterId).hide();
                 $.each(filterArray, function(key, item) {
@@ -1053,17 +1052,13 @@ define(
                         html += `
                         <div class="form-check col-md-12 searchOption_${item.field_name}">
                             <input type="checkbox" class="form-check-input rangeCheck" name="[${item.field_name}]" id="${itemValue.value}" ${$.inArray(itemValue.value, selectedIndex) != -1? 'checked' : 'null'} data-range="${itemValue.value}" data-typename="${item.field_name}" readonly="true">
-                            <label class="form-check-label" for="range1">${itemValue.value} (${itemValue.count})</label>
+                            <label class="form-check-label" for="range1">${itemValue.value}</label>
+			    <span class="form-check-label-count">${itemValue.count}</span>
                         </div>
                         `;
                     }
                 }
             });
-            if (!expandItems) {
-                html = html + `<div class="read_more_less_buttons">
-                    <button data-info="${item.field_name}" data-count="${item.counts.length}" data-toggle-state="more" id="toggle_${item.field_name}" class="read_toggle_link">Read More</button>
-                </div>`
-            }
             return html;
         }
 
@@ -1212,6 +1207,7 @@ define(
                             updateParam.updateParams(filterParam, null, 1);
                             if (filterParam['price'] && isSlide == 1) {
                                 let currentPerPage = $('#product_count_page').val() || null;
+                                $('#product-pagination').twbsPagination('destroy');
                                 productSearch($('#search-result-box').val(), 1, searchConfig.createClient(typesenseConfig), '', '', ui.values[0] + '-' + ui.values[1], currentPerPage);
                             }
                         }

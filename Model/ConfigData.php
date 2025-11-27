@@ -317,6 +317,10 @@ class ConfigData
    private const CATEGORY_PAGE_ENABLED ='typesense_categories/categories/enable_Category';
    private const AUTOCOMPLETE_OUT_OF_STOCK ='typesense_autocomplete/autocomplete/show_outof_stock';
    private const AUTOCOMPLETE_ENABLED ='typesense_autocomplete/autocomplete/enable_frontend';
+   /**
+    * Analytics URL
+    */
+   private const ANALYTICS_URL = 'typesense_general/credentials/analytic_url';
     /**
      * @var ScopeConfigInterface
      */
@@ -552,7 +556,16 @@ class ConfigData
     {
         return $this->getSystemConfigValues(self::PAGE_SEARCH);
     }
-
+    /**
+     * Analytics URL
+     *
+     * @param void
+     * @return string
+     */
+    public function getAnalyticsUrl()
+    {
+        return $this->getSystemConfigValues(self::ANALYTICS_URL);
+    }
     /**
      * Category Section Count
      *

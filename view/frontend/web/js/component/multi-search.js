@@ -38,9 +38,11 @@ define(
         const STORE = typesenseConfig.general.storeCode;
         const POPULAR_TERMS = typesenseConfig.search_terms.data;
         const UNIQUEID = typesenseConfig.general.unique_id;
-       
+        const CATEGORY_SECTION = typesenseConfig.auto_complete.category_enabled;
+       	const PAGE_SECTION = typesenseConfig.auto_complete.pages_enabled;
+	    const SUGGESTION_SECTION = typesenseConfig.auto_complete.suggestions;
         let excludedPageArr = [];
-        let analyticsURL='https://devbackend.conversionbox.io/';
+        let analyticsURL= typesenseConfig.general.analytic_url;
         if (Object.keys(EXCUDED_PAGE).length >= 1) {
             $.each(EXCUDED_PAGE, function (key, item) {
                 excludedPageArr.push(item.page)
@@ -57,13 +59,22 @@ define(
              */
             multiSearch: function(keyword, typsenseClient,callback) {
                 try {
+                    let searches = [getProductAttributes(keyword)];
+                    
+                    if (CATEGORY_SECTION == 1) {
+                        searches.push(getCategoryAttributes(keyword));
+                    }
+                    
+                    if (PAGE_SECTION == 1) {
+                        searches.push(getPageAttributes(keyword));
+                    }
+                    
+                    if (SUGGESTION_SECTION == 1) {
+                        searches.push(getQuerySuggestions(keyword));
+                    }
+                    
                     let searchRequests = {
-                        'searches': [
-                            getProductAttributes(keyword),
-                            getCategoryAttributes(keyword),
-                            getPageAttributes(keyword),
-                            getQuerySuggestions(keyword),
-                        ]
+                        'searches': searches
                     }
                     let commonSearchParams = {}
                     $.when(typsenseClient.multiSearch.perform(searchRequests, commonSearchParams)).done(function(searchResults) {
@@ -71,13 +82,13 @@ define(
                             if (value.request_params.collection_name === INDEX_PERFIX+STORE+'-products') {
                                 renderProducts(value.hits, value.found,keyword,value.out_of,value.search_time_ms);
                             }
-                            if (value.request_params.collection_name === INDEX_PERFIX+STORE+'-categories') {
+                            if (CATEGORY_SECTION == 1 && value.request_params.collection_name === INDEX_PERFIX+STORE+'-categories') {
                                 renderCategory(value.hits);
                             }
-                            if (value.request_params.collection_name === INDEX_PERFIX+STORE+'-pages') {
+                            if (PAGE_SECTION == 1 && value.request_params.collection_name === INDEX_PERFIX+STORE+'-pages') {
                                 renderPages(value.hits);
                             }
-                            if (value.request_params.collection_name === INDEX_PERFIX+STORE+'-suggestions') {
+                            if (SUGGESTION_SECTION == 1 && value.request_params.collection_name === INDEX_PERFIX+STORE+'-suggestions') {
                                 renderSuggestions(value.hits);
                             }
                         });

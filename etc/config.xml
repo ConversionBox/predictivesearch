@@ -24,8 +24,14 @@
                 <nb_of_categories_suggestions>6</nb_of_categories_suggestions>
                 <nb_of_pages_suggestions>6</nb_of_pages_suggestions>
                 <enable_suggestions>1</enable_suggestions>
+                <nb_of_query_suggestions>5</nb_of_pages_suggestions>
             </autocomplete>
         </typesense_autocomplete>
+        <typesense_categories>
+        <categories>
+          <nb_of_products_shown>9</nb_of_products_shown>
+        </categories>
+        </typesense_categories>
          <typesense_products>
             <products>
                 <product_additional_attributes>{"_1693459422484_484":{"productAttribute":"name","searchable":"1"},"_1693459460584_584":{"productAttribute":"sku","searchable":"1"},"_1693459466618_618":{"productAttribute":"price","searchable":"0"}}</product_additional_attributes>

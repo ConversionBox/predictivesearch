@@ -126,6 +126,7 @@ class Configuration extends Template implements CollectionDataSourceInterface
                 'storeCode' => $this->getStoreCode(),
                 'placeholder' => $this->getPlaceHolderImage(),
                 'grid_per_value' => $this->configData->getGridPerValue(),
+                'analytic_url' => $this->configData->getAnalyticsUrl(),
             ],
             'search_result' => [
                 'no_products' => $this->configData->getNoProductsPage(),

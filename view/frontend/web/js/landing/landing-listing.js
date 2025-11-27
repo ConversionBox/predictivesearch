@@ -59,7 +59,7 @@ define(
        const SHOW_OUT_OF_STOCK = typesenseConfig.search_result.show_out_of_stock;
         const urlParams = new URLSearchParams(window.location.search);
         let refine = 'Refine';
-        let analyticsURL = 'https://devbackend.conversionbox.io/';
+        let analyticsURL = typesenseConfig.general.analytic_url;
         const queryParam = urlParams.get('q');
         const UNIQUEID = typesenseConfig.general.unique_id;
         let pageParam = 1;

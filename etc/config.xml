@@ -24,7 +24,7 @@
                 <nb_of_categories_suggestions>6</nb_of_categories_suggestions>
                 <nb_of_pages_suggestions>6</nb_of_pages_suggestions>
                 <enable_suggestions>1</enable_suggestions>
-                <nb_of_query_suggestions>5</nb_of_pages_suggestions>
+                <nb_of_query_suggestions>5</nb_of_query_suggestions>
             </autocomplete>
         </typesense_autocomplete>
         <typesense_categories>

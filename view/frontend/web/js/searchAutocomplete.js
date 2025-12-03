@@ -97,7 +97,7 @@ define([
 					window.location.href = url.build('catalogsearch/result/?q=' + keyword);
 				}
 			});
-           $(document).on("click scroll", function (e) {
+           $(document).on("click", function (e) {
                   // if click/scroll happens outside #search_result and #searchbox
                 if (!$(e.target).closest('#search_result, #searchbox').length) {
                  $('#search_result').removeClass("autocomplete");

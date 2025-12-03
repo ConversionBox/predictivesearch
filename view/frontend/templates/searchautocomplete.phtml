@@ -4,11 +4,11 @@
   * @var \Magento\Framework\Escaper $escaper
   */
 ?>
-<div class="search-main block block-search">
+<div class="search-main block block-search predictiveSearchContainer">
     <input type="text" 
            placeholder="<?= $escaper->escapeHtmlAttr(__('search here...')) ?>" 
-           id="searchbox" class="searchbox" />
-    <div id="search-component" data-bind="scope:'searchcomponent'">
+           id="searchbox" class="searchbox" autocomplete="off" />
+    <div id="search-component" class="predictiveSearchComponent" data-bind="scope:'searchcomponent'">
         <!-- ko template: getTemplate() --><!-- /ko -->
         <script type="text/x-magento-init">
         {

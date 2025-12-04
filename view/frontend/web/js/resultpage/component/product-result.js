@@ -85,6 +85,11 @@ define(
             facetArr.push(val.filterAttribute);
         });
 
+        // Always include 'price' in facets to get stats without separate API call
+        if (SLIDER == 1 && !facetArr.includes('price')) {
+            facetArr.push('price');
+        }
+
         let facetParam = facetArr.toString();
 
         let tmin = 0;
@@ -234,11 +239,10 @@ define(
                     'filter_by' :`storeCode:["${STORE}"]`,
                     'page': page,
                     'facet_by': facetQueryParam,
-                    'sort_by': ranking,
-                    'typo_tokens_threshold': TYPO_ENABLED,
+                    'typo_tokens_threshold': 1,
                     'num_typos': 2,
-                    'min_len_1typo': WORD_LENGTH,
-                    'min_len_2typo': WORD_LENGTH,
+                    'min_len_1typo': 2,
+                    'min_len_2typo': 2,
                 }
                 if(SHOW_OUT_OF_STOCK == 0){
                     searchParameters.filter_by += ` && stock_status:=true`;
@@ -304,12 +308,25 @@ define(
                     searchParameters.facet_query = facetQuery;
                 }
                 searchParameters.filter_by = cleanQuery(searchParameters.filter_by);
-                typsenseClient.collections(INDEX_PERFIX + STORE + '-products').documents().search(searchParameters).then((searchResults) => {
+                
+                // Use multi-search API for better performance
+                let searches = [{
+                    collection: INDEX_PERFIX + STORE + '-products',
+                    ...searchParameters
+                }];
+                
+                let searchRequests = {
+                    'searches': searches
+                };
+                
+                typsenseClient.multiSearch.perform(searchRequests, {}).then((multiSearchResults) => {
+                        // Extract product search results from multi-search response
+                        const searchResults = multiSearchResults.results[0];
+                        
                         if (callback) {
                             callback(searchResults);
                             return;
                         }
-                        //   sliderAction(keyword,searchParameters,searchResults.facet_counts[0].stats);
 
                         searchResultsArray.push(searchResults);
                         let html = '';
@@ -545,11 +562,15 @@ define(
                         renderFilterOptions(searchResults);
                         showSelectedFilter(filterParam)
                         if(SLIDER == 1){
-                        if (searchParameters.filter_by == "") {
-                            sliderAction(location.search.split('=')[1], filterParam, null, page);
-                        } else {
-                            sliderAction(keyword, filterParam, searchResults.facet_counts[0].stats, page);
-                        }
+                            // Extract price stats from search results to avoid separate API call
+                            let priceStats = null;
+                            if (searchResults.facet_counts && searchResults.facet_counts.length > 0) {
+                                const priceFacet = searchResults.facet_counts.find(facet => facet.field_name === 'price');
+                                if (priceFacet && priceFacet.stats) {
+                                    priceStats = priceFacet.stats;
+                                }
+                            }
+                            sliderAction(keyword || location.search.split('=')[1], filterParam, priceStats, page);
                         }
                         hitSearchAnalytics(searchParameters, searchResults)
                         const cartBtn = document.querySelector('#product_result');
@@ -1188,37 +1209,47 @@ define(
                 }
 
                 let minValue, maxValue;
-                let priceData = priceComponent.sliderPrice(keyword, filterParamData);
-                priceData.then((value) => {
-                    if (currentValue) {
-                        minValue = currentValue.min;
-                        maxValue = currentValue.max;
-                    } else {
-                        minValue = value.min;
-                        maxValue = value.max;
+                
+                // Use price stats from search results (no separate API call needed)
+                if (currentValue) {
+                    minValue = currentValue.min;
+                    maxValue = currentValue.max;
+                } else {
+                    // If no price stats available, hide slider and return
+                    $('.filter_price_slider').hide();
+                    return;
+                }
+                
+                // Override with filter param if price filter is applied
+                if (filterParamData && filterParamData.price != undefined) {
+                    let priceRange = filterParamData.price.split("..");
+                    if (priceRange != '') {
+                        minValue = parseInt(priceRange[0]);
+                        maxValue = parseInt(priceRange[1]);
                     }
-                    // Reset slider values to default if no values are passed
-                    if (filterParamData.price != undefined) {
-                        let priceRange = filterParamData.price.split("..");
-                        if (priceRange != '') {
-                            minValue = parseInt(priceRange[0]);
-                            maxValue = parseInt(priceRange[1]);
-                        }
-                    }
-                    if (filterParamData != undefined || filterParamData != "") {
-                        min = parseInt(minValue);
-                        max = parseInt(maxValue);
-                    } else {
-                        min = parseInt(value.min);
-                        max = parseInt(value.max);
-                    }
-                     // Hide the price slider container if price values are NaN
-                     if (isNaN(min) || isNaN(max)) {
-                         $('.filter_price_slider').hide();
-                         return;
-                     } else {
-                         $('.filter_price_slider').show();
-                     }
+                }
+                
+                let min = parseInt(minValue);
+                let max = parseInt(maxValue);
+                
+                // Hide the price slider container if price values are NaN
+                if (isNaN(min) || isNaN(max)) {
+                    $('.filter_price_slider').hide();
+                    return;
+                } else {
+                    $('.filter_price_slider').show();
+                }
+                
+                // Check if slider already exists
+                if ($("#price-range").hasClass('ui-slider')) {
+                    // Update existing slider
+                    $("#price-range").slider('option', {
+                        min: min,
+                        max: max,
+                        values: [parseInt(minValue), parseInt(maxValue)]
+                    });
+                } else {
+                    // Initialize slider for the first time
                     $("#price-range").slider({
                         step: 1,
                         range: true,
@@ -1243,12 +1274,11 @@ define(
                             }
                         }
                     });
+                }
                     updateParam.updateParams(filterParam, null, page);
                     let sliderHandles = $("#price-range").find(".ui-slider-handle");
                     sliderHandles.eq(0).html("<span class='point'>$" + Math.floor(minValue) + "</span>");
                     sliderHandles.eq(1).html("<span class='point'>$" + Math.ceil(maxValue) + "</span>");
-                });
-
             }
         }
     }

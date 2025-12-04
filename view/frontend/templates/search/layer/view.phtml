@@ -4,8 +4,32 @@
   */
   $viewModel = $block->getData('view_model');
 ?>
-<div class="mobileFilterContainer visible-xs visible-sm"><span class="mobileFilterTitle">Filters</span><span class="mobileFilterClose"></span></div>
-<div class="filter_main hidden-sm hidden-xs">
+<div id="cbSearchResultSkeleton">
+        <div class="cbFiltersSidebar cbProductFilters">
+            <div class="cbSkeletonCard cbProductFiltersBlock">
+                <div class=cbProductFiltersTitle><span class="cbFullWidth cbSkeletonText"></span></div>
+                <div class=cbProductFiltersList>
+                    <span class="cbFullWidth cbSkeletonText"></span>
+                    <span class="cbFullWidth cbSkeletonText"></span>
+                    <span class="cbFullWidth cbSkeletonText"></span>
+                </div>
+            </div>
+            <div class="cbSkeletonCard cbProductFiltersBlock">
+                <div class=cbProductFiltersTitle><span class="cbFullWidth cbSkeletonText"></span></div>
+                <div class=cbProductFiltersList><span class="cbFullWidth cbSkeletonText"></span> <span
+                        class="cbFullWidth cbSkeletonText"></span> <span class="cbFullWidth cbSkeletonText"></span>
+                </div>
+            </div>
+            <div class="cbSkeletonCard cbProductFiltersBlock">
+                <div class=cbProductFiltersTitle><span class="cbFullWidth cbSkeletonText"></span></div>
+                <div class=cbProductFiltersList><span class="cbFullWidth cbSkeletonText"></span> <span
+                        class="cbFullWidth cbSkeletonText"></span> <span class="cbFullWidth cbSkeletonText"></span>
+                </div>
+            </div>
+        </div>
+</div>
+<div class="mobileFilterContainer visible-xs visible-sm" style="display:none"><span class="mobileFilterTitle">Filters</span><span class="mobileFilterClose"></span></div>
+<div class="filter_main hidden-sm hidden-xs" style="display:none">
     <div id="selected-filter">
 	<div class="SelectedFiltersContainer">
 		<span class="selectedFiltersTitle">Selected Filters</span>

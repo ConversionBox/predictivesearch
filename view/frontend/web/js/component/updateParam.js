@@ -8,14 +8,18 @@ define(
         return {
             updateParams: function(params, mode = null, page = null,sortQuery=null) {
                 const urlParams = new URLSearchParams(window.location.search);
-                var keyword = $("#search-result-box").value;
+                var keyword = $("#search-result-box").val();
                 let queryParam = urlParams.get('q');
                 let searchparams = '';
                 let filterData = {};
-                for (let key of Object.keys(params)) {
-                    filterData.key = params[key];
-                    if (params[key]) {
-                        searchparams += '&&'+key+':='+params[key];
+                
+                // Build filter parameters
+                if (params && typeof params === 'object') {
+                    for (let key of Object.keys(params)) {
+                        filterData.key = params[key];
+                        if (params[key]) {
+                            searchparams += '&&'+key+':='+params[key];
+                        }
                     }
                 }
       
@@ -33,11 +37,8 @@ define(
                     newUrl  = baseUrl + '?'+ finalParam;
                 }
 
-                if (page) {
+                if (page && page != 1) {
                     newUrl = newUrl+'&&page='+page;
-                }
-                 if (!page || page == 1 ) {
-                    newUrl = newUrl;
                 }
                 if (sortQuery) {
                     newUrl = newUrl+'&&sort_by='+sortQuery;

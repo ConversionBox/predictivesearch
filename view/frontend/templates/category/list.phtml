@@ -3,27 +3,296 @@
   * @var \Magento\Framework\Escaper $escaper
   */
 ?>
+<div id="cbSearchResultSkeleton">
+        <div class=cbSearchResultMainWrapper>
+            <div class="cbGridMode cbThreeColumns" id="cbSearchResultsWrapper">
+                <ul class="cbSearchResultContent">
+                    <li class="cbProducts">
+                        <div class="cbSkeletonCard cbItem">
+                            <div class="cbThumbnailWrap">
+                                <div class="cbThumbnail"></div>
+                            </div>
+                            <div class="cbOverhidden">
+                                <span class="cbFullWidth cbSkeletonText"></span>
+                                <span class="cbFullWidth cbSkeletonText"></span>
+                                <span class="cbFullWidth cbSkeletonText"></span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="cbProducts">
+                        <div class="cbSkeletonCard cbItem">
+                            <div class="cbThumbnailWrap">
+                                <div class="cbThumbnail"></div>
+                            </div>
+                            <div class="cbOverhidden">
+                                <span class="cbFullWidth cbSkeletonText"></span>
+                                <span class="cbFullWidth cbSkeletonText"></span>
+                                <span class="cbFullWidth cbSkeletonText"></span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="cbProducts">
+                        <div class="cbSkeletonCard cbItem">
+                            <div class="cbThumbnailWrap">
+                                <div class="cbThumbnail"></div>
+                            </div>
+                            <div class="cbOverhidden">
+                                <span class="cbFullWidth cbSkeletonText"></span>
+                                <span class="cbFullWidth cbSkeletonText"></span>
+                                <span class="cbFullWidth cbSkeletonText"></span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="cbProducts">
+                        <div class="cbSkeletonCard cbItem">
+                            <div class="cbThumbnailWrap">
+                                <div class="cbThumbnail"></div>
+                            </div>
+                            <div class="cbOverhidden">
+                                <span class="cbFullWidth cbSkeletonText"></span>
+                                <span class="cbFullWidth cbSkeletonText"></span>
+                                <span class="cbFullWidth cbSkeletonText"></span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="cbProducts">
+                        <div class="cbSkeletonCard cbItem">
+                            <div class="cbThumbnailWrap">
+                                <div class="cbThumbnail"></div>
+                            </div>
+                            <div class="cbOverhidden">
+                                <span class="cbFullWidth cbSkeletonText"></span>
+                                <span class="cbFullWidth cbSkeletonText"></span>
+                                <span class="cbFullWidth cbSkeletonText"></span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="cbProducts">
+                        <div class="cbSkeletonCard cbItem">
+                            <div class="cbThumbnailWrap">
+                                <div class="cbThumbnail"></div>
+                            </div>
+                            <div class="cbOverhidden">
+                                <span class="cbFullWidth cbSkeletonText"></span>
+                                <span class="cbFullWidth cbSkeletonText"></span>
+                                <span class="cbFullWidth cbSkeletonText"></span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <style>
+        @keyframes cbSkeletonAnim {
+            0% {
+                opacity: 1
+            }
+
+            50% {
+                opacity: .5
+            }
+
+            100% {
+                opacity: 1
+            }
+        }
+
+        #cbSearchResultSkeleton{
+          overflow: hidden;
+        }
+
+        #cbSearchResultSkeleton * {
+            box-sizing: border-box
+        }
+
+        #cbSearchResultSkeleton .cbSkeletonCard {
+            padding: 10px;
+            border: 1px solid #eee
+        }
+
+        #cbSearchResultSkeleton .cbSkeletonText {
+            height: 8px;
+            background: #eee;
+            border-radius: 3px;
+            display: inline-block;
+            animation: cbSkeletonAnim 2s infinite
+        }
+
+        #cbSearchResultSkeleton .cbSkeletonText.cbFullWidth:last-child {
+            width: 100%
+        }
+
+        #cbSearchResultSkeleton .cbSkeletonText.cbFullWidth:first-child:not(:last-child) {
+            width: 80%
+        }
+
+        #cbSearchResultSkeleton .cbSkeletonText.cbFullWidth:nth-child(2):not(:last-child) {
+            width: 95%
+        }
+
+        #cbSearchResultSkeleton .cbSkeletonText.cbFullWidth:last-child:not(:first-child) {
+            width: 60%
+        }
+
+        #cbSearchResultSkeleton .cbFiltersSidebar {
+            float: left;
+            width: 225px
+        }
+
+        #cbSearchResultSkeleton .cbFiltersSidebar>.cbSkeletonCard:not(:last-child) {
+            border-bottom: none
+        }
+
+        #cbSearchResultSkeleton .cbFiltersSidebar .cbProductFiltersTitle {
+            padding: 4px 0 12px 0
+        }
+
+        #cbSearchResultSkeleton .cbFiltersSidebar .cbProductFiltersTitle>span.cbFullWidth {
+            width: 40%
+        }
+
+        #cbSearchResultSkeleton .cbFiltersSidebar .cbProductFiltersList>span {
+            margin: 1px 0 12px 0
+        }
+
+        #cbSearchResultSkeleton .cbFiltersSidebar .cbProductFiltersList>span:last-child {
+            margin-bottom: 10px
+        }
+
+        /* #cbSearchResultSkeleton .cbSearchResultMainWrapper {
+            margin-left: 225px
+        } */
+
+        #cbSearchResultSkeleton ul.cbSearchResultContent {
+            margin: 0 0 0 -1%;
+            list-style: none;
+            white-space: nowrap;
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        #cbSearchResultSkeleton ul.cbSearchResultContent>li {
+            display: inline-block
+        }
+
+        #cbSearchResultSkeleton .cbThreeColumns ul.cbSearchResultContent>li {
+            width: 30.3%;
+            width: calc(100%/3 - 2%)
+        }
+
+        #cbSearchResultSkeleton li.cbProducts {
+            cursor: pointer;
+            margin: 0 1% 2%;
+            white-space: normal
+        }
+
+        #cbSearchResultSkeleton li.cbProducts .cbThumbnailWrap {
+            position: relative
+        }
+
+        #cbSearchResultSkeleton li.cbProducts .cbThumbnailWrap .cbThumbnail {
+            margin: -10px -10px 0 -10px;
+            background: #eee;
+            height: 180px
+        }
+
+        #cbSearchResultSkeleton li.cbProducts .cbOverhidden {
+            padding-bottom: 20px;
+            text-align: center
+        }
+
+        #cbSearchResultSkeleton li.cbProducts .cbOverhidden>span {
+            margin: 15px 0 0 0
+        }
+
+        #cbSearchResultSkeleton ul.cbSearchResultContent li.cbProducts:nth-child(4),
+        #cbSearchResultSkeleton ul.cbSearchResultContent li.cbProducts:nth-child(5) {
+            display: none
+        }
+
+        @media (min-width:768px) and (max-width:910px) {
+            #cbSearchResultSkeleton ul.cbSearchResultContent li.cbProducts {
+                width: 46%;
+                width: calc(50% - 10px);
+                min-width: 160px;
+                margin: 0 5px 10px
+            }
+
+            #cbSearchResultSkeleton ul.cbSearchResultContent li.cbProducts:nth-child(3) {
+                display: none
+            }
+        }
+
+        @media (max-width:768px) {
+            #cbSearchResultSkeleton .cbFiltersSidebar {
+                display: none
+            }
+
+            #cbSearchResultSkeleton .cbSearchResultMainWrapper {
+                margin-left: 0
+            }
+
+            #cbSearchResultSkeleton ul.cbSearchResultContent {
+                margin: 0;
+                padding: 0
+            }
+
+            #cbSearchResultSkeleton ul.cbSearchResultContent li.cbProducts:nth-child(3) {
+                display: none
+            }
+
+            #cbSearchResultSkeleton ul.cbSearchResultContent li.cbProducts {
+                width: 46%;
+                width: calc(50% - 10px);
+                min-width: 160px;
+                margin: 0 5px 10px
+            }
+        }
+
+        @media (max-width:370px) {
+            #cbSearchResultSkeleton ul.cbSearchResultContent li.cbProducts {
+                width: 96%;
+                width: calc(100% - 10px)
+            }
+
+            #cbSearchResultSkeleton ul.cbSearchResultContent li.cbProducts:not(:first-child) {
+                display: none
+            }
+        }
+    </style>
 <div class="message success" id="message_parent">
     <div id="success_message"></div>
 </div>
-<div class="search-result-page">
+<div class="search-result-page" style="display:none">
     <div id="search_result_page" class="search_result_page">
         <div class="content_wrapper">
-             <div class="search-box">
-                <input type="text" 
-                    placeholder="<?= $escaper->escapeHtmlAttr(__('search here...')) ?>" 
-                    id="search-result-box" class="search-result-box" />
-                <span class="search-btn"></span>
-            </div>
-            <div class="search-option-insta">
-            <div id="product_count"></div>
-              
+	    <div class="search-option-insta">
+		<div class="insideSearchContainer showDesk">
+			<div class="search-box">
+                		<input type="text" placeholder="<?= $escaper->escapeHtmlAttr(__('search here...')) ?>" id="search-result-box" class="search-result-box" />
+				<span class="search-btn"></span>
+				<div id="product_count"></div>
+			</div>
+		</div>
+
+	    <div id="refineToggle" class="refineToggle visible-xs visible-sm">Filters</div>
+<div class="cBoxToolsContainer">
+	<div class="cBoxProductView">
+		<span class="cBoxGridView cBoxViewSelected">
+			<svg enable-background="new 0 0 32 32" height="32px" id="Layer_1" version="1.1" viewBox="0 0 32 32" width="32px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g id="grid-2"><path d="M10.246,4.228c0-0.547-0.443-0.991-0.99-0.991H3.914c-0.548,0-0.991,0.443-0.991,0.991V9.57   c0,0.546,0.443,0.99,0.991,0.99h5.342c0.547,0,0.99-0.444,0.99-0.99V4.228z" fill="currentcolor"></path><path d="M19.453,4.228c0-0.547-0.443-0.991-0.991-0.991h-5.343c-0.546,0-0.99,0.443-0.99,0.991V9.57   c0,0.546,0.444,0.99,0.99,0.99h5.343c0.548,0,0.991-0.444,0.991-0.99V4.228z" fill="currentcolor"></path><path d="M28.868,4.228c0-0.547-0.443-0.991-0.99-0.991h-5.342c-0.548,0-0.991,0.443-0.991,0.991V9.57   c0,0.546,0.443,0.99,0.991,0.99h5.342c0.547,0,0.99-0.444,0.99-0.99V4.228z" fill="currentcolor"></path><path d="M10.246,13.224c0-0.547-0.443-0.99-0.99-0.99H3.914c-0.548,0-0.991,0.443-0.991,0.99v5.342   c0,0.549,0.443,0.99,0.991,0.99h5.342c0.547,0,0.99-0.441,0.99-0.99V13.224z" fill="currentcolor"></path><path d="M19.453,13.224c0-0.547-0.443-0.99-0.991-0.99h-5.343c-0.546,0-0.99,0.443-0.99,0.99v5.342   c0,0.549,0.444,0.99,0.99,0.99h5.343c0.548,0,0.991-0.441,0.991-0.99V13.224z" fill="currentcolor"></path><path d="M28.868,13.224c0-0.547-0.443-0.99-0.99-0.99h-5.342c-0.548,0-0.991,0.443-0.991,0.99v5.342   c0,0.549,0.443,0.99,0.991,0.99h5.342c0.547,0,0.99-0.441,0.99-0.99V13.224z" fill="currentcolor"></path><path d="M10.246,22.43c0-0.545-0.443-0.99-0.99-0.99H3.914c-0.548,0-0.991,0.445-0.991,0.99v5.344   c0,0.547,0.443,0.99,0.991,0.99h5.342c0.547,0,0.99-0.443,0.99-0.99V22.43z" fill="currentcolor"></path><path d="M19.453,22.43c0-0.545-0.443-0.99-0.991-0.99h-5.343c-0.546,0-0.99,0.445-0.99,0.99v5.344   c0,0.547,0.444,0.99,0.99,0.99h5.343c0.548,0,0.991-0.443,0.991-0.99V22.43z" fill="currentcolor"></path><path d="M28.868,22.43c0-0.545-0.443-0.99-0.99-0.99h-5.342c-0.548,0-0.991,0.445-0.991,0.99v5.344   c0,0.547,0.443,0.99,0.991,0.99h5.342c0.547,0,0.99-0.443,0.99-0.99V22.43z" fill="currentcolor"></path></g></svg>
+		</span>
+		<span class="cBoxListView">
+<svg height="32" id="svg2" version="1.1" viewBox="0 0 32 32" width="32" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg"><defs id="defs6"></defs><g id="g10" transform="matrix(1.3333333,0,0,-1.3333333,0,32)"><path d="M 6.4124,16.292783 H 18.411669" id="path168" style="fill:currentcolor;stroke:currentcolor;stroke-width:0.77399999;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"></path><path d="m 6.4124,12.110025 h 8.205209" id="path170" style="fill:currentcolor;stroke:currentcolor;stroke-width:0.77399999;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"></path><path d="m 6.4124,7.9272666 h 4.424821" id="path981" style="fill:currentcolor;stroke:currentcolor;stroke-width:0.77399999;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"></path></g></svg>
+		</span>
+	</div>
+
             <div id="sort_option"></div>
-            <div id="product_display_count"></div>
+            <div id="product_display_count"></div></div>
         </div>
         </div>
         
-        <div id="product_result" class="suggestion_section"></div>
+        <div id="product_result" class="suggestion_section GridView"></div>
     </div>
     <ul id="product-pagination" class="pagination-sm"></ul>
     <div id="search-result-component" data-bind="scope:'search-resultcomponent'">

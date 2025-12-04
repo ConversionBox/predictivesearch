@@ -80,6 +80,32 @@ body.catalogsearch-result-index .sidebar.sidebar-main.mobile-sidebar .filter_mai
 @media only screen and (min-width: 992px) {.catalogsearch-result-index #search_result_page .content_wrapper .search-option-insta .insideSearchContainer.showDesk{position: relative;width: 50%;margin-right: 10px;}}
 /* search result page new design styles end */
 
+/* Product image flip on hover styles start */
+.catalogsearch-result-index #search_result_page #product_result.suggestion_section>.product-wrapper-main>a .product-image-div.flip-container{
+    position: relative;
+    overflow: hidden;
+}
+.catalogsearch-result-index #search_result_page #product_result.suggestion_section>.product-wrapper-main>a .product-image-div.flip-container .search-product-image{
+    transition: opacity 0.3s ease-in-out;
+    display: block;
+    width: 100%;
+    height: auto;
+}
+.catalogsearch-result-index #search_result_page #product_result.suggestion_section>.product-wrapper-main>a .product-image-div.flip-container .hover-image{
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+.catalogsearch-result-index #search_result_page #product_result.suggestion_section>.product-wrapper-main>a:hover .product-image-div.flip-container .main-image{
+    opacity: 0;
+}
+.catalogsearch-result-index #search_result_page #product_result.suggestion_section>.product-wrapper-main>a:hover .product-image-div.flip-container .hover-image{
+    opacity: 1;
+}
+/* Product image flip on hover styles end */
+
 /* cBox grid/list view style start */
 .catalogsearch-result-index #search_result_page .content_wrapper .search-option-insta .cBoxProductView{cursor: pointer;display: flex;gap: 10px;}
 .catalogsearch-result-index #search_result_page .content_wrapper .search-option-insta .cBoxProductView .cBoxGridView{}

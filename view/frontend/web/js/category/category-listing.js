@@ -17,16 +17,17 @@ define(
          * Index Prefix
          */
         const INDEX_PERFIX = typesenseConfig.general.indexprefix;
-        const CATEGORY     = typesenseConfig.category.name;
+
         /**
          * Total number per page
          */
+        const CATEGORY     = typesenseConfig.category.name;
         const NO_PRODUCTS_PAGE = typesenseConfig.category.no_products;
         const sortOptions = typesenseConfig.category.sort_options;
         const ADD_To = typesenseConfig.search_result.addto_cart;
         const SEARCHBLE_ATTRIBUTES = typesenseConfig.products.attributes;
         const POPULAR_TERMS = typesenseConfig.search_terms.data;
-        const RANKING = typesenseConfig.products.ranking;
+        const RANKING = typesenseConfig.category.ranking;
 
         /**
          * Typo Tolerance
@@ -46,7 +47,7 @@ define(
         const IMAGE_TYPE = typesenseConfig.search_result.image_type;
         const IMAGE_WIDTH = typesenseConfig.search_result.image_width;
         const IMAGE_HEIGHT = typesenseConfig.search_result.image_height;
-        const SHOW_SKU =  typesenseConfig.search_result.show_sku;
+        const SHOW_SKU =  typesenseConfig.category.show_sku;
         const SHOW_PRICE  = typesenseConfig.category.show_price;
         const SHOW_DESCRIPTION = typesenseConfig.category.show_description;
         const  MAX_DESCRIPTION_LINE = typesenseConfig.category.max_description_line;
@@ -66,7 +67,7 @@ define(
         let selectedFilters = [];
         let selectedRadio = [];
         let selectedIndex = [];
-        let filterParam = [];
+        let filterParam = {};
         let stableContent = null;
         let selectedSort = null;
         let selectedDisplayvalue = null;
@@ -102,16 +103,88 @@ define(
                 }
             });
             filterParam = filterparamArr;
-            sliderAction(location.search.split('=')[1], filterParam);
+            sliderAction(location.search.split('=')[1], filterParam, null, pageParam);
             /* Mobile filter toggle */
-            $('body').on('click', '#refine-toggle', function() {
+            $('body').on('click', '.refineToggle, .mobileFilterClose', function() {
                 $('.filter_main').toggleClass('hidden-sm').toggleClass('hidden-xs');
-                if ($(this).html().trim()[0] === '+')
-                    $(this).html('- ' + refine);
-                else
-                    $(this).html('+ ' + refine);
+		$('.sidebar.mobile-sidebar').toggleClass('active');
             });
+	   /* Grid/List view change script */
+		$('body').on('click', '.cBoxGridView, .cBoxListView', function() {
+		    $('.cBoxGridView, .cBoxListView').removeClass('cBoxViewSelected');
+		    $(this).addClass('cBoxViewSelected');
+			if ($(this).hasClass('cBoxGridView')) {
+			    $('#product_result')
+		            .removeClass('ListView')
+		            .addClass('GridView');
+			} else if ($(this).hasClass('cBoxListView')) {
+			    $('#product_result')
+		            .removeClass('GridView')
+		            .addClass('ListView');
+			}
+		});
             /* Mobile slider issue */
+            $(document).on('touchstart', '#price-range .ui-slider-handle', function(e) {
+                let t = e.touches[0] || e;
+                jQuery(this).addClass('ui-state-hover').addClass('ui-state-active').addClass('ui-state-focus')
+                var newEvent = new MouseEvent('mousedown', {
+                    screenX: t.screenX,
+                    screenY: t.screenY,
+                    clientX: t.clientX,
+                    clientY: t.clientY,
+                    relatedTarget: t.target,
+                })
+                Object.defineProperty(newEvent, 'target', {
+                    value: t.target,
+                    enumerable: true
+                });
+                Object.defineProperty(newEvent, 'currentTarget', {
+                    value: t.target,
+                    enumerable: true
+                });
+                $(this).parent().slider("instance")._mouseDown(newEvent)
+            });
+            $(document).on('touchend', '#price-range .ui-slider-handle', function(e) {
+                let t = e.touches[0] || e;
+                jQuery(this).removeClass('ui-state-hover').removeClass('ui-state-active').removeClass('ui-state-focus')
+                var newEvent = new MouseEvent('mouseup', {
+                    screenX: t.screenX,
+                    screenY: t.screenY,
+                    clientX: t.clientX,
+                    clientY: t.clientY,
+                    relatedTarget: t.target,
+                })
+                Object.defineProperty(newEvent, 'target', {
+                    value: t.target,
+                    enumerable: true
+                });
+                Object.defineProperty(newEvent, 'currentTarget', {
+                    value: t.target,
+                    enumerable: true
+                });
+                $(this).parent().slider("instance")._mouseUp(newEvent)
+            });
+            $(document).on('touchmove', '#price-range .ui-slider-handle', function(e) {
+                let t = e.touches[0] || e;
+                var newEvent = new MouseEvent('mousemove', {
+                    screenX: t.screenX,
+                    screenY: t.screenY,
+                    clientX: t.clientX,
+                    clientY: t.clientY,
+                    relatedTarget: t.target,
+                    'bubbles': true,
+                    'cancelable': true,
+                });
+                Object.defineProperty(newEvent, 'target', {
+                    value: t.target,
+                    enumerable: true
+                });
+                Object.defineProperty(newEvent, 'currentTarget', {
+                    value: t.target,
+                    enumerable: true
+                });
+                $(this).parent().slider("instance")._mouseMove(newEvent);
+            });
         });
         return {
             /**
@@ -136,7 +209,7 @@ define(
          * @param {*} page 
          * @param {*} typsenseClient 
          */
-        function productSearch(keyword, page, typsenseClient, filterValue, sortQuery, priceFilter, perPage = null) {
+        function productSearch(keyword, page, typsenseClient, filterValue, sortQuery, priceFilter, perPage = null, disjunctiveFacet = null, callback = null, facetQuery = null) {
             priceSlide = priceFilter;
             try {
                 let searchAttributes = SEARCHBLE_ATTRIBUTES.map((item) => {
@@ -149,27 +222,29 @@ define(
                 if (RANKING !== false && RANKING) {
                     ranking = RANKING;
                 }
-                if (keyword == undefined) {
-                    keyword = '';
+
+                let facetQueryParam = facetParam;
+                if (disjunctiveFacet) {
+                    facetQueryParam = disjunctiveFacet;
                 }
+
                 let searchParameters = {
                     'q': keyword,
-                    'query_by'  : 'category_ids,'+searchAttributes,
+                    'query_by': 'category_ids,'+searchAttributes,
                     'per_page': NO_PRODUCTS_PAGE,
+                    'filter_by' :`storeCode:["${STORE}"] && category_ids:["${CATEGORY}"]`,
                     'page': page,
-                    'filter_by' : `category_ids:["${CATEGORY}"]`,
-                    'facet_by': facetParam,
+                    'facet_by': facetQueryParam,
                     'sort_by': ranking,
                     'typo_tokens_threshold': TYPO_ENABLED,
                     'num_typos': 2,
                     'min_len_1typo': WORD_LENGTH,
-                    'min_len_2typo': WORD_LENGTH
-
+                    'min_len_2typo': WORD_LENGTH,
                 }
                 if(SHOW_OUT_OF_STOCK == 0){
-                    searchParameters.filter_by += `&& stock_status:=true`;
+                    searchParameters.filter_by += ` && stock_status:=true`;
                 }
-
+                
                 if (perPage || $('#product_count_page').val()) {
                     perPage = ($('#product_count_page').val()) ? $('#product_count_page').val() : perPage;
                     searchParameters.per_page = perPage;
@@ -184,15 +259,15 @@ define(
                 }
 
                 if (selectedIndex.length >= 1 || selectedRadio.length >= 1) {
-                    $('#clear_all').show();
+                    $('#clear_all').show();$('.SelectedFiltersContainer').show();$('#selected-filter').addClass('withValue');
                 } else {
-                    $('#clear_all').hide();
+                    $('#clear_all').hide();$('.SelectedFiltersContainer').hide();$('#selected-filter').removeClass('withValue');
                 }
 
                 //make request query
                 let requestQuery = '';
                 $.each(finalRequestParam, function(key, val) {
-                    if (val != '') {
+                    if (val != '' && key !== disjunctiveFacet) {
                         requestQuery += '&&'+ key + ':=[' + val + '] &&';
                     }
                 });
@@ -201,7 +276,7 @@ define(
                     searchParameters.query_by = searchAttributes;
                     requestQuery = requestQuery.slice(0, -2);
                     // if (SLIDER == 1 && (tmin && tmax)) {
-                    //     requestQuery += requestQuery;
+                    //     requestQuery = requestQuery;
                     // }
                 }
                 searchParameters.filter_by += requestQuery;
@@ -212,7 +287,7 @@ define(
                     if (SLIDER != 1) {
                         multiRequestQuery = '&& price:=[' + priceFilter[0] + '..' + priceFilter[1] + '] &&' + requestQuery;
                         multiRequestQuery = multiRequestQuery.slice(0, -2);
-                        searchParameters.filter_by += multiRequestQuery;
+                        searchParameters.filter_by = multiRequestQuery;
                     }
                 }
 
@@ -225,15 +300,33 @@ define(
                 if (sortQuery) {
                     searchParameters.sort_by = sortQuery;
                 }
-                searchParameters.filter_by += ` && storeCode:["${STORE}"]`;
+
+                if (facetQuery) {
+                    searchParameters.facet_query = facetQuery;
+                }
                 searchParameters.filter_by = cleanQuery(searchParameters.filter_by);
                 typsenseClient.collections(INDEX_PERFIX + STORE + '-products').documents().search(searchParameters).then((searchResults) => {
+                        if (callback) {
+                            callback(searchResults);
+                            return;
+                        }
                         //   sliderAction(keyword,searchParameters,searchResults.facet_counts[0].stats);
 
                         searchResultsArray.push(searchResults);
                         let html = '';
+                        
+                        // Hide skeleton and show actual content
+                        $('#cbSearchResultSkeleton').hide();
+                        $('.cbFiltersSidebar.cbProductFilters').hide();
+                        $('.search-result-page').show();
+                        $('.mobileFilterContainer').show();
+                        
                         if (searchResults.hits.length < 1) {
+                             if(!$('#price-range').hasClass('.ui-slider') && requestQuery == ''){
+                            $('.filter_main').hide();
+                             }else {
                             $('.filter_main').show();
+                            }
                             let htmlhead = '<div class="popular_search_head"> No product Found </div>';
                                 html += `Try clearing the filters or changing your input`;
                             html = htmlhead + html;
@@ -242,9 +335,10 @@ define(
                         }
 
                         perPage = $('#product_count_page').val() ? $('#product_count_page').val() : perPage;
-                        if (searchResults.found > NO_PRODUCTS_PAGE) {
+                        let actualPerPage = perPage || NO_PRODUCTS_PAGE;
+                        if (searchResults.found > actualPerPage) {
                             $('#product-pagination').show();
-                            totalPage = searchResults.found / NO_PRODUCTS_PAGE;
+                            totalPage = searchResults.found / actualPerPage;
                             totalPage = Math.ceil(totalPage);
                             if (totalPage > 4) {
                                 visiblePage = 3;
@@ -258,7 +352,7 @@ define(
                         if (perPage > searchResults.found) {
                             $('#product-pagination').hide();
                         } else {
-                            if (searchResults.found > NO_PRODUCTS_PAGE) {
+                            if (searchResults.found > actualPerPage) {
                                 $('#product-pagination').show();
                             }
                         }
@@ -266,10 +360,10 @@ define(
                         let loadedProductCount = 0;
                         if (totalPage == searchResults.page) {
                             loadedProductCount = searchResults.found;
-                        } else if (searchResults.found < NO_PRODUCTS_PAGE) {
+                        } else if (searchResults.found < actualPerPage) {
                             loadedProductCount = searchResults.found;
                         } else {
-                            loadedProductCount = (NO_PRODUCTS_PAGE * searchResults.page);
+                            loadedProductCount = (actualPerPage * searchResults.page);
                         }
 
                         if (perPage || $('#product_count_page').val()) {
@@ -292,8 +386,8 @@ define(
                                 <option value="${item.sortAttribute+'-'+item.sortDirection}">${item.fieldName}</option>
                             `;
                             });
-                            let sortDropDown = `<span class="sort_by">Sort By</span><select id="product_sort" name="product_sort">
-                            <option value="">Select Option </option>
+                            let sortDropDown = `<select id="product_sort" name="product_sort">
+                            <option value="">Sort By </option>
                                 ${sOptions}
                             </select>`;
                             $('#sort_option').html(sortDropDown);
@@ -363,17 +457,23 @@ define(
                         paginationAction(totalPage, visiblePage, keyword, productCount);
 
                         $.each(searchResults.hits, function(key, val) {
-                            let price = val.document.price;
-                            if (val.document.special_price) {
-                                let currentDate = new Date();
-                                let startDate = new Date(val.document.special_from_date);
-                                let endDate = new Date(val.document.special_to_date);
-                                if (startDate <= currentDate && endDate >= currentDate) {
-                                    price = `<span class="special_price">${val.document.special_price}</span>
-                                            <span class="normal_price">${val.document.price}</span>
-                                    `;
-                                }
-                            }
+                 let price =  CURRENCY + parseFloat(val.document.price).toFixed(2);
+                     if(val.document.type_id == 'bundle'){
+                      price = formatPriceRange(val.document.price_range);
+                      }
+                  let priceval = Number(price);
+                  priceval = Math.floor(priceval * 100) / 100; // truncate instead of round
+                  if (val.document.special_price) {
+                        let currentDate = new Date();
+                        let startDate = new Date(val.document.special_from_date);
+                        let endDate = new Date(val.document.special_to_date);
+                           if (isDateInRange(new Date(), new Date(val.document.special_from_date), new Date(val.document.special_to_date))) {
+                            let splval = Number(val.document.special_price);
+                               splval = Math.floor(splval * 100) / 100;
+                               price = CURRENCY + parseFloat(val.document.special_price).toFixed(2);
+
+                        }
+                    }
                             var name = val.document.product_name;
                             var sku = val.document.sku;
                             var description = val.document.description;
@@ -389,22 +489,33 @@ define(
                             }
 
                             let image = null;
+                            let hoverImage = null;
+                            
                             if (IMAGE_TYPE == 'product_base_image') {
                                 image = val.document.image_url;
+                                hoverImage = val.document.small_image || val.document.thumbnail;
                             } else if (IMAGE_TYPE == 'product_small_image') {
                                 image = val.document.small_image;
+                                hoverImage = val.document.image_url || val.document.thumbnail;
                             } else if (IMAGE_TYPE == 'product_thumbnail_image') {
                                 image = val.document.thumbnail;
-                            } else if(typeof image === 'undefined' || image === null)  {
+                                hoverImage = val.document.image_url || val.document.small_image;
+                            } else if(typeof image === 'undefined' || image === null) {
                                 image = BASE_URL+`media/catalog/product/placeholder/`+PLACEHOLDER;
+                            }
+                            
+                            // Fallback for hover image
+                            if (!hoverImage || hoverImage === image) {
+                                hoverImage = image;
                             }
 
                             html += `
                                 <div class="product-wrapper-main">
                                     <a href="${val.document.url}" >
                                         <div class="product-wrapper">
-                                            <div class="product-image-div">
-                                                <img src="${image}" class="search-product-image" width="${IMAGE_WIDTH}" height="${IMAGE_HEIGHT}">
+                                            <div class="product-image-div ${FLIP_IMG_HOVER == 1 ? 'flip-container' : ''}">
+                                                <img src="${image}" class="search-product-image ${FLIP_IMG_HOVER == 1 ? 'main-image' : ''}" width="${IMAGE_WIDTH}" height="${IMAGE_HEIGHT}">
+                                                ${FLIP_IMG_HOVER == 1 && hoverImage !== image ? `<img src="${hoverImage}" class="search-product-image hover-image" width="${IMAGE_WIDTH}" height="${IMAGE_HEIGHT}">` : ''}
                                             </div>
                                             <div class="product_item_wrapper">
                                                 <div class="item_name" style="-webkit-line-clamp:${MAX_TITLE_LINE};">${name}</div>`;
@@ -415,7 +526,7 @@ define(
                                               html +=`<div class="item_sku">SKU: ${sku}</div>`;
                                                }
                                                if(SHOW_PRICE == 1){
-                                                html +=`<div class="item_price">${CURRENCY+priceUtils.formatPriceLocale(price)}</div>`;
+                                                html +=`<div class="item_price">${price}</div>`;
                                                 }
                                           html +=`</div>
                                         </div>
@@ -426,12 +537,6 @@ define(
                                    html +=`${ADD_To == 1 ? `<div class="cartbutton_wrapper"><div class="btn_conatiner" id="btn_conatiner">
                                         <button class="cart_btn" id="${val.document.id}">Add to Cart</button>
                                     </div>`:''}
-                                    <div class="whishlist_wrapper_main product-item">
-                                        <a href="#" id="${val.document.id}" class="action towishlist wishlist_wrapper" data-wishlist-url="/wishlist/index/add/product/${val.document.id}" title="Add to Wish List" aria-label="Add to Wish List" data-action="add-to-wishlist" role="button">
-                                        </a>
-                                        <a href="#" id="${val.document.id}" class="action tocompare compare_wrapper" data-compare-url="/catalog/product_compare/add/product/${val.document.id}"   title="Add to Compare" aria-label="Add to Compare" data-action="add-to-compare" role="button">
-                                        </a>
-                                    </div>
                             `;
                             }
                             html +=`</div></div>`;
@@ -442,11 +547,12 @@ define(
                         showSelectedFilter(filterParam)
                         if(SLIDER == 1){
                         if (searchParameters.filter_by == "") {
-                            sliderAction(location.search.split('=')[1], filterParam);
+                            sliderAction(location.search.split('=')[1], filterParam, null, page);
                         } else {
-                            sliderAction(keyword, filterParam, searchResults.facet_counts[0].stats);
+                            sliderAction(keyword, filterParam, searchResults.facet_counts[0].stats, page);
                         }
                         }
+                        hitSearchAnalytics(searchParameters, searchResults)
                         const cartBtn = document.querySelector('#product_result');
                         if (cartBtn) {
                             cartBtn.addEventListener('click', function(e) {
@@ -468,14 +574,56 @@ define(
                         }
                     })
                     .catch((error) => {
-                        $('#product_result').html('Configuration issues try again');
+                        $('#product_result').html(error);
                         console.error(error);
                     });
             } catch (error) {
                 console.log(error)
             }
         }
+      function normalizeDate(date) {
+            return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+            }
+    function formatPriceRange(priceRange) {
+        // Remove all $ signs
+        let cleaned = priceRange.replace(/\$/g, "").trim();
+        const format = (value) => {
+        let num = parseFloat(value);
+        if (isNaN(num)) return "0.00";
+        return num.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    };
 
+        // Check if it's a range (contains "-")
+        if (cleaned.includes("-")) {
+            let [min, max] = cleaned.split("-");
+               return `$${format(min)} - $${format(max)}`;
+        } else {
+                return `$${format(cleaned)}`;
+        }
+        }
+
+        function isDateInRange(current, start, end) {
+            const c = normalizeDate(current);
+            const s = normalizeDate(start);
+            const e = normalizeDate(end);
+            return c >= s && c <= e;
+            }
+        function cleanQuery(query) {
+            // Remove extra spaces and ensure uniform spacing around "&&"
+            query = query.replace(/\s*&&+\s*/g, " && ");
+        
+            // Split query by " && "
+            let parts = query.split(" && ").map(part => part.trim());
+        
+            // Use a Set to remove duplicate parameters
+            let uniqueParts = [...new Set(parts)];
+        
+            // Join back without trailing "&&"
+            return uniqueParts.join(" && ");
+        }
         function paginationAction(totalPage, visiblePage, keyword, productCount) {
 
             if (totalPage && visiblePage) {
@@ -529,51 +677,58 @@ define(
             $('#filter-items').html(selectedHtml);
 
             const clearButton = document.querySelector('#filter-items');
-            if (clearButton) {
+          if (clearButton) {
                 clearButton['onclick'] = function(e) {
-                    $('#product-pagination').twbsPagination('destroy');
+                    try {
+                        $('#product-pagination').twbsPagination('destroy');
+                    } catch(e) {}
                     let keyword = $('#search-result-box').val();
                     const typsenseClient = searchConfig.createClient(typesenseConfig);
                     let selectedId = e.target.id;
-                    let selectArr = selectedId.split('-');
-                    if (selectArr.length > 1) {
-                        if (filterParam[selectArr[0]]) {
-                            let currentValue = filterParam[selectArr[0]].toString().split(',');
-                            var selectFiled = document.getElementById(selectArr[1]);
+                    // Split only on the first hyphen to handle values with hyphens
+                    let firstHyphenIndex = selectedId.indexOf('-');
+                    if (firstHyphenIndex > -1) {
+                        let attributeName = selectedId.substring(0, firstHyphenIndex);
+                        let attributeValue = selectedId.substring(firstHyphenIndex + 1);
+                        
+                        if (filterParam[attributeName]) {
+                            let currentValue = filterParam[attributeName].toString().split(',');
+                            var selectFiled = document.getElementById(attributeValue);
                             if (selectFiled) {
                                 selectFiled.removeAttribute('checked');
                             } else {
                                 currentValue.splice(0, 1);
                             }
-                            const index = currentValue.indexOf(selectArr[1]);
+                            const index = currentValue.indexOf(attributeValue);
                             if (index > -1) {
                                 currentValue.splice(index, 1);
                             }
-                            filterParam[selectArr[0]] = currentValue.toString();
-                            //const itemIndex = selectedRadio.indexOf(selectArr[1]);
-                            const itemIndex = selectedIndex.indexOf(selectArr[1]);
+                            filterParam[attributeName] = currentValue.toString();
+                            //const itemIndex = selectedRadio.indexOf(attributeValue);
+                            const itemIndex = selectedIndex.indexOf(attributeValue);
                             if (itemIndex > -1) {
                                 selectedIndex.splice(itemIndex, 1);
                             }
-                            const itemRadioindex = selectedRadio.indexOf(selectArr[1]);
+                            const itemRadioindex = selectedRadio.indexOf(attributeValue);
                             if (itemRadioindex > -1) {
                                 selectedRadio.splice(itemIndex, 1);
                             }
-                            if (selectArr[0] != 'price') {
-                                stableContent = $('#' + selectArr[0])[0].outerHTML;
+                            if (attributeName != 'price') {
+                                stableContent = $('#' + attributeName)[0].outerHTML;
                             }
                             if (filterParam == '') {
                                 selectedRadio = [];
                                 $('#clear_all').hide();
                             }
                             selectedFilters.push({
-                                key: selectArr[0],
+                                key: attributeName,
                                 content: stableContent
                             });
                         }
                     }
-                    updateParam.updateParams(filterParam);
-                    productSearch(keyword, 1, typsenseClient, filterParam, '');
+                    updateParam.updateParams(filterParam, null, 1);
+                    let currentPerPage = $('#product_count_page').val() || null;
+                    productSearch(keyword, 1, typsenseClient, filterParam, '', null, currentPerPage);
 
                 };
 
@@ -584,6 +739,8 @@ define(
          * 
          * @param {*} searchData 
          */
+
+
         function renderFilterOptions(searchData) {
             let filterArray = searchData.facet_counts.filter((item) => {
                 if ($.inArray(item.field_name, facetArr) !== -1) {
@@ -598,44 +755,71 @@ define(
             let keyword = $('#search-result-box').val();
 
             let html = '';
-            let filterHtml = '';
-            searchOptionFilter(filterArray)
             $.each(filterArray, function(key, item) {
-                let condition = true;
-                let itemOptionsCondition = false;
-                let itemOptions = 6;
-                filterHtml = renderFilterHtml(item, 6, false, item.field_name);
+                let filterHtml = renderFilterHtml(item, 300, false, item.field_name);
                 let itemLabel = item.field_name.toUpperCase();
+                let itemOptions = 6;
+                let itemOptionsCondition = false;
                 $.each(facet, function(key, value) {
                     if (item.field_name == value.filterAttribute) {
                         itemLabel = value.fieldName;
                         itemOptions = value.filterOption;
                     }
                 });
-                if (item.counts.length <= 6) {
-                    condition = false;
-                }
                 if (itemOptions == 1) {
                     itemOptionsCondition = true;
                 }
+
                 if (filterHtml) {
                     html += `<div class="filter_main_test" id="price"></div><div class="filter_main_test" id="${item.field_name}">
-                    <span class="item_label">${itemLabel}</span>
-                    <div class="child_main" id="more_option_${item.field_name}">
-                        ${itemOptionsCondition ? `
-                            <div class="search_bar_option">
-                                <input class="search_option_filter" data-attr="${item.field_name}" type="search" id="search_filter_${item.field_name}" placeholder="Search by option">
-                            </div>` : ''}
-                        <div id="filtermore_attribute_${item.field_name}" class="filter_check">${filterHtml}</div>
-                        <div class="read_more_less_buttons">
-                        ${condition ? `<button data-info="${item.field_name}" data-count="${item.counts.length}" data-toggle-state="more" id="toggle_${item.field_name}" class="read_toggle_link">Read More</button>` : ''}
+                        <span class="item_label active">${itemLabel}</span>
+                        <div class="child_main" id="more_option_${item.field_name}">
+                            ${itemOptionsCondition ? `
+                                <div class="search_bar_option">
+                                    <input class="search_option_filter" data-attr="${item.field_name}" type="search" id="search_filter_${item.field_name}" placeholder="Search by option">
+                                </div>` : ''}
+                            <div id="filtermore_attribute_${item.field_name}" class="filter_check">${filterHtml}</div>
                         </div>
-                    </div>
-                </div>`;
+                    </div>`;
                 }
             });
 
             $('#filter_container').html(html);
+
+            // Trigger disjunctive search for active filters
+            for (const key in filterParam) {
+                if (filterParam[key]) {
+                    productSearch(keyword, 1, typsenseClient, null, null, null, null, key, function(results) {
+                        if (results.facet_counts.length > 0) {
+                            let filterHtml = renderFilterHtml(results.facet_counts[0], results.facet_counts[0].counts.length, true, key);
+                            $('#filtermore_attribute_' + key).html(filterHtml);
+                        }
+                    });
+                }
+            }
+
+            $(document).on('keyup', '.search_option_filter', function(e) {
+                let filterKeyword = e.target.value;
+                let filterId = $(this).attr("data-attr");
+                let filterItem = '';
+                $('.filter_' + filterId).hide();
+                
+                // Get the filter item from the last search results
+               if (searchResultsArray.length > 0) {
+                    $.each(searchResultsArray[searchResultsArray.length - 1].facet_counts, function(key, item) {
+                        if (item.field_name === filterId) {
+                            filterItem = item;
+                        }
+                    });
+                }
+                
+                const searchOptionsContainer = document.getElementById('filtermore_attribute_' + filterId);
+                if (searchOptionsContainer && filterItem) {
+                   const generatedHTML = searchOpitonHtml(filterItem, filterKeyword, filterId);
+                    searchOptionsContainer.innerHTML = generatedHTML;
+               }
+            });
+
             //setting data after refresh
             for (let key of Object.keys(filterParam)) {
                 let paramValues = filterParam[key].split(',');
@@ -645,60 +829,18 @@ define(
                     }
                 });
             }
-
-            // Read more Toggle
-            $(document).on('click', '.read_toggle_link', function(e) {
-                let $button = $(this);
-                let itemId = $button.data('info');
-                let itemCount = $button.data('count');
-                let toggleState = $button.data('toggle-state');
-                let filterArr = [];
-                searchResultsArray[searchResultsArray.length - 1].facet_counts.filter((item) => {
-                    if (item.field_name === itemId) {
-                        filterArr.push(item);
-                    }
-                });
-                const singleObjectItemData = filterArr[0];
-                var isReadMore = true;
-                $('#toggle_' + itemId).text("Read Less");
-                $('#toggle_' + itemId).attr('data-toggle-state', 'less');
-                $('#toggle_' + itemId).removeClass('read_toggle_link');
-                $('#toggle_' + itemId).addClass('read_less');
-                var filterHtml = renderFilterHtml(singleObjectItemData, itemCount, isReadMore, itemId);
-                $('#filtermore_attribute_' + itemId).html(filterHtml);
-                $('#toggle_' + itemId).css("display", "block");
-            });
-            // Read less Toggle
-            $(document).on('click', '.read_less', function(e) {
-                let $button = $(this);
-                let itemId = $button.data('info');
-                let toggleState = $button.data('toggle-state');
-                let filterArr = [];
-                searchResultsArray[searchResultsArray.length - 1].facet_counts.filter((item) => {
-                    if (item.field_name === itemId) {
-                        filterArr.push(item);
-                    }
-                });
-                const singleObjectItemData = filterArr[0];
-                var isReadMore = toggleState === "less";
-                $button.text("Read More");
-                $button.attr('data-toggle-state', 'more');
-                $button.removeClass('read_less');
-                $('#toggle_' + itemId).addClass('read_toggle_link');
-                var filterHtml = renderFilterHtml(singleObjectItemData, 6, isReadMore, itemId);
-                $('#filtermore_attribute_' + itemId).html(filterHtml);
-            });
             const resetbutton = document.querySelector('#clear_all');
 
             if (resetbutton) {
                 resetbutton['onclick'] = function(e) {
-                    filterParam = [];
+                    filterParam = {};
                     selectedFilters = [];
                     selectedIndex = [];
                     selectedRadio = [];
                     $('#clear_all').hide();
                     sliderAction(keyword, filterParam);
-                    productSearch(keyword, 1, typsenseClient, null);
+                    let currentPerPage = $('#product_count_page').val() || null;
+                    productSearch(keyword, 1, typsenseClient, null, null, null, currentPerPage);
                 };
             }
 
@@ -730,7 +872,7 @@ define(
                                     if ($.inArray(e.target.id, selectedIndex) === -1) {
                                         selectedIndex.push(e.target.id);
                                     }
-                                    updateParam.updateParams(filterParam);
+                                    updateParam.updateParams(filterParam, null, 1);
                                 } else {
                                     checkField.removeAttribute('checked');
                                     const currentarray = filterParam[attributeFieldname].toString().split(',');
@@ -746,9 +888,10 @@ define(
                                         key: attributeFieldname,
                                         content: stableContent
                                     });
-                                    updateParam.updateParams(filterParam);
+                                    updateParam.updateParams(filterParam, null, 1);
                                 }
-                                productSearch(keyword, 1, typsenseClient, filterParam);
+                                let currentPerPage = $('#product_count_page').val() || null;
+                                productSearch(keyword, 1, typsenseClient, filterParam, null, null, currentPerPage);
                             }
                         } else {
                             if (e.target.type === 'radio') {
@@ -768,22 +911,26 @@ define(
                                     if (checkField.checked) {
                                         // Handle the checked state
                                         checkField.setAttribute("checked", "checked");
-                                        filterParam[attributeFieldname] = e.target.id; // Store the selected radio button ID
+                                        filterParam[attributeFieldname] = checkField.getAttribute('data-range'); // Store the selected radio button value
                                         stableContent = $('#' + attributeFieldname)[0].outerHTML;
                                         selectedFilters.push({
                                             key: attributeFieldname,
                                             content: stableContent
                                         });
-                                        selectedRadio = [];
-                                        // Update selectedIndex if necessary
-                                        selectedRadio.push(e.target.id);
+                                        
+                                        // Create attribute-specific identifiers for selected radio buttons
+                                        // Remove any previous selection for this attribute
+                                        selectedRadio = selectedRadio.filter(item => !item.startsWith(attributeFieldname + '_'));
+                                        // Add the new selection with attribute prefix
+                                        selectedRadio.push(attributeFieldname + '_' + checkField.getAttribute('data-range'));
                                         if (selectedRadio >= 1) {
                                             $('#clear_all').show();
                                         }
                                     }
 
-                                    updateParam.updateParams(filterParam);
-                                    productSearch(keyword, 1, typsenseClient, filterParam);
+                                    updateParam.updateParams(filterParam, null, 1);
+                                    let currentPerPage = $('#product_count_page').val() || null;
+                                    productSearch(keyword, 1, typsenseClient, filterParam, null, null, currentPerPage);
                                 }
                             }
                         }
@@ -798,7 +945,7 @@ define(
          * @param {*} item 
          * @returns 
          */
-        function renderFilterHtml(item, maxItems = 6, isReadMore = true, fieldName) {
+        function renderFilterHtml(item, maxItems = 300, isReadMore = true, fieldName) {
             $.each(facet, function(key, value) {
                 if (fieldName == value.filterAttribute) {
                     itemFacetType = value.facet;
@@ -812,14 +959,16 @@ define(
                     html += `
                         <div class="form-check col-md-12 filter_${item.field_name}">
                         <input type="checkbox" class="form-check-input rangeCheck" name="[${item.field_name}]" id="${itemValue.value}" ${$.inArray(itemValue.value, selectedIndex) != -1 ? 'checked' : 'null'}  data-range="${itemValue.value}" data-typename="${item.field_name}" readonly="true">
-                        <label class="form-check-label" for="${itemValue.value}">${itemValue.value} (${itemValue.count})</label>
+                        <label class="form-check-label" for="${itemValue.value}">${itemValue.value}</label>
+			<span class="form-check-label-count">${itemValue.count}</span>
                         </div>
                     `;
                 } else if (itemValue.value && itemFacetType == 'conjunctive') {
                     html += `
                         <div class="form-check col-md-12 filter_${item.field_name}">
-                        <input type="radio" class="form-check-input radioCheck" name="[${item.field_name}]" id="${itemValue.value}" data-range="${itemValue.value}" data-typename="${item.field_name}" ${$.inArray(itemValue.value, selectedRadio) != -1 ? 'checked' : 'null'}  readonly="true">
-                        <label class="form-check-label" for="${itemValue.value}">${itemValue.value} (${itemValue.count})</label>
+                        <input type="radio" class="form-check-input radioCheck" name="[${item.field_name}]" id="${item.field_name}[${itemValue.value}]" data-range="${itemValue.value}" data-typename="${item.field_name}" ${$.inArray(item.field_name + '_' + itemValue.value, selectedRadio) != -1 ? 'checked' : 'null'}  readonly="true">
+                        <label class="form-check-label" for="${itemValue.value}">${itemValue.value}</label>
+			<span class="form-check-label-count">${itemValue.count}</span>
                         </div>
                     `;
 
@@ -861,7 +1010,8 @@ define(
                         html += `
                         <div class="form-check col-md-12 searchOption_${item.field_name}">
                             <input type="checkbox" class="form-check-input rangeCheck" name="[${item.field_name}]" id="${itemValue.value}" ${$.inArray(itemValue.value, selectedIndex) != -1? 'checked' : 'null'} data-range="${itemValue.value}" data-typename="${item.field_name}" readonly="true">
-                            <label class="form-check-label" for="range1">${itemValue.value} (${itemValue.count})</label>
+                            <label class="form-check-label" for="range1">${itemValue.value}</label>
+			    <span class="form-check-label-count">${itemValue.count}</span>
                         </div>
                         `;
                     }
@@ -891,19 +1041,7 @@ define(
                 searchOptionsContainer.innerHTML = generatedHTML;
             });
         }
-        function cleanQuery(query) {
-            // Remove extra spaces and ensure uniform spacing around "&&"
-            query = query.replace(/\s*&&+\s*/g, " && ");
-        
-            // Split query by " && "
-            let parts = query.split(" && ").map(part => part.trim());
-        
-            // Use a Set to remove duplicate parameters
-            let uniqueParts = [...new Set(parts)];
-        
-            // Join back without trailing "&&"
-            return uniqueParts.join(" && ");
-        }
+
         /**
          * Search Option filer Html
          *
@@ -935,8 +1073,10 @@ define(
             let expandItems = true;
             let itemData = item.counts;
             if (!filterKeyword) {
+               if(item.counts.length  >=6){
                 expandItems = false;
-                itemData = item.counts.slice(0, 2);
+                }
+                itemData = item.counts.slice(0, 6);
             }
             $.each(itemData, function(itemkey, itemValue) {
                 if (itemValue.value) {
@@ -944,17 +1084,13 @@ define(
                         html += `
                         <div class="form-check col-md-12 searchOption_${item.field_name}">
                             <input type="checkbox" class="form-check-input rangeCheck" name="[${item.field_name}]" id="${itemValue.value}" ${$.inArray(itemValue.value, selectedIndex) != -1? 'checked' : 'null'} data-range="${itemValue.value}" data-typename="${item.field_name}" readonly="true">
-                            <label class="form-check-label" for="range1">${itemValue.value} (${itemValue.count})</label>
+                            <label class="form-check-label" for="range1">${itemValue.value}</label>
+			    <span class="form-check-label-count">${itemValue.count}</span>
                         </div>
                         `;
                     }
                 }
             });
-            if (!expandItems) {
-                html = html + `<div class="read_more_less_buttons">
-                    <button data-info="${item.field_name}" data-count="${item.counts.length}" data-toggle-state="more" id="toggle_${item.field_name}" class="read_toggle_link">Read More</button>
-                </div>`
-            }
             return html;
         }
 
@@ -991,6 +1127,14 @@ define(
                 }
             }
 
+            // Hide the price slider container if price values are NaN
+            if (isNaN(minValue) || isNaN(maxValue)) {
+                $('.filter_price_slider').hide();
+                return;
+            } else {
+                $('.filter_price_slider').show();
+            }
+
             tmin = minValue;
             let i = 0;
             if (!isSlide) {
@@ -1000,71 +1144,113 @@ define(
             }
             i++;
         }
-                /** Slider Handling  */
-                function sliderAction(keyword, filterParamData = null, currentValue = null) {
-                    if (SLIDER == 1 && location.search) {
-                        if (!keyword) {
-                            keyword = location.search.split('=')[1];
+
+        function hitSearchAnalytics(searchParameters, searchResults) {
+            setTimeout(function() {
+                try {
+                    const postData = {
+                        uniqueId: UNIQUEID,
+                        searchKey: searchParameters.q,
+                        searchResult: searchResults,
+                        sortValue: searchParameters.sort_by,
+                        facetValue: searchParameters.filter_by,
+                        page: searchParameters.page,
+                        sessionId: $.cookie("_conversion_box_track_id")
+                    };
+                    $.ajax({
+                        url: analyticsURL + `api/v1/analytics/instantSearchLog`,
+                        type: 'POST',
+                        contentType: 'application/json',
+                        dataType: 'json',
+                        data: JSON.stringify(postData),
+                        success: function(data) {
+                            if (!data.ok) {
+                                console.log('Network response was not ok');
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error:', error);
                         }
-                        if (keyword.match(/&&/g)) {
-                            keyword = keyword.substring(0, keyword.indexOf('&&'));
-                        }
-        
-                        let minValue, maxValue;
-                        let priceData = priceComponent.sliderPrice(keyword, filterParamData);
-                        priceData.then((value) => {
-                            if (currentValue) {
-                                minValue = currentValue.min;
-                                maxValue = currentValue.max;
-                            } else {
-                                minValue = value.min;
-                                maxValue = value.max;
-                            }
-                            // Reset slider values to default if no values are passed
-                            if (filterParamData.price != undefined) {
-                                let priceRange = filterParamData.price.split("..");
-                                if (priceRange != '') {
-                                    minValue = parseInt(priceRange[0]);
-                                    maxValue = parseInt(priceRange[1]);
-                                }
-                            }
-                            if (filterParamData != undefined || filterParamData != "") {
-                                min = parseInt(minValue);
-                                max = parseInt(maxValue);
-                            } else {
-                                min = parseInt(value.min);
-                                max = parseInt(value.max);
-                            }
-                            $("#price-range").slider({
-                                step: 1,
-                                range: true,
-                                min: min,
-                                max: max,
-                                values: [parseInt(minValue), parseInt(maxValue)],
-                                slide: function(event, ui) {
-                                    ui.handle.innerHTML = '<span class="point">$' + ui.value + '</span>';
-                                    isSlide = true;
-                                    tmin = ui.values[0];
-                                    tmax = ui.values[1];
-        
-                                },
-                                stop: function(event, ui) {
-                                    alert(1);
-                                    let priceParam = ui.values[0] + ".." + ui.values[1];
-                                    filterParam['price'] = priceParam;
-                                    //     updateParam.updateParams(filterParam);
-                                    if (filterParam['price'] && isSlide == 1) {
-                                        productSearch($('#search-result-box').val(), 1, searchConfig.createClient(typesenseConfig), '', '', ui.values[0] + '-' + ui.values[1]);
-                                    }
-                                }
-                            });
-                            updateParam.updateParams(filterParam);
-                            let sliderHandles = $("#price-range").find(".ui-slider-handle");
-                            sliderHandles.eq(0).html("<span class='point'>$" + Math.floor(minValue) + "</span>");
-                            sliderHandles.eq(1).html("<span class='point'>$" + Math.ceil(maxValue) + "</span>");
-                        });
-        
-                    }
+                    });
+                } catch (error) {
+                    console.error('Error:', error);
                 }
+            }, 6000);
+
+        }
+        /** Slider Handling  */
+        function sliderAction(keyword, filterParamData = null, currentValue = null, page = null) {
+            if (SLIDER == 1 && location.search) {
+                if (!keyword) {
+                    keyword = location.search.split('=')[1];
+                }
+                if (keyword.match(/&&/g)) {
+                    keyword = keyword.substring(0, keyword.indexOf('&&'));
+                }
+
+                let minValue, maxValue;
+                let priceData = priceComponent.sliderPrice(keyword, filterParamData);
+                priceData.then((value) => {
+                    if (currentValue) {
+                        minValue = currentValue.min;
+                        maxValue = currentValue.max;
+                    } else {
+                        minValue = value.min;
+                        maxValue = value.max;
+                    }
+                    // Reset slider values to default if no values are passed
+                    if (filterParamData.price != undefined) {
+                        let priceRange = filterParamData.price.split("..");
+                        if (priceRange != '') {
+                            minValue = parseInt(priceRange[0]);
+                            maxValue = parseInt(priceRange[1]);
+                        }
+                    }
+                    if (filterParamData != undefined || filterParamData != "") {
+                        min = parseInt(minValue);
+                        max = parseInt(maxValue);
+                    } else {
+                        min = parseInt(value.min);
+                        max = parseInt(value.max);
+                    }
+                     // Hide the price slider container if price values are NaN
+                     if (isNaN(min) || isNaN(max)) {
+                         $('.filter_price_slider').hide();
+                         return;
+                     } else {
+                         $('.filter_price_slider').show();
+                     }
+                    $("#price-range").slider({
+                        step: 1,
+                        range: true,
+                        min: min,
+                        max: max,
+                        values: [parseInt(minValue), parseInt(maxValue)],
+                        slide: function(event, ui) {
+                            ui.handle.innerHTML = '<span class="point">$' + ui.value + '</span>';
+                            isSlide = true;
+                            tmin = ui.values[0];
+                            tmax = ui.values[1];
+
+                        },
+                        stop: function(event, ui) {
+                            let priceParam = ui.values[0] + ".." + ui.values[1];
+                            filterParam['price'] = priceParam;
+                            updateParam.updateParams(filterParam, null, 1);
+                            if (filterParam['price'] && isSlide == 1) {
+                                let currentPerPage = $('#product_count_page').val() || null;
+                                $('#product-pagination').twbsPagination('destroy');
+                                productSearch($('#search-result-box').val(), 1, searchConfig.createClient(typesenseConfig), '', '', ui.values[0] + '-' + ui.values[1], currentPerPage);
+                            }
+                        }
+                    });
+                    updateParam.updateParams(filterParam, null, page);
+                    let sliderHandles = $("#price-range").find(".ui-slider-handle");
+                    sliderHandles.eq(0).html("<span class='point'>$" + Math.floor(minValue) + "</span>");
+                    sliderHandles.eq(1).html("<span class='point'>$" + Math.ceil(maxValue) + "</span>");
+                });
+
+            }
+        }
     }
 );

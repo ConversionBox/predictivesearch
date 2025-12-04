@@ -488,22 +488,33 @@ define(
                             }
 
                             let image = null;
+                            let hoverImage = null;
+                            
                             if (IMAGE_TYPE == 'product_base_image') {
                                 image = val.document.image_url;
+                                hoverImage = val.document.small_image || val.document.thumbnail;
                             } else if (IMAGE_TYPE == 'product_small_image') {
                                 image = val.document.small_image;
+                                hoverImage = val.document.image_url || val.document.thumbnail;
                             } else if (IMAGE_TYPE == 'product_thumbnail_image') {
                                 image = val.document.thumbnail;
+                                hoverImage = val.document.image_url || val.document.small_image;
                             } else if(typeof image === 'undefined' || image === null) {
                                 image = BASE_URL+`media/catalog/product/placeholder/`+PLACEHOLDER;
+                            }
+                            
+                            // Fallback for hover image
+                            if (!hoverImage || hoverImage === image) {
+                                hoverImage = image;
                             }
 
                             html += `
                                 <div class="product-wrapper-main">
                                     <a href="${val.document.url}" >
                                         <div class="product-wrapper">
-                                            <div class="product-image-div">
-                                                <img src="${image}" class="search-product-image" width="${IMAGE_WIDTH}" height="${IMAGE_HEIGHT}">
+                                            <div class="product-image-div ${FLIP_IMG_HOVER == 1 ? 'flip-container' : ''}">
+                                                <img src="${image}" class="search-product-image ${FLIP_IMG_HOVER == 1 ? 'main-image' : ''}" width="${IMAGE_WIDTH}" height="${IMAGE_HEIGHT}">
+                                                ${FLIP_IMG_HOVER == 1 && hoverImage !== image ? `<img src="${hoverImage}" class="search-product-image hover-image" width="${IMAGE_WIDTH}" height="${IMAGE_HEIGHT}">` : ''}
                                             </div>
                                             <div class="product_item_wrapper">
                                                 <div class="item_name" style="-webkit-line-clamp:${MAX_TITLE_LINE};">${name}</div>`;

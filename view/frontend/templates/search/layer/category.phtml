@@ -4,19 +4,49 @@
   */
   $viewModel = $block->getData('view_model');
 ?>
-<div id="refine-toggle" class="visible-xs visible-sm">+ Refine</div>
-<div class="filter_main hidden-sm hidden-xs">
+<div id="cbSearchResultSkeleton">
+        <div class="cbFiltersSidebar cbProductFilters">
+            <div class="cbSkeletonCard cbProductFiltersBlock">
+                <div class=cbProductFiltersTitle><span class="cbFullWidth cbSkeletonText"></span></div>
+                <div class=cbProductFiltersList>
+                    <span class="cbFullWidth cbSkeletonText"></span>
+                    <span class="cbFullWidth cbSkeletonText"></span>
+                    <span class="cbFullWidth cbSkeletonText"></span>
+                </div>
+            </div>
+            <div class="cbSkeletonCard cbProductFiltersBlock">
+                <div class=cbProductFiltersTitle><span class="cbFullWidth cbSkeletonText"></span></div>
+                <div class=cbProductFiltersList><span class="cbFullWidth cbSkeletonText"></span> <span
+                        class="cbFullWidth cbSkeletonText"></span> <span class="cbFullWidth cbSkeletonText"></span>
+                </div>
+            </div>
+            <div class="cbSkeletonCard cbProductFiltersBlock">
+                <div class=cbProductFiltersTitle><span class="cbFullWidth cbSkeletonText"></span></div>
+                <div class=cbProductFiltersList><span class="cbFullWidth cbSkeletonText"></span> <span
+                        class="cbFullWidth cbSkeletonText"></span> <span class="cbFullWidth cbSkeletonText"></span>
+                </div>
+            </div>
+        </div>
+</div>
+<div class="mobileFilterContainer visible-xs visible-sm" style="display:none"><span class="mobileFilterTitle">Filters</span><span class="mobileFilterClose"></span></div>
+<div class="filter_main hidden-sm hidden-xs" style="display:none">
     <div id="selected-filter">
-        <button id="clear_all"><?= $escaper->escapeHtmlAttr(__('Clear All')) ?></button>
+	<div class="SelectedFiltersContainer">
+		<span class="selectedFiltersTitle">Selected Filters</span>
+		<span id="clear_all" class="selectedFiltersClearAll">Clear All</span>
+	</div>
         <div id="filter-items"></div>
     </div>
+
     <?php if ($viewModel->priceSlider() == 1): ?>
-        <span class="item_label"><?= $escaper->escapeHtmlAttr(__('Price')) ?></span>
+        <div class="filter_price_slider">
+        <span class="item_label active" style="padding:0 13px;"><?= $escaper->escapeHtmlAttr(__('Price')) ?></span>
         <div class="slider-box">
             <div id="price-range" class="slider"></div>
            <input type="text" id="priceRange" readonly> 
            
         </div>
+    </div>
     <?php endif; ?>
      <div class="container hidden-sm hidden-xs" id="filter_container"> 
         <div class="filter_main_test" id="price"></div>

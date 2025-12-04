@@ -52,6 +52,10 @@ define([
 				return;
 			}
 			this.getSessionID();
+			
+			// Debounce timer for search
+			let searchTimeout = null;
+			
 			//search action
 			$("#searchbox").on("keyup", function(e) {
 				 if (e.keyCode === 13) {
@@ -59,18 +63,26 @@ define([
                                  }
 				keyword = e.target.value.trim();
 				var keywordlength = keyword.length;
+				
+				// Clear previous timeout
+				if (searchTimeout) {
+					clearTimeout(searchTimeout);
+				}
+				
 				if (keyword && (keywordlength >= mimimumqueryLength)) {
-				 	//enabling the search popup
-					//bind product, category and page data and suggestion data
-                                       multiSearchComponent.multiSearch(keyword, typsenseClient, function() {
-                                               // Add autocomplete class only after typesense binding is complete
-                                               $("#search_result").addClass("autocomplete");
-                                       });
-                                    let searchBtn = document.querySelector('.action.search');
-                                if (searchBtn) {
-                                  searchBtn.removeAttribute('disabled');
-                               }
-                                 
+					// Debounce search - wait 200ms after user stops typing
+					searchTimeout = setTimeout(function() {
+						//enabling the search popup
+						//bind product, category and page data and suggestion data
+						multiSearchComponent.multiSearch(keyword, typsenseClient, function() {
+							// Add autocomplete class only after typesense binding is complete
+							$("#search_result").addClass("autocomplete");
+						});
+						let searchBtn = document.querySelector('.action.search');
+						if (searchBtn) {
+							searchBtn.removeAttribute('disabled');
+						}
+					}, 200);
 				} else {
 					$('#product_section').html('');
 					$('#cms_section').html('');

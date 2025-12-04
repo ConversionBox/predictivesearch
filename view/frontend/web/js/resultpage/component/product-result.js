@@ -514,7 +514,7 @@ define(
                                         <div class="product-wrapper">
                                             <div class="product-image-div ${FLIP_IMG_HOVER == 1 ? 'flip-container' : ''}">
                                                 <img src="${image}" class="search-product-image ${FLIP_IMG_HOVER == 1 ? 'main-image' : ''}" width="${IMAGE_WIDTH}" height="${IMAGE_HEIGHT}">
-                                                ${FLIP_IMG_HOVER == 1 && hoverImage !== image ? `<img src="${hoverImage}" class="search-product-image hover-image" width="${IMAGE_WIDTH}" height="${IMAGE_HEIGHT}">` : ''}
+                                                ${FLIP_IMG_HOVER == 1 ? `<img src="${hoverImage}" class="search-product-image hover-image" width="${IMAGE_WIDTH}" height="${IMAGE_HEIGHT}">` : ''}
                                             </div>
                                             <div class="product_item_wrapper">
                                                 <div class="item_name" style="-webkit-line-clamp:${MAX_TITLE_LINE};">${name}</div>`;

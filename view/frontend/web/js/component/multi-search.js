@@ -49,6 +49,8 @@ define(
             });
         }
         
+        // Track latest search request ID to prevent race conditions
+        let latestSearchId = 0;
 
         return {
             /**
@@ -59,6 +61,9 @@ define(
              */
             multiSearch: function(keyword, typsenseClient,callback) {
                 try {
+                    // Generate unique ID for this search request
+                    const currentSearchId = ++latestSearchId;
+                    
                     let searches = [getProductAttributes(keyword)];
                     
                     if (CATEGORY_SECTION == 1) {
@@ -78,6 +83,12 @@ define(
                     }
                     let commonSearchParams = {}
                     $.when(typsenseClient.multiSearch.perform(searchRequests, commonSearchParams)).done(function(searchResults) {
+                        // Only process results if this is still the latest search
+                        if (currentSearchId !== latestSearchId) {
+                            console.log('Ignoring outdated search results (ID: ' + currentSearchId + ', Latest: ' + latestSearchId + ')');
+                            return;
+                        }
+                        
                         $.each(searchResults.results, function(index, value) {
                             if (value.request_params.collection_name === INDEX_PERFIX+STORE+'-products') {
                                 renderProducts(value.hits, value.found,keyword,value.out_of,value.search_time_ms);

@@ -68,7 +68,7 @@ body.catalogsearch-result-index .sidebar.sidebar-main.mobile-sidebar .filter_mai
 @media (min-width: 1023.98px) and (max-width: 1124px) {
 #search-component #search_result.autocomplete .col-center{width: 30% !important;order:1;}#search-component #search_result.three-col .col-right{width: 70% !important;}#search-component .search_result{flex-direction: row !important;}
 .page-header .header.content .search-main.block.block-search.show #search-component #product_section{grid-template-columns: repeat(3, 1fr) !important;}}
-#search-component #search_result.autocomplete .col-center .suggest_category{padding-left: 25px;position: relative;}
+#search-component #search_result.autocomplete .col-center .suggest_category{padding-left: 25px !important;position: relative;}
 #search-component #search_result.autocomplete .col-center .suggest_category:before{content: '\e884';font-family: 'porto-icons';margin-right: 10px;position: absolute;left: 0;top: 50%;transform: translateY(-50%);width: 20px;height: 20px;background-color: #fff;color: #333;  display: flex;align-items: center;justify-content: center;font-weight: bold;font-size: 14px;align-items: center;}.suggestion_section .suggestion_container{margin-bottom: 5px !important;}
 
 .catalogsearch-result-index #search_result_page .content_wrapper .search-option-insta{justify-content: space-between;background: none;}

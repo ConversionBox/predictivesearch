@@ -290,15 +290,23 @@ define(
                             </a>
                         </div>
                     `;                    count++;
-                    if (count == PRODUCT_MAX_COUNT) {
+                   /* if (count == PRODUCT_MAX_COUNT) {
                         $('.product-viewall').html('View All '+found+' Products')
                         $('.product-viewall').show();
                         return false;
+                    }*/
+                   if (count == PRODUCT_MAX_COUNT) {
+                                return false;
                     }
+
             });
-            if (count < PRODUCT_MAX_COUNT || SEE_ALL_BUTTON == 0) {
+
+            if (SEE_ALL_BUTTON == 0 || hits.length < 1) {
                 $('.product-viewall').hide();
-            }
+            }else if(hits.length > 1 && SEE_ALL_BUTTON == 1){
+                $('.product-viewall').html('View All '+found+' Products');
+                $('.product-viewall').show();
+             }            
             $('#product_section').html(html);
         }
         

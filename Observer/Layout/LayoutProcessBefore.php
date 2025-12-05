@@ -61,10 +61,7 @@ class LayoutProcessBefore implements ObserverInterface
         
         // Excluded actions where we don't want to load search
         $excludedActions = [
-            'weltpixel_quickview_catalog_product_view',
-            'checkout_cart_index',
-            'checkout_index_index',
-            'checkout_onepage_success'
+            'weltpixel_quickview_catalog_product_view'
         ];
         
         // Handle category page with Typesense
@@ -76,11 +73,15 @@ class LayoutProcessBefore implements ObserverInterface
             }
         }
         
-        // Load search handle for autocomplete on all pages (except excluded actions)
-        // This loads the searchAutocomplete.js and multi-search.js components
-        if ($this->configData->getAutocompleteEnabled() == 1 && 
-            !in_array($fullActionName, $excludedActions)) {
-            $layout->getUpdate()->addHandle('typsense_search_handle');
+        // Load search result handle only on search result page for page speed optimization
+        // This loads the Typesense configuration and search result components
+        if ($fullActionName === 'catalogsearch_result_index') {
+            $layout->getUpdate()->addHandle('typesense_search_result_handle');
         }
+     if( $this->configData->getAutocompleteEnabled() == 1 && 
+-            !in_array($fullActionName, $excludedActions)) {
+                $layout = $observer->getData('layout');
+                $layout->getUpdate()->addHandle('typsense_search_handle');
+            }
     }
 }

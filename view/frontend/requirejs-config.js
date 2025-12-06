@@ -7,5 +7,9 @@ var config = {
     },
 	paths: {
 		'typesense': 'Conversionbox_Predictivesearch/typesense/typesense.min',
-	}
+	},
+	deps: [
+		'Conversionbox_Predictivesearch/js/resultpage/component/product-result',
+		'Conversionbox_Predictivesearch/js/resultpage/result'
+	]
 };

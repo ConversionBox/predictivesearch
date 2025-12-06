@@ -95,6 +95,7 @@ define(
         let tmin = 0;
         let tmax = 0;
         let isSlide = false;
+        let isInitialLoad = true;
 
         $(document).ready(function() {
             loadParams = location.search.slice(location.search.indexOf('&&') + 2);
@@ -107,7 +108,7 @@ define(
                 }
             });
             filterParam = filterparamArr;
-            sliderAction(location.search.split('=')[1], filterParam, null, pageParam);
+            // Removed initial sliderAction call - slider will be initialized after first search
             /* Mobile filter toggle */
             $('body').on('click', '.refineToggle, .mobileFilterClose', function() {
                 $('.filter_main').toggleClass('hidden-sm').toggleClass('hidden-xs');
@@ -806,17 +807,21 @@ define(
 
             $('#filter_container').html(html);
 
-            // Trigger disjunctive search for active filters
-            for (const key in filterParam) {
-                if (filterParam[key]) {
-                    productSearch(keyword, 1, typsenseClient, null, null, null, null, key, function(results) {
-                        if (results.facet_counts.length > 0) {
-                            let filterHtml = renderFilterHtml(results.facet_counts[0], results.facet_counts[0].counts.length, true, key);
-                            $('#filtermore_attribute_' + key).html(filterHtml);
-                        }
-                    });
+            // Trigger disjunctive search for active filters (skip on initial page load)
+            if (!isInitialLoad) {
+                for (const key in filterParam) {
+                    if (filterParam[key]) {
+                        productSearch(keyword, 1, typsenseClient, null, null, null, null, key, function(results) {
+                            if (results.facet_counts.length > 0) {
+                                let filterHtml = renderFilterHtml(results.facet_counts[0], results.facet_counts[0].counts.length, true, key);
+                                $('#filtermore_attribute_' + key).html(filterHtml);
+                            }
+                        });
+                    }
                 }
             }
+            // Mark initial load as complete after first render
+            isInitialLoad = false;
 
             $(document).on('keyup', '.search_option_filter', function(e) {
                 let filterKeyword = e.target.value;

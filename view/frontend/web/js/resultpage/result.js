@@ -3,7 +3,7 @@ define(
 		'jquery',
 		'uiComponent',
 		'Conversionbox_Predictivesearch/js/config/typesenseSearchConfig',
-		'Conversionbox_Predictivesearch/js/resultpage/component/product-result',
+		'productResult',
 		'mage/url',
 		'ko'
 	],

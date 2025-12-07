@@ -96,6 +96,8 @@ define(
         let tmax = 0;
         let isSlide = false;
         let isInitialLoad = true;
+        let currentSearchId = 0;
+        let latestSearchId = 0;
 
         $(document).ready(function() {
             loadParams = location.search.slice(location.search.indexOf('&&') + 2);
@@ -216,6 +218,11 @@ define(
          */
         function productSearch(keyword, page, typsenseClient, filterValue, sortQuery, priceFilter, perPage = null, disjunctiveFacet = null, callback = null, facetQuery = null) {
             priceSlide = priceFilter;
+            
+            // Generate unique search ID for this request
+            currentSearchId = ++latestSearchId;
+            const thisSearchId = currentSearchId;
+            
             try {
                 let searchAttributes = SEARCHBLE_ATTRIBUTES.map((item) => {
                     if (item.search == 1) {
@@ -321,6 +328,12 @@ define(
                 };
                 
                 typsenseClient.multiSearch.perform(searchRequests, {}).then((multiSearchResults) => {
+                        // Only process results if this is still the latest search
+                        if (thisSearchId !== latestSearchId) {
+                            console.log('Ignoring outdated search results (ID: ' + thisSearchId + ', Latest: ' + latestSearchId + ')');
+                            return;
+                        }
+                        
                         // Extract product search results from multi-search response
                         const searchResults = multiSearchResults.results[0];
                         
@@ -595,6 +608,11 @@ define(
                         }
                     })
                     .catch((error) => {
+                        // Only show error if this is still the latest search
+                        if (thisSearchId !== latestSearchId) {
+                            console.log('Ignoring error from outdated search (ID: ' + thisSearchId + ')');
+                            return;
+                        }
                         $('#product_result').html('Configuration issues try again');
                         console.error(error);
                     });
@@ -656,6 +674,7 @@ define(
                     last: false,
                     prev: '<<',
                     next: '>>',
+                    initiateStartPageClick: false, // Prevent initial page click on setup
                     onPageClick: function(event, page) {
                         updateParam.updateParams(filterParam, null, page);
                         productSearch(keyword, page, typsenseClient);

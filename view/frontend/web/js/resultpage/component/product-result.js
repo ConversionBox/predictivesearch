@@ -487,23 +487,29 @@ define(
                         paginationAction(totalPage, visiblePage, keyword, productCount);
 
                         $.each(searchResults.hits, function(key, val) {
-                 let price =  CURRENCY + parseFloat(val.document.price).toFixed(2);
-                     if(val.document.type_id == 'bundle'){
-                      price = formatPriceRange(val.document.price_range);
-                      }
-                  let priceval = Number(price);
-                  priceval = Math.floor(priceval * 100) / 100; // truncate instead of round
-                  if (val.document.special_price) {
-                        let currentDate = new Date();
-                        let startDate = new Date(val.document.special_from_date);
-                        let endDate = new Date(val.document.special_to_date);
-                           if (isDateInRange(new Date(), new Date(val.document.special_from_date), new Date(val.document.special_to_date))) {
-                            let splval = Number(val.document.special_price);
-                               splval = Math.floor(splval * 100) / 100;
-                               price = CURRENCY + parseFloat(val.document.special_price).toFixed(2);
-
-                        }
-                    }
+                            let price = CURRENCY + parseFloat(val.document.price).toFixed(2);
+                            let regularPrice = price;
+                            let hasSpecialPrice = false;
+                            
+                            if(val.document.type_id == 'bundle'){
+                                price = formatPriceRange(val.document.price_range);
+                                regularPrice = price;
+                            }
+                            
+                            let priceval = Number(price);
+                            priceval = Math.floor(priceval * 100) / 100; // truncate instead of round
+                            
+                            if (val.document.special_price) {
+                                let currentDate = new Date();
+                                let startDate = new Date(val.document.special_from_date);
+                                let endDate = new Date(val.document.special_to_date);
+                                if (isDateInRange(new Date(), new Date(val.document.special_from_date), new Date(val.document.special_to_date))) {
+                                    let splval = Number(val.document.special_price);
+                                    splval = Math.floor(splval * 100) / 100;
+                                    price = CURRENCY + parseFloat(val.document.special_price).toFixed(2);
+                                    hasSpecialPrice = true;
+                                }
+                            }
                             var name = val.document.product_name;
                             var sku = val.document.sku;
                             var description = val.document.description;
@@ -556,7 +562,14 @@ define(
                                               html +=`<div class="item_sku">SKU: ${sku}</div>`;
                                                }
                                                if(SHOW_PRICE == 1){
-                                                html +=`<div class="item_price">${price}</div>`;
+                                                   if(hasSpecialPrice){
+                                                       html +=`<div class="item_price">
+                                                           <span class="old_price">${regularPrice}</span>
+                                                           <span class="special_price">${price}</span>
+                                                       </div>`;
+                                                   } else {
+                                                       html +=`<div class="item_price">${price}</div>`;
+                                                   }
                                                 }
                                           html +=`</div>
                                         </div>

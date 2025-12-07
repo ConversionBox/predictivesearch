@@ -2234,3 +2234,17 @@ div#price-range span:nth-child(2) span{
 #price-range .ui-slider-handle.ui-state-active .point {
     background: #00a7b5; /* Match your handle color */
 }
+
+/* Special Price Styling */
+.catalogsearch-result-index #search_result_page #product_result.suggestion_section>.product-wrapper-main>a .product_item_wrapper .item_price .old_price {
+    text-decoration: line-through;
+    margin-right: 8px;
+    color: #999;
+    font-size: 14px;
+}
+
+.catalogsearch-result-index #search_result_page #product_result.suggestion_section>.product-wrapper-main>a .product_item_wrapper .item_price .special_price {
+    color: #444;
+    font-weight: bold;
+    font-size: 16px;
+}

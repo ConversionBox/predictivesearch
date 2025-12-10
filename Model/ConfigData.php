@@ -320,7 +320,7 @@ class ConfigData
    /**
     * Analytics URL
     */
-   private const ANALYTICS_URL = 'typesense_general/credentials/analytic_url';
+   private const ANALYTICS_URL = 'typesense_general/credentials/analytics_url';
     /**
      * @var ScopeConfigInterface
      */

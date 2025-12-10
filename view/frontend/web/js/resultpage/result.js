@@ -44,9 +44,9 @@ define(
 					upadteUrl(keyword);
                                        if (productResult && typeof productResult.performSearch === 'function') {
 					productResult.performSearch(keyword, page, typsenseClient, filterValue); }
-					if(SLIDER == 1){
+					/* if(SLIDER == 1){
 						productResult.sliderComponent(keyword);
-					}
+					} */
 					
 				});
 			},

@@ -105,7 +105,8 @@ define(
             loadParams.split('&&').forEach(function(param) {
                 let stringArr = param.split(':=');
                 if (stringArr[1] != undefined) {
-                    let filterText = stringArr[1].replace("%20", " ");
+                    //let filterText = stringArr[1].replace("%20", " ");
+                    let filterText = decodeURIComponent(stringArr[1]);
                     filterparamArr[stringArr[0]] = filterText;
                 }
             });
@@ -606,7 +607,7 @@ define(
                                 const target = e.target;
                                 if (target.classList.contains('cart_btn')) {
                                     const productId = target.id;
-                                    addTOCart.toCart(productId);
+                                    addTOCart.toCart(productId,target);
                                     e.stopImmediatePropagation();
                                 } else if (target.classList.contains('towishlist')) {
                                     e.preventDefault();

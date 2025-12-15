@@ -10,8 +10,14 @@ define(
         const CART_URL = UrlBuilder.build('typesense/Add/AddToCart');
 
         return {
-            toCart: function(id) {
+            toCart: function(id, buttonElement) {
                 try {
+                   // Change button text to "Adding..." and disable it
+                   if (buttonElement) {
+                       buttonElement.textContent = 'Adding...';
+                       buttonElement.disabled = true;
+                   }
+                   
                    $.ajax({
                         url: CART_URL,
                         type: 'GET',
@@ -27,20 +33,42 @@ define(
                             $('#message_parent').css("display", "block");
                             $('#success_message').html(response.responseJSON.message);
                             window.scrollTo({ top: 0, behavior: 'smooth' });
+                            
+                            // Reset button text to "Add to Cart" after success
+                            if (buttonElement) {
+                                buttonElement.textContent = 'Add to Cart';
+                                buttonElement.disabled = false;
+                            }
                         } else {
                             if (response.responseJSON.url) {
                                 window.location.replace(response.responseJSON.url);
+                            }
+                            // Reset button on error
+                            if (buttonElement) {
+                                buttonElement.textContent = 'Add to Cart';
+                                buttonElement.disabled = false;
                             }
                         }
                     },
                     error: function (xhr, status, errorThrown) {
                         console.log('Error happens. Try again.');
+                        // Reset button on error
+                        if (buttonElement) {
+                            buttonElement.textContent = 'Add to Cart';
+                            buttonElement.disabled = false;
+                        }
                     }
                     });
                 } catch (error) {
                     console.log(error)
+                    // Reset button on exception
+                    if (buttonElement) {
+                        buttonElement.textContent = 'Add to Cart';
+                        buttonElement.disabled = false;
+                    }
                 }
             }
         };
     }
 );
+

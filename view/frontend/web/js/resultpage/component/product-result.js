@@ -243,7 +243,7 @@ define(
 
                 let searchParameters = {
                     'q': keyword,
-                    'query_by': searchAttributes,
+                    'query_by': searchAttributes +',category',
                     'per_page': NO_PRODUCTS_PAGE,
                     'filter_by' :`storeCode:["${STORE}"]`,
                     'page': page,
@@ -252,7 +252,11 @@ define(
                     'num_typos': 2,
                     'min_len_1typo': 2,
                     'min_len_2typo': 2,
+                    'exhaustive_search': false,
+                    'prioritize_exact_match': true,
+                    'sort_by': ranking,
                 }
+               
                 if(SHOW_OUT_OF_STOCK == 0){
                     searchParameters.filter_by += ` && stock_status:=true`;
                 }

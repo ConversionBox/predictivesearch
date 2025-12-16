@@ -182,14 +182,14 @@ define(
             let productSearchParameters = {
                 'collection': INDEX_PERFIX+STORE+'-products',
                 'q'         : keyword,
-                'query_by'  : productSearchAttributes,
+                'query_by'  : productSearchAttributes+',category',
                 'per_page'  : PRODUCT_MAX_COUNT,
                 'sort_by'   : ranking,
                 'filter_by' : `storeCode:["${STORE}"]`,
                 'typo_tokens_threshold': 1,
                 'num_typos': 2,
                 'min_len_1typo': 2,
-                    'min_len_2typo': 2,
+                'min_len_2typo': 2,
                       'exhaustive_search': false, // Faster approximate search
                     'prioritize_exact_match': true, // Better relevance with speed
             }    
@@ -242,6 +242,8 @@ define(
             html = '';
             if (hits.length < 1) {
                 html = 'No products found';
+               $('.product-viewall').hide();
+                return;
             }
 
             let count = 0;
@@ -320,7 +322,7 @@ define(
 
             if (SEE_ALL_BUTTON == 0 || hits.length < 1) {
                 $('.product-viewall').hide();
-            }else if(hits.length > 1 && SEE_ALL_BUTTON == 1){
+            }else if(hits.length >= 1 && SEE_ALL_BUTTON == 1){
                 $('.product-viewall').html('View All '+found+' Products');
                 $('.product-viewall').show();
              }            

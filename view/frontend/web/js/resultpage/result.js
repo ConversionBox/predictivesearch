@@ -15,6 +15,7 @@ define(
 		let filterValue = null;
 		let sortParam = null;
 		const SLIDER = typesenseConfig.search_result.price_slider;
+		const initialQuery = typesenseConfig.general.query;
 		//initialize the typsense client
 		const typsenseClient = searchConfig.createClient(typesenseConfig);
 
@@ -74,9 +75,11 @@ define(
 				var paramName = paramParts[0];
 				var paramValue = paramParts[1];
 
-				if (paramName === 'q') {
+				if (paramName === 'q' && keyword!='') {
 					// Replace the value of 'exampleParam'
 					paramValue = keyword;
+				}else{
+					paramValue = initialQuery;
 				}
 
 				updatedParams[paramName] = paramValue;

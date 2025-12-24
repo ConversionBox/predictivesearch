@@ -24,6 +24,7 @@ use Conversionbox\Predictivesearch\Api\TypesenseSearchRepositoryInterface;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Framework\Filter\FilterManager;
 use Magento\CatalogInventory\Api\StockRegistryInterface;
+use Magento\Store\Model\StoreManagerInterface;
 class ProductDataProcessor
 {
     /**
@@ -124,6 +125,12 @@ class ProductDataProcessor
      * @var $stockRegistry;
      */
       protected $stockRegistry;
+    
+    /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
+    
     /**
      * ProductData processing Constructor
      *
@@ -146,6 +153,8 @@ class ProductDataProcessor
      * @param TypesenseSearchRepositoryInterface $typesenseSearchRepositoryInterface
      * @param TimezoneInterface $timezoneInterface
      * @param FilterManager $filterManager
+     * @param StockRegistryInterface $stockRegistry
+     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         ConfigData $configData,
@@ -167,7 +176,8 @@ class ProductDataProcessor
         TypesenseSearchRepositoryInterface $typesenseSearchRepositoryInterface,
         TimezoneInterface $timezoneInterface,
         FilterManager $filterManager,
-        StockRegistryInterface   $stockRegistry
+        StockRegistryInterface $stockRegistry,
+        StoreManagerInterface $storeManager
     ) {
         $this->configData = $configData;
         $this->collectionFactory = $collectionFactory;
@@ -189,6 +199,7 @@ class ProductDataProcessor
         $this->timezoneInterface = $timezoneInterface;
         $this->filterManager = $filterManager;
         $this->stockRegistry = $stockRegistry;
+        $this->storeManager = $storeManager;
     }
 
     /**
@@ -693,13 +704,74 @@ class ProductDataProcessor
             $priceRange = ($minimalPrice)?:'';
             $priceMin =($min)?:'';
             $priceMax=($max)?:'';
+            
+            // Prepare SKU - array format for all products
+            $skuArray = [$product->getSku()]; // Start with parent/main SKU
+            
+            // Add child SKUs for configurable products
+            if ($product->getTypeId() === Configurable::TYPE_CODE) {
+                $childProducts = $this->configurableProductType->getUsedProducts($product);
+                foreach ($childProducts as $childProduct) {
+                    $childSku = $childProduct->getSku();
+                    if ($childSku && !in_array($childSku, $skuArray)) {
+                        $skuArray[] = $childSku;
+                    }
+                }
+            }
+            
+            // Add child SKUs for bundle products
+            if ($product->getTypeId() == 'bundle') {
+                $typeInstance = $product->getTypeInstance();
+                // Get ALL children (required + optional) by passing false
+                $allChildrenIds = $typeInstance->getChildrenIds($product->getId(), false);
+                
+                foreach ($allChildrenIds as $optionId => $childrenIds) {
+                    foreach ($childrenIds as $childId) {
+                        try {
+                            $childProduct = $this->productFactory->create()->load($childId);
+                            if ($childProduct->getId()) {
+                                $childSku = $childProduct->getSku();
+                                if ($childSku && !in_array($childSku, $skuArray)) {
+                                    $skuArray[] = $childSku;
+                                }
+                            }
+                        } catch (\Exception $e) {
+                            // Skip if child product cannot be loaded
+                            continue;
+                        }
+                    }
+                }
+            }
+            
+            // Add child SKUs for grouped products
+            if ($product->getTypeId() == 'grouped') {
+                $typeInstance = $product->getTypeInstance();
+                $childProducts = $typeInstance->getAssociatedProducts($product);
+                
+                foreach ($childProducts as $childProduct) {
+                    $childSku = $childProduct->getSku();
+                    if ($childSku && !in_array($childSku, $skuArray)) {
+                        $skuArray[] = $childSku;
+                    }
+                }
+            }
+            
+            $skuData = $skuArray;
+            
+            // Generate frontend URL using store base URL and product URL key
+            $store = $this->storeManager->getStore($storeId);
+            $baseUrl = $store->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_LINK);
+            $urlKey = $product->getUrlKey();
+            $productUrl = $urlKey ? $baseUrl . $urlKey . '.html' : $baseUrl . 'catalog/product/view/id/' . $product->getId();
+            
             $response = [
                 'id' => $product->getId(),
                 'product_id' => $product->getId(),
                 'product_name' => $product->getName(),
                 'name' => $product->getName(),
                 'sku' => $product->getSku(),
-                'url' => $product->getProductUrl(),
+                'all_sku' => $skuData,
+                'url' => $productUrl,
                 'image_url' => $image,
                 'small_image' => $smallImage,
                 'thumbnail' => $thumbNailImage,

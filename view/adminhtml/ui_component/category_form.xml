@@ -33,9 +33,7 @@
                     <item name="default" xsi:type="string">[]</item>
                     <item name="deleteProperty" xsi:type="boolean">false</item>
                     <item name="label" xsi:type="string">Facets</item>
-                    <additionalClasses>
-                    <class name="admin__field-wide">true</class>
-                    </additionalClasses>
+                    <item name="cssClass" xsi:type="string">admin__field-wide</item>
                     </item>
             </argument>
             <container name="record">
@@ -97,8 +95,7 @@
             <formElements>
                 <select>
                     <settings>
-                    <options class="Conversionbox\Predictivesearch\Ui\Component\FacetType"/>
-                     <default>Conjunctive</default>
+                        <options class="Conversionbox\Predictivesearch\Ui\Component\FacetType"/>
                     </settings>
                 </select>
             </formElements>

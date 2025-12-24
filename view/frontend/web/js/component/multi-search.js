@@ -39,8 +39,8 @@ define(
         const POPULAR_TERMS = typesenseConfig.search_terms.data;
         const UNIQUEID = typesenseConfig.general.unique_id;
         const CATEGORY_SECTION = typesenseConfig.auto_complete.category_enabled;
-       	const PAGE_SECTION = typesenseConfig.auto_complete.pages_enabled;
-	    const SUGGESTION_SECTION = typesenseConfig.auto_complete.suggestions;
+        const PAGE_SECTION = typesenseConfig.auto_complete.pages_enabled;
+        const SUGGESTION_SECTION = typesenseConfig.auto_complete.suggestions;
         let excludedPageArr = [];
         let analyticsURL= typesenseConfig.general.analytic_url;
         if (Object.keys(EXCUDED_PAGE).length >= 1) {
@@ -182,7 +182,7 @@ define(
             let productSearchParameters = {
                 'collection': INDEX_PERFIX+STORE+'-products',
                 'q'         : keyword,
-                'query_by'  : productSearchAttributes+',category',
+                'query_by'  : productSearchAttributes+'all_sku',
                 'per_page'  : PRODUCT_MAX_COUNT,
                 'sort_by'   : ranking,
                 'filter_by' : `storeCode:["${STORE}"]`,
@@ -241,8 +241,11 @@ define(
           let searchUrl = BASE_URL+'catalogsearch/result/?q='+keyword;
             html = '';
             if (hits.length < 1) {
-                html = 'No products found';
-               $('.product-viewall').hide();
+                html = '<div class="no-product-found">No product found</div>';
+                $('#product_section').html(html);
+                $('.product-viewall').hide();
+                $('.col-center').hide();
+                $('.col-right').css('width', '100%');
                 return;
             }
 
@@ -325,7 +328,10 @@ define(
             }else if(hits.length >= 1 && SEE_ALL_BUTTON == 1){
                 $('.product-viewall').html('View All '+found+' Products');
                 $('.product-viewall').show();
-             }            
+             }
+            // Show col-center when products are found and reset col-right width
+            $('.col-center').show();
+            $('.col-right').css('width', '');
             $('#product_section').html(html);
         }
         

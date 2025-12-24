@@ -105,7 +105,7 @@ define(
             loadParams.split('&&').forEach(function(param) {
                 let stringArr = param.split(':=');
                 if (stringArr[1] != undefined) {
-                    //let filterText = stringArr[1].replace("%20", " ");
+                    // Properly decode URL-encoded values (handles all %20 occurrences)
                     let filterText = decodeURIComponent(stringArr[1]);
                     filterparamArr[stringArr[0]] = filterText;
                 }
@@ -115,22 +115,22 @@ define(
             /* Mobile filter toggle */
             $('body').on('click', '.refineToggle, .mobileFilterClose', function() {
                 $('.filter_main').toggleClass('hidden-sm').toggleClass('hidden-xs');
-		$('.sidebar.mobile-sidebar').toggleClass('active');
+        $('.sidebar.mobile-sidebar').toggleClass('active');
             });
-	   /* Grid/List view change script */
-		$('body').on('click', '.cBoxGridView, .cBoxListView', function() {
-		    $('.cBoxGridView, .cBoxListView').removeClass('cBoxViewSelected');
-		    $(this).addClass('cBoxViewSelected');
-			if ($(this).hasClass('cBoxGridView')) {
-			    $('#product_result')
-		            .removeClass('ListView')
-		            .addClass('GridView');
-			} else if ($(this).hasClass('cBoxListView')) {
-			    $('#product_result')
-		            .removeClass('GridView')
-		            .addClass('ListView');
-			}
-		});
+       /* Grid/List view change script */
+        $('body').on('click', '.cBoxGridView, .cBoxListView', function() {
+            $('.cBoxGridView, .cBoxListView').removeClass('cBoxViewSelected');
+            $(this).addClass('cBoxViewSelected');
+            if ($(this).hasClass('cBoxGridView')) {
+                $('#product_result')
+                    .removeClass('ListView')
+                    .addClass('GridView');
+            } else if ($(this).hasClass('cBoxListView')) {
+                $('#product_result')
+                    .removeClass('GridView')
+                    .addClass('ListView');
+            }
+        });
             /* Mobile slider issue */
             $(document).on('touchstart', '#price-range .ui-slider-handle', function(e) {
                 let t = e.touches[0] || e;
@@ -243,7 +243,7 @@ define(
 
                 let searchParameters = {
                     'q': keyword,
-                    'query_by': searchAttributes +',category',
+                    'query_by': searchAttributes+'all_sku',
                     'per_page': NO_PRODUCTS_PAGE,
                     'filter_by' :`storeCode:["${STORE}"]`,
                     'page': page,
@@ -254,9 +254,13 @@ define(
                     'min_len_2typo': 2,
                     'exhaustive_search': false,
                     'prioritize_exact_match': true,
-                    'sort_by': ranking,
                 }
-               
+
+                // Only add sort_by if ranking is not null
+                if (ranking !== null && ranking !== undefined && ranking !== '') {
+                    searchParameters.sort_by = ranking;
+                }
+
                 if(SHOW_OUT_OF_STOCK == 0){
                     searchParameters.filter_by += ` && stock_status:=true`;
                 }
@@ -268,7 +272,11 @@ define(
 
                 let finalRequestParam = {};
                 for (var key of Object.keys(filterParam)) {
-                    if (!$.isArray(filterParam[key])) {
+                    if ($.isArray(filterParam[key])) {
+                        // If it's already an array, use it directly
+                        finalRequestParam[key] = filterParam[key];
+                    } else if (filterParam[key]) {
+                        // If it's a string, split it into an array
                         const valeArr = filterParam[key].split(',');
                         finalRequestParam[key] = valeArr;
                     }
@@ -284,12 +292,16 @@ define(
                 let requestQuery = '';
                 $.each(finalRequestParam, function(key, val) {
                     if (val != '' && key !== disjunctiveFacet) {
-                        requestQuery += '&&'+ key + ':=[' + val + '] &&';
+                        // Remove only parentheses characters ( and ) from filter values
+                        let cleanedVal = Array.isArray(val) 
+                            ? val.map(v => v.replace(/[()]/g, '')) 
+                            : val.replace(/[()]/g, '');
+                        requestQuery += '&&'+ key + ':=[' + cleanedVal + '] &&';
                     }
                 });
 
                 if (requestQuery) {
-                    searchParameters.query_by = searchAttributes;
+                    searchParameters.query_by = searchAttributes+'all_sku';
                     requestQuery = requestQuery.slice(0, -2);
                     // if (SLIDER == 1 && (tmin && tmax)) {
                     //     requestQuery = requestQuery;
@@ -415,7 +427,7 @@ define(
 
                         //implementing sort options
                         let sOptions = '';
-                        if (Object.keys(sortOptions).length > 1) {
+                        if (Object.keys(sortOptions).length >= 1) {
                             $.each(sortOptions, function(key, item) {
                                 sOptions += `  
                                 <option value="${item.sortAttribute+'-'+item.sortDirection}">${item.fieldName}</option>
@@ -611,7 +623,7 @@ define(
                                 const target = e.target;
                                 if (target.classList.contains('cart_btn')) {
                                     const productId = target.id;
-                                    addTOCart.toCart(productId,target);
+                                    addTOCart.toCart(productId, target);
                                     e.stopImmediatePropagation();
                                 } else if (target.classList.contains('towishlist')) {
                                     e.preventDefault();
@@ -709,7 +721,8 @@ define(
         function showSelectedFilter(filterParam) {
             let selectedHtml = '';
             for (var key of Object.keys(filterParam)) {
-                let slValues = filterParam[key].toString().split(',');
+                // Handle both array and string formats
+                let slValues = Array.isArray(filterParam[key]) ? filterParam[key] : filterParam[key].toString().split(',');
                 let slHtml = '';
                 $.each(slValues, function(itemkey, val) {
                     if ((key == 'price' && SLIDER == 1) && val != '') {
@@ -718,11 +731,19 @@ define(
                     }
                     if (val != '') {
                         slHtml += `<div class="clear_filter_main">
-                            <div id="clear-filter">${val}<button id="${key+'-'+val}" class="remove_button">x</button></div>
+                            <div id="clear-filter">${val}<button id="${key+'-'+val}" class="remove_button" data-attr="${key}" data-value="${val}">x</button></div>
                         </div>`;
                     }
                 })
+                
+                // Get the proper label from facet configuration
                 let label = key.toUpperCase();
+                $.each(facet, function(index, value) {
+                    if (key == value.filterAttribute) {
+                        label = value.fieldName;
+                    }
+                });
+                
                 if (slHtml != '') {
                     selectedHtml += `
                         <div class="sl_main">
@@ -742,47 +763,64 @@ define(
                     } catch(e) {}
                     let keyword = $('#search-result-box').val();
                     const typsenseClient = searchConfig.createClient(typesenseConfig);
-                    let selectedId = e.target.id;
-                    // Split only on the first hyphen to handle values with hyphens
-                    let firstHyphenIndex = selectedId.indexOf('-');
-                    if (firstHyphenIndex > -1) {
-                        let attributeName = selectedId.substring(0, firstHyphenIndex);
-                        let attributeValue = selectedId.substring(firstHyphenIndex + 1);
+                    // Get attribute name and value from data attributes
+                    let attributeName = $(e.target).attr('data-attr');
+                    let attributeValue = $(e.target).attr('data-value');
+                    
+                    if (attributeName && attributeValue && filterParam[attributeName]) {
+                        // Handle both array and string formats
+                        let currentValue = Array.isArray(filterParam[attributeName]) 
+                            ? filterParam[attributeName] 
+                            : filterParam[attributeName].toString().split(',');
                         
-                        if (filterParam[attributeName]) {
-                            let currentValue = filterParam[attributeName].toString().split(',');
-                            var selectFiled = document.getElementById(attributeValue);
-                            if (selectFiled) {
-                                selectFiled.removeAttribute('checked');
-                            } else {
-                                currentValue.splice(0, 1);
-                            }
-                            const index = currentValue.indexOf(attributeValue);
-                            if (index > -1) {
-                                currentValue.splice(index, 1);
-                            }
-                            filterParam[attributeName] = currentValue.toString();
-                            //const itemIndex = selectedRadio.indexOf(attributeValue);
-                            const itemIndex = selectedIndex.indexOf(attributeValue);
-                            if (itemIndex > -1) {
-                                selectedIndex.splice(itemIndex, 1);
-                            }
-                            const itemRadioindex = selectedRadio.indexOf(attributeValue);
-                            if (itemRadioindex > -1) {
-                                selectedRadio.splice(itemIndex, 1);
-                            }
-                            if (attributeName != 'price') {
-                                stableContent = $('#' + attributeName)[0].outerHTML;
-                            }
-                            if (filterParam == '') {
-                                selectedRadio = [];
-                                $('#clear_all').hide();
-                            }
-                            selectedFilters.push({
-                                key: attributeName,
-                                content: stableContent
-                            });
+                        // Find and uncheck the checkbox using data attributes
+                        let checkboxes = document.querySelectorAll(`input[data-typename="${attributeName}"][data-range="${attributeValue}"]`);
+                        checkboxes.forEach(checkbox => {
+                            checkbox.removeAttribute('checked');
+                            checkbox.checked = false;
+                        });
+                        
+                        // Remove the value from the array
+                        const index = currentValue.indexOf(attributeValue);
+                        if (index > -1) {
+                            currentValue.splice(index, 1);
                         }
+                        
+                        // Update filterParam
+                        if (currentValue.length === 0) {
+                            delete filterParam[attributeName];
+                        } else {
+                            filterParam[attributeName] = currentValue;
+                        }
+                        
+                        // Remove from selectedIndex using the unique key format
+                        const filterKey = attributeName + '_' + attributeValue;
+                        const itemIndex = selectedIndex.indexOf(filterKey);
+                        if (itemIndex > -1) {
+                            selectedIndex.splice(itemIndex, 1);
+                        }
+                        
+                        // Remove from selectedRadio if it's a radio button
+                        const itemRadioindex = selectedRadio.indexOf(filterKey);
+                        if (itemRadioindex > -1) {
+                            selectedRadio.splice(itemRadioindex, 1);
+                        }
+                        
+                        if (attributeName != 'price') {
+                            stableContent = $('#' + attributeName)[0].outerHTML;
+                        }
+                        
+                        // Hide clear all button if no filters remain
+                        if (Object.keys(filterParam).length === 0) {
+                            selectedRadio = [];
+                            selectedIndex = [];
+                            $('#clear_all').hide();
+                        }
+                        
+                        selectedFilters.push({
+                            key: attributeName,
+                            content: stableContent
+                        });
                     }
                     updateParam.updateParams(filterParam, null, 1);
                     let currentPerPage = $('#product_count_page').val() || null;
@@ -816,7 +854,7 @@ define(
             $.each(filterArray, function(key, item) {
                 let filterHtml = renderFilterHtml(item, 300, false, item.field_name);
                 let itemLabel = item.field_name.toUpperCase();
-                let itemOptions = 6;
+                let itemOptions = 100;
                 let itemOptionsCondition = false;
                 $.each(facet, function(key, value) {
                     if (item.field_name == value.filterAttribute) {
@@ -864,7 +902,6 @@ define(
                 let filterKeyword = e.target.value;
                 let filterId = $(this).attr("data-attr");
                 let filterItem = '';
-                $('.filter_' + filterId).hide();
                 
                 // Get the filter item from the last search results
                if (searchResultsArray.length > 0) {
@@ -877,17 +914,46 @@ define(
                 
                 const searchOptionsContainer = document.getElementById('filtermore_attribute_' + filterId);
                 if (searchOptionsContainer && filterItem) {
-                   const generatedHTML = searchOpitonHtml(filterItem, filterKeyword, filterId);
-                    searchOptionsContainer.innerHTML = generatedHTML;
+                    // If search is cleared, show all options, otherwise show filtered
+                    if (!filterKeyword || filterKeyword.trim() === '') {
+                        // Regenerate all filter options when search is cleared
+                        const allOptionsHTML = renderFilterHtml(filterItem, 300, true, filterId);
+                        searchOptionsContainer.innerHTML = allOptionsHTML;
+                        
+                        // Re-apply checked state for selected filters
+                        if (filterParam[filterId]) {
+                            let paramValues = Array.isArray(filterParam[filterId]) ? filterParam[filterId] : filterParam[filterId].split(',');
+                            paramValues.forEach(function(value) {
+                                if (value) {
+                                    let checkboxes = document.querySelectorAll(`input[data-typename="${filterId}"][data-range]`);
+                                    checkboxes.forEach(checkbox => {
+                                        if (checkbox.getAttribute('data-range') === value) {
+                                            checkbox.setAttribute('checked', 'checked');
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    } else {
+                        // Show filtered search results
+                        const generatedHTML = searchOpitonHtml(filterItem, filterKeyword, filterId);
+                        searchOptionsContainer.innerHTML = generatedHTML;
+                    }
                }
             });
 
             //setting data after refresh
             for (let key of Object.keys(filterParam)) {
-                let paramValues = filterParam[key].split(',');
+                let paramValues = Array.isArray(filterParam[key]) ? filterParam[key] : filterParam[key].split(',');
                 paramValues.forEach(function(value) {
-                    if (document.getElementById(value)) {
-                        document.getElementById(value).setAttribute('checked', 'checked');
+                    if (value) {  // Skip empty values
+                        // Find checkbox by data-typename and data-range attributes
+                        let checkboxes = document.querySelectorAll(`input[data-typename="${key}"][data-range]`);
+                        checkboxes.forEach(checkbox => {
+                            if (checkbox.getAttribute('data-range') === value) {
+                                checkbox.setAttribute('checked', 'checked');
+                            }
+                        });
                     }
                 });
             }
@@ -900,6 +966,10 @@ define(
                     selectedIndex = [];
                     selectedRadio = [];
                     $('#clear_all').hide();
+
+                    // Update URL parameters to remove all filters
+                    updateParam.updateParams({}, null, 1);
+                    
                     sliderAction(keyword, filterParam);
                     let currentPerPage = $('#product_count_page').val() || null;
                     productSearch(keyword, 1, typsenseClient, null, null, null, currentPerPage);
@@ -915,12 +985,20 @@ define(
                             var checkField = document.getElementById(e.target.id);
                             if (checkField) {
                                 let attributeFieldname = checkField.getAttribute('data-typename');
+                                let filterValue = checkField.getAttribute('data-range'); // Get actual filter value
+                                let filterKey = attributeFieldname + '_' + filterValue; // Create a unique key for this filter
+                                
                                 if (checkField.checked) {
                                     checkField.setAttribute("checked", "checked");
-                                    if (filterParam[attributeFieldname]) {
-                                        filterParam[attributeFieldname] += ',' + e.target.id;
-                                    } else {
-                                        filterParam[attributeFieldname] = e.target.id;
+                                    
+                                    // Initialize the array for this attribute if it doesn't exist
+                                    if (!filterParam[attributeFieldname]) {
+                                        filterParam[attributeFieldname] = [];
+                                    }
+                                    
+                                    // Add the value if it's not already in the array
+                                    if ($.inArray(filterValue, filterParam[attributeFieldname]) === -1) {
+                                        filterParam[attributeFieldname].push(filterValue);
                                     }
 
                                     if ($.inArray(attributeFieldname, selectedFilters) === -1) {
@@ -931,18 +1009,30 @@ define(
                                         });
                                     }
 
-                                    if ($.inArray(e.target.id, selectedIndex) === -1) {
-                                        selectedIndex.push(e.target.id);
+                                    // Store filter key (attribute + value) to uniquely identify the selection
+                                    if ($.inArray(filterKey, selectedIndex) === -1) {
+                                        selectedIndex.push(filterKey);
                                     }
                                     updateParam.updateParams(filterParam, null, 1);
                                 } else {
                                     checkField.removeAttribute('checked');
-                                    const currentarray = filterParam[attributeFieldname].toString().split(',');
-                                    currentarray.splice($.inArray(e.target.id, currentarray), 1);
-                                    filterParam[attributeFieldname] = currentarray.toString();
+                                    
+                                    // Remove the value from the filter parameters
+                                    if (filterParam[attributeFieldname] && Array.isArray(filterParam[attributeFieldname])) {
+                                        const valueIndex = filterParam[attributeFieldname].indexOf(filterValue);
+                                        if (valueIndex !== -1) {
+                                            filterParam[attributeFieldname].splice(valueIndex, 1);
+                                        }
+                                        
+                                        // If no more values for this attribute, remove the attribute
+                                        if (filterParam[attributeFieldname].length === 0) {
+                                            delete filterParam[attributeFieldname];
+                                        }
+                                    }
 
-                                    stableContent = $('#' + attributeFieldname)[0].outerHTML;
-                                    const index = selectedIndex.indexOf(e.target.id);
+                                    // Remove from selectedIndex using the unique key
+                                    const filterKey = attributeFieldname + '_' + filterValue;
+                                    const index = selectedIndex.indexOf(filterKey);
                                     if (index > -1) {
                                         selectedIndex.splice(index, 1);
                                     }
@@ -1018,19 +1108,32 @@ define(
 
             $.each(counts, function(itemkey, itemValue) {
                 if (itemValue.value && itemFacetType == 'disjunctive') {
+                    // Create unique ID by combining field name and value
+                    let uniqueId = item.field_name + '_' + itemValue.value.replace(/[^a-zA-Z0-9]/g, '_');
+                    let filterKey = item.field_name + '_' + itemValue.value;
+                    let isChecked = selectedIndex.includes(filterKey) ? 'checked' : '';
+                    
                     html += `
                         <div class="form-check col-md-12 filter_${item.field_name}">
-                        <input type="checkbox" class="form-check-input rangeCheck" name="[${item.field_name}]" id="${itemValue.value}" ${$.inArray(itemValue.value, selectedIndex) != -1 ? 'checked' : 'null'}  data-range="${itemValue.value}" data-typename="${item.field_name}" readonly="true">
-                        <label class="form-check-label" for="${itemValue.value}">${itemValue.value}</label>
-			<span class="form-check-label-count">${itemValue.count}</span>
+                            <input type="checkbox" class="form-check-input rangeCheck" 
+                                   name="${item.field_name}[]" 
+                                   id="${uniqueId}" 
+                                   ${isChecked} 
+                                   data-range="${itemValue.value}" 
+                                   data-typename="${item.field_name}" 
+                                   readonly="true">
+                            <label class="form-check-label" style="pointer-events:auto;" for="${uniqueId}">${itemValue.value}</label>
+                            <span class="form-check-label-count">${itemValue.count}</span>
                         </div>
                     `;
                 } else if (itemValue.value && itemFacetType == 'conjunctive') {
+                    // Create unique ID for radio buttons
+                    let uniqueId = item.field_name + '_' + itemValue.value.replace(/[^a-zA-Z0-9]/g, '_');
                     html += `
                         <div class="form-check col-md-12 filter_${item.field_name}">
-                        <input type="radio" class="form-check-input radioCheck" name="[${item.field_name}]" id="${item.field_name}[${itemValue.value}]" data-range="${itemValue.value}" data-typename="${item.field_name}" ${$.inArray(item.field_name + '_' + itemValue.value, selectedRadio) != -1 ? 'checked' : 'null'}  readonly="true">
-                        <label class="form-check-label" for="${itemValue.value}">${itemValue.value}</label>
-			<span class="form-check-label-count">${itemValue.count}</span>
+                        <input type="radio" class="form-check-input radioCheck" name="[${item.field_name}]" id="${uniqueId}" data-range="${itemValue.value}" data-typename="${item.field_name}" ${$.inArray(item.field_name + '_' + itemValue.value, selectedRadio) != -1 ? 'checked' : 'null'}  readonly="true">
+                        <label class="form-check-label" style="pointer-events:auto;" for="${uniqueId}">${itemValue.value}</label>
+            <span class="form-check-label-count">${itemValue.count}</span>
                         </div>
                     `;
 
@@ -1069,11 +1172,15 @@ define(
             $.each(item.counts, function(itemkey, itemValue) {
                 if (itemValue.value) {
                     if (itemValue.value && $.inArray(itemValue.value, filteredArray) > -1 && item.field_name == filterId) {
+                        // Create unique ID to avoid duplicates
+                        let uniqueId = item.field_name + '_' + itemValue.value.replace(/[^a-zA-Z0-9]/g, '_');
+                        let filterKey = item.field_name + '_' + itemValue.value;
+                        let isChecked = selectedIndex.includes(filterKey) ? 'checked' : '';
                         html += `
                         <div class="form-check col-md-12 searchOption_${item.field_name}">
-                            <input type="checkbox" class="form-check-input rangeCheck" name="[${item.field_name}]" id="${itemValue.value}" ${$.inArray(itemValue.value, selectedIndex) != -1? 'checked' : 'null'} data-range="${itemValue.value}" data-typename="${item.field_name}" readonly="true">
-                            <label class="form-check-label" for="range1">${itemValue.value}</label>
-			    <span class="form-check-label-count">${itemValue.count}</span>
+                            <input type="checkbox" class="form-check-input rangeCheck" name="${item.field_name}[]" id="${uniqueId}" ${isChecked} data-range="${itemValue.value}" data-typename="${item.field_name}" readonly="true">
+                            <label class="form-check-label" for="${uniqueId}">${itemValue.value}</label>
+                <span class="form-check-label-count">${itemValue.count}</span>
                         </div>
                         `;
                     }
@@ -1135,19 +1242,23 @@ define(
             let expandItems = true;
             let itemData = item.counts;
             if (!filterKeyword) {
-               if(item.counts.length  >=6){
+               if(item.counts.length  >=100){
                 expandItems = false;
                 }
-                itemData = item.counts.slice(0, 6);
+                itemData = item.counts.slice(0, 100);
             }
             $.each(itemData, function(itemkey, itemValue) {
                 if (itemValue.value) {
                     if (itemValue.value && $.inArray(itemValue.value, filteredArray) > -1 && item.field_name == filterId) {
+                        // Create unique ID to avoid duplicates
+                        let uniqueId = item.field_name + '_' + itemValue.value.replace(/[^a-zA-Z0-9]/g, '_');
+                        let filterKey = item.field_name + '_' + itemValue.value;
+                        let isChecked = selectedIndex.includes(filterKey) ? 'checked' : '';
                         html += `
                         <div class="form-check col-md-12 searchOption_${item.field_name}">
-                            <input type="checkbox" class="form-check-input rangeCheck" name="[${item.field_name}]" id="${itemValue.value}" ${$.inArray(itemValue.value, selectedIndex) != -1? 'checked' : 'null'} data-range="${itemValue.value}" data-typename="${item.field_name}" readonly="true">
-                            <label class="form-check-label" for="range1">${itemValue.value}</label>
-			    <span class="form-check-label-count">${itemValue.count}</span>
+                            <input type="checkbox" class="form-check-input rangeCheck" name="${item.field_name}[]" id="${uniqueId}" ${isChecked} data-range="${itemValue.value}" data-typename="${item.field_name}" readonly="true">
+                            <label class="form-check-label" for="${uniqueId}">${itemValue.value}</label>
+                <span class="form-check-label-count">${itemValue.count}</span>
                         </div>
                         `;
                     }

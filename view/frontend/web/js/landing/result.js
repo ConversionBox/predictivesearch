@@ -17,6 +17,7 @@ define(
 		//initialize the typsense client
 		const typsenseClient = searchConfig.createClient(typesenseConfig);
 		const SLIDER = typesenseConfig.category.price_slider;
+		const initialQuery = typesenseConfig.general.query;
 		const urlParams = new URLSearchParams(window.location.search);
 		const queryParam = urlParams.get('q');
 		$('#search-result-box').val(queryParam);

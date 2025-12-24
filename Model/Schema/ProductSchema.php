@@ -48,6 +48,7 @@ class ProductSchema
             ['name' => 'product_name', 'type' => TypesenseTypes::STRING],
             ['name' => 'name', 'type' => TypesenseTypes::STRING, 'sort'  => true],
             ['name' => 'sku', 'type' => TypesenseTypes::STRING],
+            ['name' => 'all_sku', 'type' => TypesenseTypes::ARRAY_STRTING],
             ['name' => 'url', 'type' => TypesenseTypes::STRING],
             ['name' => 'image_url', 'type' => TypesenseTypes::AUTO],
             ['name' => 'thumbnail', 'type' => TypesenseTypes::AUTO],

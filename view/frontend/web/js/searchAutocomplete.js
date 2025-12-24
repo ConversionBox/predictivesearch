@@ -117,7 +117,7 @@ define([
            });
 			//popup toogle action when clicking on search box
 			$("#searchbox").click(function(e) {
-				var keywordlength = keyword.length.trim();
+				var keywordlength = String(keyword || "").trim().length;
 				if (keywordlength >= mimimumqueryLength && $('#search_result').hasClass("autocomplete")) {
 					$('#search_result').removeClass("autocomplete");
 				} else if (keywordlength >= mimimumqueryLength) {

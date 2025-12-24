@@ -17,6 +17,7 @@ define(
 		//initialize the typsense client
 		const typsenseClient = searchConfig.createClient(typesenseConfig);
 		const SLIDER = typesenseConfig.category.price_slider;
+		const initialQuery = typesenseConfig.general.query;
 		const urlParams = new URLSearchParams(window.location.search);
 		const queryParam = urlParams.get('q');
 		$('#search-result-box').val(queryParam);
@@ -86,9 +87,11 @@ define(
 				var paramName = paramParts[0];
 				var paramValue = paramParts[1];
 
-				if (paramName === 'q') {
+				if (paramName === 'q'  && keyword !='') {
 					// Replace the value of 'exampleParam'
 					paramValue = keyword;
+				}else{
+					paramValue = initialQuery;
 				}
 
 				updatedParams[paramName] = paramValue;

@@ -758,11 +758,21 @@ class ProductDataProcessor
             
             $skuData = $skuArray;
             
-            // Generate frontend URL using store base URL and product URL key
+            // Generate frontend URL - use getProductUrl() and fix admin URL if present
             $store = $this->storeManager->getStore($storeId);
             $baseUrl = $store->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_LINK);
-            $urlKey = $product->getUrlKey();
-            $productUrl = $urlKey ? $baseUrl . $urlKey . '.html' : $baseUrl . 'catalog/product/view/id/' . $product->getId();
+            $productUrl = $product->getProductUrl();
+            
+            // Check if URL contains /catalog/product/view/ (admin URL pattern)
+            if (strpos($productUrl, '/catalog/product/view/') !== false) {
+                // Extract the path starting from /catalog/product/view/
+                preg_match('#/catalog/product/view/id/(\d+)(?:/s/([^/]+))?#', $productUrl, $matches);
+                if (!empty($matches[1])) {
+                    $productId = $matches[1];
+                    $urlSlug = isset($matches[2]) ? $matches[2] : '';
+                    $productUrl = $baseUrl . 'catalog/product/view/id/' . $productId . ($urlSlug ? '/s/' . $urlSlug : '');
+                }
+            }
             
             $response = [
                 'id' => $product->getId(),

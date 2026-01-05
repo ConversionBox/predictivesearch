@@ -725,13 +725,15 @@ define(
                 let slValues = Array.isArray(filterParam[key]) ? filterParam[key] : filterParam[key].toString().split(',');
                 let slHtml = '';
                 $.each(slValues, function(itemkey, val) {
+                    let displayVal = val;
+                    let originalVal = val;
                     if ((key == 'price' && SLIDER == 1) && val != '') {
-                        val = val.split('..');
-                        val = CURRENCY + val[0] + '-' + CURRENCY + val[1];
+                        let priceArr = val.split('..');
+                        displayVal = CURRENCY + priceArr[0] + '-' + CURRENCY + priceArr[1];
                     }
                     if (val != '') {
                         slHtml += `<div class="clear_filter_main">
-                            <div id="clear-filter">${val}<button id="${key+'-'+val}" class="remove_button" data-attr="${key}" data-value="${val}">x</button></div>
+                            <div id="clear-filter">${displayVal}<button id="${key+'-'+originalVal}" class="remove_button" data-attr="${key}" data-value="${originalVal}">x</button></div>
                         </div>`;
                     }
                 })
@@ -807,7 +809,10 @@ define(
                         }
                         
                         if (attributeName != 'price') {
-                            stableContent = $('#' + attributeName)[0].outerHTML;
+                            var attrElement = $('#' + attributeName)[0];
+                            if (attrElement) {
+                                stableContent = attrElement.outerHTML;
+                            }
                         }
                         
                         // Hide clear all button if no filters remain
@@ -901,45 +906,53 @@ define(
             $(document).on('keyup', '.search_option_filter', function(e) {
                 let filterKeyword = e.target.value;
                 let filterId = $(this).attr("data-attr");
-                let filterItem = '';
+                let keyword = $('#search-result-box').val();
+                const searchOptionsContainer = document.getElementById('filtermore_attribute_' + filterId);
                 
-                // Get the filter item from the last search results
-               if (searchResultsArray.length > 0) {
-                    $.each(searchResultsArray[searchResultsArray.length - 1].facet_counts, function(key, item) {
-                        if (item.field_name === filterId) {
-                            filterItem = item;
+                // If search is cleared, fetch all options using disjunctive search
+                if (!filterKeyword || filterKeyword.trim() === '') {
+                    // Use disjunctive search to get ALL facet options (not filtered by current selection)
+                    productSearch(keyword, 1, typsenseClient, null, null, null, null, filterId, function(results) {
+                        if (results.facet_counts.length > 0) {
+                            const allOptionsHTML = renderFilterHtml(results.facet_counts[0], 300, true, filterId);
+                            if (searchOptionsContainer) {
+                                searchOptionsContainer.innerHTML = allOptionsHTML;
+                            }
+                            
+                            // Re-apply checked state for selected filters
+                            if (filterParam[filterId]) {
+                                let paramValues = Array.isArray(filterParam[filterId]) ? filterParam[filterId] : filterParam[filterId].split(',');
+                                paramValues.forEach(function(value) {
+                                    if (value) {
+                                        let checkboxes = document.querySelectorAll(`input[data-typename="${filterId}"][data-range]`);
+                                        checkboxes.forEach(checkbox => {
+                                            if (checkbox.getAttribute('data-range') === value) {
+                                                checkbox.setAttribute('checked', 'checked');
+                                                checkbox.checked = true;
+                                            }
+                                        });
+                                    }
+                                });
+                            }
                         }
                     });
-                }
-                
-                const searchOptionsContainer = document.getElementById('filtermore_attribute_' + filterId);
-                if (searchOptionsContainer && filterItem) {
-                    // If search is cleared, show all options, otherwise show filtered
-                    if (!filterKeyword || filterKeyword.trim() === '') {
-                        // Regenerate all filter options when search is cleared
-                        const allOptionsHTML = renderFilterHtml(filterItem, 300, true, filterId);
-                        searchOptionsContainer.innerHTML = allOptionsHTML;
-                        
-                        // Re-apply checked state for selected filters
-                        if (filterParam[filterId]) {
-                            let paramValues = Array.isArray(filterParam[filterId]) ? filterParam[filterId] : filterParam[filterId].split(',');
-                            paramValues.forEach(function(value) {
-                                if (value) {
-                                    let checkboxes = document.querySelectorAll(`input[data-typename="${filterId}"][data-range]`);
-                                    checkboxes.forEach(checkbox => {
-                                        if (checkbox.getAttribute('data-range') === value) {
-                                            checkbox.setAttribute('checked', 'checked');
-                                        }
-                                    });
-                                }
-                            });
-                        }
-                    } else {
+                } else {
+                    // Get filter item from last search results for filtering
+                    let filterItem = '';
+                    if (searchResultsArray.length > 0) {
+                        $.each(searchResultsArray[searchResultsArray.length - 1].facet_counts, function(key, item) {
+                            if (item.field_name === filterId) {
+                                filterItem = item;
+                            }
+                        });
+                    }
+                    
+                    if (searchOptionsContainer && filterItem) {
                         // Show filtered search results
                         const generatedHTML = searchOpitonHtml(filterItem, filterKeyword, filterId);
                         searchOptionsContainer.innerHTML = generatedHTML;
                     }
-               }
+                }
             });
 
             //setting data after refresh
@@ -1143,53 +1156,6 @@ define(
         }
 
         /**
-         * Search Option filer Html
-         *
-         * @param {*} item
-         * @param {*} filterKeyword
-         * @returns
-         */
-        function searchOpitonHtml(item, filterKeyword, filterId) {
-            let html = '';
-            let values = [];
-            let filteredArray = [];
-            $.each(item.counts, function(itemkey, itemValue) {
-                if (itemValue.value) {
-                    values.push(itemValue.value);
-                }
-            });
-            if (values) {
-                filteredArray = filterSearch(filterKeyword, values);
-            }
-            if ($.isEmptyObject(filteredArray)) {
-                html += `
-                <div class="form-check col-md-12 searchOption_${item.field_name}">
-                    No Data Found
-                </div>
-                `;
-                return html;
-            }
-            $.each(item.counts, function(itemkey, itemValue) {
-                if (itemValue.value) {
-                    if (itemValue.value && $.inArray(itemValue.value, filteredArray) > -1 && item.field_name == filterId) {
-                        // Create unique ID to avoid duplicates
-                        let uniqueId = item.field_name + '_' + itemValue.value.replace(/[^a-zA-Z0-9]/g, '_');
-                        let filterKey = item.field_name + '_' + itemValue.value;
-                        let isChecked = selectedIndex.includes(filterKey) ? 'checked' : '';
-                        html += `
-                        <div class="form-check col-md-12 searchOption_${item.field_name}">
-                            <input type="checkbox" class="form-check-input rangeCheck" name="${item.field_name}[]" id="${uniqueId}" ${isChecked} data-range="${itemValue.value}" data-typename="${item.field_name}" readonly="true">
-                            <label class="form-check-label" for="${uniqueId}">${itemValue.value}</label>
-                <span class="form-check-label-count">${itemValue.count}</span>
-                        </div>
-                        `;
-                    }
-                }
-            });
-            return html;
-        }
-
-        /**
          *
          * @param {*} filterArray
          */
@@ -1222,6 +1188,15 @@ define(
             let html = '';
             let values = [];
             let filteredArray = [];
+            
+            // Get facet type for this filter
+            let itemFacetType = 'disjunctive';
+            $.each(facet, function(key, value) {
+                if (filterId == value.filterAttribute) {
+                    itemFacetType = value.facet;
+                }
+            });
+            
             $.each(item.counts, function(itemkey, itemValue) {
                 if (itemValue.value) {
                     values.push(itemValue.value);
@@ -1253,14 +1228,28 @@ define(
                         // Create unique ID to avoid duplicates
                         let uniqueId = item.field_name + '_' + itemValue.value.replace(/[^a-zA-Z0-9]/g, '_');
                         let filterKey = item.field_name + '_' + itemValue.value;
-                        let isChecked = selectedIndex.includes(filterKey) ? 'checked' : '';
-                        html += `
-                        <div class="form-check col-md-12 searchOption_${item.field_name}">
-                            <input type="checkbox" class="form-check-input rangeCheck" name="${item.field_name}[]" id="${uniqueId}" ${isChecked} data-range="${itemValue.value}" data-typename="${item.field_name}" readonly="true">
-                            <label class="form-check-label" for="${uniqueId}">${itemValue.value}</label>
-                <span class="form-check-label-count">${itemValue.count}</span>
-                        </div>
-                        `;
+                        
+                        if (itemFacetType == 'conjunctive') {
+                            // Radio button for conjunctive facet
+                            let isChecked = $.inArray(filterKey, selectedRadio) != -1 ? 'checked' : '';
+                            html += `
+                            <div class="form-check col-md-12 searchOption_${item.field_name}">
+                                <input type="radio" class="form-check-input radioCheck" name="[${item.field_name}]" id="${uniqueId}" ${isChecked} data-range="${itemValue.value}" data-typename="${item.field_name}" readonly="true">
+                                <label class="form-check-label" for="${uniqueId}">${itemValue.value}</label>
+                                <span class="form-check-label-count">${itemValue.count}</span>
+                            </div>
+                            `;
+                        } else {
+                            // Checkbox for disjunctive facet
+                            let isChecked = selectedIndex.includes(filterKey) ? 'checked' : '';
+                            html += `
+                            <div class="form-check col-md-12 searchOption_${item.field_name}">
+                                <input type="checkbox" class="form-check-input rangeCheck" name="${item.field_name}[]" id="${uniqueId}" ${isChecked} data-range="${itemValue.value}" data-typename="${item.field_name}" readonly="true">
+                                <label class="form-check-label" for="${uniqueId}">${itemValue.value}</label>
+                                <span class="form-check-label-count">${itemValue.count}</span>
+                            </div>
+                            `;
+                        }
                     }
                 }
             });

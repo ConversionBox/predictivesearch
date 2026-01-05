@@ -1,6 +1,6 @@
 .page-header .search-main.block-search.predictiveSearchContainer input[type=text] {padding-right: 50px !important;border: 2px solid #369 !important;border-radius: 5px !important;background: no-repeat padding-box #eee;height: 40px !important;}.page-header .search-main.block-search.predictiveSearchContainer button.action.search{background: none !important;height: 40px !important;}
 .search-result-page #product-pagination .page-item.active {background: none !important;font-weight:500;font-size: 1.75rem !important;color: #EE2D43;}
-.search-result-page #product-pagination.pagination-sm li.page-item .page-link{font-size: 1.75rem !important;}
+.search-result-page #product-pagination.pagination-sm li.page-item .page-link{font-size: 1.25rem !important;}
 .search-result-page #product-pagination .page-item.active .page-link{font-weight:700;}
 .search-result-page #product-pagination li.page-item:hover {text-decoration: underline !important;}
 .page-header.type2.header-newskin .block-search .action.search:before{font-family: 'porto-icons';}.block-search .action.search>span{ border: 0;clip: rect(0, 0, 0, 0);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}

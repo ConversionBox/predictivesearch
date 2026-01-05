@@ -209,7 +209,8 @@ class CategoryDataProcessor
                     $categoryCollection = $this->collectionFactory->create()
                         ->addAttributeToSelect('*')
                         ->setStore($stores)
-                        ->addAttributeToFilter('level', ['gt' => 1]);
+                        ->addAttributeToFilter('level', ['gt' => 1])
+                        ->addAttributeToFilter('is_active', 1);
                          
                     $catCollection = [];
                     foreach ($categoryCollection as $data) {

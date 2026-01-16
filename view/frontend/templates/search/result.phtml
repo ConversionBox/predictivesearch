@@ -321,37 +321,3 @@
         </script>
     </div>
 </div>
-<!-- Expand/Collapse -->
-<script>
-(function () {
-    const sidebar = document.querySelector('.sidebar');
-    if (!sidebar) return;
-
-    function toggleItem(e) {
-        const title = e.target.closest('.filter_main .item_label');
-        if (!title || !sidebar.contains(title)) return;
-
-        title.classList.toggle('active');
-        const content = title.nextElementSibling;
-        if (content) {
-            content.style.display = title.classList.contains('active')
-                ? 'block'
-                : 'none';
-        }
-    }
-
-    // Event delegation (works for dynamic content)
-    sidebar.addEventListener('click', toggleItem);
-
-    // Optional: observe sidebar re-renders
-    const observer = new MutationObserver(() => {
-        // no-op; delegation already handles dynamic items
-    });
-
-    observer.observe(sidebar, {
-        childList: true,
-        subtree: true
-    });
-})();
-</script>
-<!-- Expand/Collapse -->

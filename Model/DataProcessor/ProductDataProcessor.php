@@ -255,39 +255,58 @@ class ProductDataProcessor
                     $this->typeSenseApi->createSchema($productSchemaData);
 
                     // Optimize collection by limiting attributes and using batch processing
-                    $collection = $this->getOptimizedProductCollection($storeData->getId());
+                    // Use pagination to avoid loading all products into memory at once
+                    $pageSize = 500; // Products per page
+                    $batchSize = 100; // Products per API call
+                    $currentPage = 1;
                     
-                    // Process in batches to avoid memory issues
-                    $batchSize = 100; // Adjust based on your server capacity
-                    $currentBatch = [];
-                    $batchCount = 0;
-                    
-                    foreach ($collection as $data) {
-                        $productData = $this->createProductData(
-                            $data->getId(),
-                            $storeData->getCode(),
-                            $storeData->getId()
-                        );
+                    do {
+                        // Get paginated collection - fresh instance each page
+                        $collection = $this->getOptimizedProductCollection($storeData->getId());
+                        $collection->setPageSize($pageSize);
+                        $collection->setCurPage($currentPage);
+                        $collection->load();
                         
-                        if ($productData) {
-                            $productData = $this->generalModel->encodeData($productData);
-                            $productData = trim($productData, '[]');
-                            $currentBatch[] = $productData;
-                            $batchCount++;
+                        $lastPage = $collection->getLastPageNumber();
+                        
+                        $currentBatch = [];
+                        $batchCount = 0;
+                        
+                        foreach ($collection as $data) {
+                            $productData = $this->createProductData(
+                                $data->getId(),
+                                $storeData->getCode(),
+                                $storeData->getId()
+                            );
                             
-                            // Process batch when it reaches the batch size
-                            if ($batchCount >= $batchSize) {
-                                $this->processBatch($currentBatch, $indexName, $mode);
-                                $currentBatch = [];
-                                $batchCount = 0;
+                            if ($productData) {
+                                $productData = $this->generalModel->encodeData($productData);
+                                $productData = trim($productData, '[]');
+                                $currentBatch[] = $productData;
+                                $batchCount++;
+                                
+                                // Process batch when it reaches the batch size
+                                if ($batchCount >= $batchSize) {
+                                    $this->processBatch($currentBatch, $indexName, $mode);
+                                    $currentBatch = [];
+                                    $batchCount = 0;
+                                }
                             }
                         }
-                    }
-                    
-                    // Process any remaining products
-                    if (!empty($currentBatch)) {
-                        $this->processBatch($currentBatch, $indexName, $mode);
-                    }
+                        
+                        // Process any remaining products in this page
+                        if (!empty($currentBatch)) {
+                            $this->processBatch($currentBatch, $indexName, $mode);
+                        }
+                        
+                        // Clear memory after each page
+                        $collection->clear();
+                        unset($collection);
+                        gc_collect_cycles();
+                        
+                        $currentPage++;
+                        
+                    } while ($currentPage <= $lastPage);
                 }
             } catch (Exception $e) {
                 $this->logger->error($e->getMessage());
@@ -358,7 +377,10 @@ class ProductDataProcessor
         );
         $collection->addAttributeToFilter(
             'visibility',
-            ['neq' => \Magento\Catalog\Model\Product\Visibility::VISIBILITY_NOT_VISIBLE]
+            ['in' => [
+                \Magento\Catalog\Model\Product\Visibility::VISIBILITY_IN_SEARCH,
+                \Magento\Catalog\Model\Product\Visibility::VISIBILITY_BOTH
+            ]]
         );
         return $collection;
     }
@@ -596,7 +618,16 @@ class ProductDataProcessor
             $category = [];
             if ($categoryIds) {
                 foreach (array_unique($categoryIds) as $catData) {
-                    $category[] = $catData;
+                    // Only include enabled categories
+                    try {
+                        $catObj = $this->categoryRepositoryInterface->get($catData, null);
+                        if ($catObj->getIsActive()) {
+                            $category[] = $catData;
+                        }
+                    } catch (\Exception $e) {
+                        // Skip if category cannot be loaded
+                        continue;
+                    }
                 }
             }
             $categoryNameArr = $this->getCategoryNameArr($category);
@@ -807,6 +838,7 @@ class ProductDataProcessor
                 'description' => $this->removeHtmlTags($product->getDescription()),
                 'short_description' => $this->removeHtmlTags($product->getShortDescription()),
                 'price_search' => round((float)$price, 2),
+                'is_promoted_for_search' => (string)($product->getData('is_promoted_for_search') ?? '0'),
             ];
             $productArray = array_merge($finalAtrArray, $response);
             return $productArray;
@@ -967,7 +999,7 @@ public function getProductQty($productId)
         $response = [];
         foreach ($category as $item) {
             $categoryData = $this->categoryRepositoryInterface->get($item, null);
-            if ($categoryData->getLevel() > 1) {
+            if ($categoryData->getLevel() > 1 && $categoryData->getIsActive()) {
                 $response[] = $categoryData->getName();
             }
         }
@@ -985,7 +1017,7 @@ public function getProductQty($productId)
         $response = [];
         foreach ($category as $item) {
             $categoryData = $this->categoryRepositoryInterface->get($item, null);
-            if ($categoryData->getUrlPath()) {
+            if ($categoryData->getUrlPath() && $categoryData->getIsActive()) {
                 $urlpath = str_replace('/', '-', $categoryData->getUrlPath());
                 $response[] = $urlpath;
             }

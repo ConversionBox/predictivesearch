@@ -249,10 +249,10 @@ define(
                     'page': page,
                     'facet_by': facetQueryParam,
                     'typo_tokens_threshold': 1,
-                    'num_typos': 2,
-                    'min_len_1typo': 2,
-                    'min_len_2typo': 2,
-                    'exhaustive_search': false,
+                    'num_typos': 1,
+                    'min_len_1typo': 1,
+                    'min_len_2typo': 1,
+                    'exhaustive_search': true,
                     'prioritize_exact_match': true,
                 }
 
@@ -276,8 +276,8 @@ define(
                         // If it's already an array, use it directly
                         finalRequestParam[key] = filterParam[key];
                     } else if (filterParam[key]) {
-                        // If it's a string, split it into an array
-                        const valeArr = filterParam[key].split(',');
+                        // If it's a string, split by ||| delimiter (not comma, to preserve commas in category names)
+                        const valeArr = filterParam[key].split('|||');
                         finalRequestParam[key] = valeArr;
                     }
                 }
@@ -296,7 +296,19 @@ define(
                         let cleanedVal = Array.isArray(val) 
                             ? val.map(v => v.replace(/[()]/g, '')) 
                             : val.replace(/[()]/g, '');
-                        requestQuery += '&&'+ key + ':=[' + cleanedVal + '] &&';
+                        
+                        // Wrap each value in backticks for Typesense (handles special chars including quotes and commas)
+                        // Exception: Don't wrap price values (they use numeric range syntax like 10..100)
+                        let quotedVal;
+                        if (key === 'price') {
+                            quotedVal = cleanedVal;
+                        } else {
+                            quotedVal = Array.isArray(cleanedVal)
+                                ? cleanedVal.map(v => "`" + v.replace(/`/g, "\\`") + "`").join(',')
+                                : "`" + cleanedVal.replace(/`/g, "\\`") + "`";
+                        }
+                        
+                        requestQuery += '&&'+ key + ':=[' + quotedVal + '] &&';
                     }
                 });
 
@@ -353,6 +365,13 @@ define(
                         
                         // Extract product search results from multi-search response
                         const searchResults = multiSearchResults.results[0];
+                        
+                        // Safety check for malformed response
+                        if (!searchResults || !searchResults.hits) {
+                            console.error('Invalid search results:', searchResults);
+                            $('#product_result').html('<div class="popular_search_head">Search error. Please try again.</div>');
+                            return;
+                        }
                         
                         if (callback) {
                             callback(searchResults);
@@ -727,13 +746,14 @@ define(
                 $.each(slValues, function(itemkey, val) {
                     let displayVal = val;
                     let originalVal = val;
+                    let escapedVal = val.replace(/"/g, '&quot;');
                     if ((key == 'price' && SLIDER == 1) && val != '') {
                         let priceArr = val.split('..');
                         displayVal = CURRENCY + priceArr[0] + '-' + CURRENCY + priceArr[1];
                     }
                     if (val != '') {
                         slHtml += `<div class="clear_filter_main">
-                            <div id="clear-filter">${displayVal}<button id="${key+'-'+originalVal}" class="remove_button" data-attr="${key}" data-value="${originalVal}">x</button></div>
+                            <div id="clear-filter">${displayVal}<button id="${key+'-'+originalVal}" class="remove_button" data-attr="${key}" data-value="${escapedVal}">x</button></div>
                         </div>`;
                     }
                 })
@@ -770,20 +790,23 @@ define(
                     let attributeValue = $(e.target).attr('data-value');
                     
                     if (attributeName && attributeValue && filterParam[attributeName]) {
+                        // Unescape HTML entities for comparison with filterParam
+                        let unescapedValue = attributeValue.replace(/&quot;/g, '"');
+                        
                         // Handle both array and string formats
                         let currentValue = Array.isArray(filterParam[attributeName]) 
                             ? filterParam[attributeName] 
                             : filterParam[attributeName].toString().split(',');
                         
-                        // Find and uncheck the checkbox using data attributes
-                        let checkboxes = document.querySelectorAll(`input[data-typename="${attributeName}"][data-range="${attributeValue}"]`);
+                        // Find and uncheck the checkbox using data attributes (use escaped value for selector)
+                        let checkboxes = document.querySelectorAll(`input[data-typename="${attributeName}"][data-range="${CSS.escape(attributeValue)}"]`);
                         checkboxes.forEach(checkbox => {
                             checkbox.removeAttribute('checked');
                             checkbox.checked = false;
                         });
                         
-                        // Remove the value from the array
-                        const index = currentValue.indexOf(attributeValue);
+                        // Remove the value from the array (use unescaped value for comparison)
+                        const index = currentValue.indexOf(unescapedValue);
                         if (index > -1) {
                             currentValue.splice(index, 1);
                         }
@@ -903,6 +926,17 @@ define(
             // Mark initial load as complete after first render
             isInitialLoad = false;
 
+            document.addEventListener("click", function(e) {
+                if (e.target.matches('.sidebar .filter_main .item_label')) {
+                    const title = e.target;
+                    title.classList.toggle("active");
+                    const content = title.nextElementSibling;
+                    if (content) {
+                        content.style.display = title.classList.contains("active") ? "block" : "none";
+                    }
+                }
+            });
+
             $(document).on('keyup', '.search_option_filter', function(e) {
                 let filterKeyword = e.target.value;
                 let filterId = $(this).attr("data-attr");
@@ -937,21 +971,17 @@ define(
                         }
                     });
                 } else {
-                    // Get filter item from last search results for filtering
-                    let filterItem = '';
-                    if (searchResultsArray.length > 0) {
-                        $.each(searchResultsArray[searchResultsArray.length - 1].facet_counts, function(key, item) {
-                            if (item.field_name === filterId) {
-                                filterItem = item;
+                    // Use disjunctive search to get ALL available options, then filter by keyword
+                    productSearch(keyword, 1, typsenseClient, null, null, null, null, filterId, function(results) {
+                        if (results.facet_counts.length > 0) {
+                            const filterItem = results.facet_counts[0];
+                            // Show filtered search results
+                            const generatedHTML = searchOpitonHtml(filterItem, filterKeyword, filterId);
+                            if (searchOptionsContainer) {
+                                searchOptionsContainer.innerHTML = generatedHTML;
                             }
-                        });
-                    }
-                    
-                    if (searchOptionsContainer && filterItem) {
-                        // Show filtered search results
-                        const generatedHTML = searchOpitonHtml(filterItem, filterKeyword, filterId);
-                        searchOptionsContainer.innerHTML = generatedHTML;
-                    }
+                        }
+                    });
                 }
             });
 
@@ -1125,6 +1155,7 @@ define(
                     let uniqueId = item.field_name + '_' + itemValue.value.replace(/[^a-zA-Z0-9]/g, '_');
                     let filterKey = item.field_name + '_' + itemValue.value;
                     let isChecked = selectedIndex.includes(filterKey) ? 'checked' : '';
+                    let escapedValue = itemValue.value.replace(/"/g, '&quot;');
                     
                     html += `
                         <div class="form-check col-md-12 filter_${item.field_name}">
@@ -1132,7 +1163,7 @@ define(
                                    name="${item.field_name}[]" 
                                    id="${uniqueId}" 
                                    ${isChecked} 
-                                   data-range="${itemValue.value}" 
+                                   data-range="${escapedValue}" 
                                    data-typename="${item.field_name}" 
                                    readonly="true">
                             <label class="form-check-label" style="pointer-events:auto;" for="${uniqueId}">${itemValue.value}</label>
@@ -1142,9 +1173,10 @@ define(
                 } else if (itemValue.value && itemFacetType == 'conjunctive') {
                     // Create unique ID for radio buttons
                     let uniqueId = item.field_name + '_' + itemValue.value.replace(/[^a-zA-Z0-9]/g, '_');
+                    let escapedValue = itemValue.value.replace(/"/g, '&quot;');
                     html += `
                         <div class="form-check col-md-12 filter_${item.field_name}">
-                        <input type="radio" class="form-check-input radioCheck" name="[${item.field_name}]" id="${uniqueId}" data-range="${itemValue.value}" data-typename="${item.field_name}" ${$.inArray(item.field_name + '_' + itemValue.value, selectedRadio) != -1 ? 'checked' : 'null'}  readonly="true">
+                        <input type="radio" class="form-check-input radioCheck" name="[${item.field_name}]" id="${uniqueId}" data-range="${escapedValue}" data-typename="${item.field_name}" ${$.inArray(item.field_name + '_' + itemValue.value, selectedRadio) != -1 ? 'checked' : 'null'}  readonly="true">
                         <label class="form-check-label" style="pointer-events:auto;" for="${uniqueId}">${itemValue.value}</label>
             <span class="form-check-label-count">${itemValue.count}</span>
                         </div>
@@ -1232,9 +1264,10 @@ define(
                         if (itemFacetType == 'conjunctive') {
                             // Radio button for conjunctive facet
                             let isChecked = $.inArray(filterKey, selectedRadio) != -1 ? 'checked' : '';
+                            let escapedValue = itemValue.value.replace(/"/g, '&quot;');
                             html += `
                             <div class="form-check col-md-12 searchOption_${item.field_name}">
-                                <input type="radio" class="form-check-input radioCheck" name="[${item.field_name}]" id="${uniqueId}" ${isChecked} data-range="${itemValue.value}" data-typename="${item.field_name}" readonly="true">
+                                <input type="radio" class="form-check-input radioCheck" name="[${item.field_name}]" id="${uniqueId}" ${isChecked} data-range="${escapedValue}" data-typename="${item.field_name}" readonly="true">
                                 <label class="form-check-label" for="${uniqueId}">${itemValue.value}</label>
                                 <span class="form-check-label-count">${itemValue.count}</span>
                             </div>
@@ -1242,9 +1275,10 @@ define(
                         } else {
                             // Checkbox for disjunctive facet
                             let isChecked = selectedIndex.includes(filterKey) ? 'checked' : '';
+                            let escapedValue = itemValue.value.replace(/"/g, '&quot;');
                             html += `
                             <div class="form-check col-md-12 searchOption_${item.field_name}">
-                                <input type="checkbox" class="form-check-input rangeCheck" name="${item.field_name}[]" id="${uniqueId}" ${isChecked} data-range="${itemValue.value}" data-typename="${item.field_name}" readonly="true">
+                                <input type="checkbox" class="form-check-input rangeCheck" name="${item.field_name}[]" id="${uniqueId}" ${isChecked} data-range="${escapedValue}" data-typename="${item.field_name}" readonly="true">
                                 <label class="form-check-label" for="${uniqueId}">${itemValue.value}</label>
                                 <span class="form-check-label-count">${itemValue.count}</span>
                             </div>

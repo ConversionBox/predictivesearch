@@ -187,11 +187,11 @@ define(
                 'sort_by'   : ranking,
                 'filter_by' : `storeCode:["${STORE}"]`,
                 'typo_tokens_threshold': 1,
-                'num_typos': 2,
-                'min_len_1typo': 2,
-                'min_len_2typo': 2,
-                      'exhaustive_search': false, // Faster approximate search
-                    'prioritize_exact_match': true, // Better relevance with speed
+                'num_typos': 1,
+                'min_len_1typo': 1,
+                'min_len_2typo': 1,
+                'exhaustive_search': true, // Faster approximate search
+                'prioritize_exact_match': true, // Better relevance with speed
             }    
              if(SHOW_OUT_OF_STOCK == 0){
                     productSearchParameters.filter_by += ` && stock_status:=true`;

@@ -18,7 +18,12 @@ define(
                     for (let key of Object.keys(params)) {
                         filterData.key = params[key];
                         if (params[key]) {
-                            searchparams += '&&'+key+':='+params[key];
+                            let paramValue = params[key];
+                            // If array, join with ||| delimiter to preserve commas in values
+                            if (Array.isArray(paramValue)) {
+                                paramValue = paramValue.join('|||');
+                            }
+                            searchparams += '&&'+key+':='+paramValue;
                         }
                     }
                 }

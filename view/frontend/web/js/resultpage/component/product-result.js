@@ -13,6 +13,56 @@ define(
         'Conversionbox_Predictivesearch/js/component/updateParam',
     ],
     function($, ui, twbsPagination, searchConfig, addTOCart, urlFormatter, priceUtils, addToWishList, addToCompare, priceComponent, updateParam) {
+        
+        // UUID generation function
+        const generateUUID = () => {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        };
+        
+        // Session and Visitor ID management
+        let visitorId = null;
+        let sessionId = null;
+        
+        // Function to get or create visitor ID and session ID
+        const getSessionID = () => {
+            // Get or create visitorId (persistent across sessions - stored in cookie/localStorage)
+            let cookieID = $.cookie('_conversion_box_track_id');
+            let storageId = localStorage.getItem('_conversion_box_track_id');
+            
+            if (!cookieID && storageId) {
+                visitorId = storageId;
+                $.cookie('_conversion_box_track_id', storageId, { expires: 30, path: '/' });
+            } else if (!storageId && cookieID) {
+                visitorId = cookieID;
+                localStorage.setItem('_conversion_box_track_id', cookieID);
+            } else if (!cookieID && !storageId) {
+                visitorId = generateUUID();
+                $.cookie('_conversion_box_track_id', visitorId, { expires: 30, path: '/' });
+                localStorage.setItem('_conversion_box_track_id', visitorId);
+            } else {
+                visitorId = cookieID;
+            }
+            
+            // Get or create sessionId (per browser session - stored in sessionStorage)
+            let sessionStorageId = sessionStorage.getItem('_cb_session_id');
+            if (!sessionStorageId) {
+                sessionStorageId = generateUUID();
+                sessionStorage.setItem('_cb_session_id', sessionStorageId);
+            }
+            sessionId = sessionStorageId;
+            
+            return {
+                visitorId: visitorId,
+                sessionId: sessionId
+            };
+        };
+        
+        // Initialize session on module load
+        getSessionID();
         /**
          * Index Prefix
          */
@@ -1344,6 +1394,10 @@ define(
         function hitSearchAnalytics(searchParameters, searchResults) {
             setTimeout(function() {
                 try {
+                    // Ensure session IDs are initialized
+                    if (!sessionId || !visitorId) {
+                        getSessionID();
+                    }
                     const postData = {
                         uniqueId: UNIQUEID,
                         searchKey: searchParameters.q,
@@ -1351,7 +1405,8 @@ define(
                         sortValue: searchParameters.sort_by,
                         facetValue: searchParameters.filter_by,
                         page: searchParameters.page,
-                        sessionId: $.cookie("_conversion_box_track_id")
+                        visitorId: visitorId,
+                        sessionId: sessionId
                     };
                     $.ajax({
                         url: analyticsURL + `api/v1/analytics/instantSearchLog`,
